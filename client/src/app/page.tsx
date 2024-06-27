@@ -1,9 +1,36 @@
 "use client";
-import ChatItem from "@/components/Chat/ChatItem";
+import ChatItem from "@/components/Conversation/ConversationItem";
 import EmojiPicker from "@/components/EmojiPicker";
 import MainLayout from "@/components/MainLayout";
-import { Avatar, Badge, Button, Input, Tooltip, User } from "@nextui-org/react";
-import { Info, PanelRight, Phone, Search, SendHorizonalIcon, SmileIcon, ThumbsUpIcon, Video } from "lucide-react";
+import {
+    Avatar,
+    Badge,
+    Button,
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownTrigger,
+    Input,
+    Tooltip,
+    User,
+} from "@nextui-org/react";
+import {
+    FileIcon,
+    ImageIcon,
+    ImagePlusIcon,
+    ImagesIcon,
+    Info,
+    PanelRight,
+    PaperclipIcon,
+    Phone,
+    PlusCircleIcon,
+    PlusIcon,
+    Search,
+    SendHorizonalIcon,
+    SmileIcon,
+    ThumbsUpIcon,
+    Video,
+} from "lucide-react";
 
 export default function Home() {
     return (
@@ -78,27 +105,43 @@ export default function Home() {
                         <div className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col p-4 scrollbar"></div>
 
                         {/* Chat bar */}
-                        <div className="px-4">
-                            <div className="flex items-center justify-between rounded-full  border-default border bg-background px-1">
-                                <EmojiPicker
-                                    onChange={(value: string) => {
-                                        console.log(value);
-                                    }}
-                                />
+                        <div className="flex items-center gap-x-2 px-4">
+                            <Dropdown placement="bottom">
+                                <DropdownTrigger>
+                                    <Button isIconOnly color="primary" size="sm" radius="full">
+                                        <PlusIcon size={18} />
+                                    </Button>
+                                </DropdownTrigger>
+                                <DropdownMenu variant="flat">
+                                    <DropdownItem startContent={<ImageIcon size={16} />} key="image">
+                                        Send image
+                                    </DropdownItem>
+                                    <DropdownItem startContent={<PaperclipIcon size={16} />} key="file">
+                                        Send files
+                                    </DropdownItem>
+                                </DropdownMenu>
+                            </Dropdown>
+
+                            <div className="flex-1 flex items-center justify-between rounded-full  border-default border bg-background px-1">
                                 <textarea
-                                    className="flex-1 outline-none ps-1 pe-4 py-3 h-11 transition-all text-sm placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 w-full rounded-full resize-none overflow-y-auto"
+                                    className="flex-1 outline-none px-4 py-3 h-11 transition-all text-sm placeholder:text-muted-foreground bg-background disabled:cursor-not-allowed disabled:opacity-50 w-full rounded-full resize-none overflow-y-auto"
                                     autoComplete="off"
                                     name="message"
                                     placeholder="Aa"
                                 ></textarea>
 
-                                {/* <Button isIconOnly variant="light" radius="full">
-                                    <ThumbsUpIcon size={18} />
-                                </Button> */}
-                                <Button isIconOnly variant="light" radius="full">
-                                    <SendHorizonalIcon size={18} />
-                                </Button>
+                                <EmojiPicker
+                                    onChange={(value: string) => {
+                                        console.log(value);
+                                    }}
+                                />
                             </div>
+                            <Button isIconOnly variant="light" radius="full">
+                                <ThumbsUpIcon size={18} />
+                            </Button>
+                            {/* <Button isIconOnly variant="light" radius="full">
+                                <SendHorizonalIcon size={18} />
+                            </Button> */}
                         </div>
                     </div>
                 </section>

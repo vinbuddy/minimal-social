@@ -11,7 +11,7 @@ interface IProps {
 
 export default function EmojiPicker({ onChange }: IProps) {
     return (
-        <Popover placement="top-start" offset={10}>
+        <Popover placement="top-end" offset={10}>
             <PopoverTrigger>
                 <Button isIconOnly variant="light" radius="full">
                     <SmileIcon className="text-muted-foreground" size={18} />
