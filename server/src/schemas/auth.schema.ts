@@ -14,5 +14,11 @@ export const loginSchema = z.object({
     password: z.string({ required_error: "Password is required" }),
 });
 
+export const otpSchema = z.object({
+    email: z.string({ required_error: "Email is required" }).email(),
+    otp: z.string({ required_error: "OTP is required" }),
+});
+
 export type CreateUserInput = z.infer<typeof registerSchema>;
 export type LoginUserInput = z.infer<typeof loginSchema>;
+export type OTPInput = z.infer<typeof otpSchema>;

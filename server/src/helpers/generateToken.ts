@@ -15,7 +15,7 @@ const generateToken = (user: User, type: "access" | "refresh" = "access"): strin
         },
         key,
         {
-            expiresIn: type == "access" ? "30s" : "365d",
+            expiresIn: type == "access" ? process.env.JWT_ACCESS_EXPIRATION : process.env.JWT_REFRESH_EXPIRATION,
         }
     );
 
