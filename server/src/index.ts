@@ -1,7 +1,11 @@
-import express, { Application, Request, Response, NextFunction } from "express";
+import express, { Application } from "express";
 import env from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
+import { errorHandler } from "./middlewares/errorHandler";
+import mongoose from "mongoose";
+
+import router from "./routes";
 
 env.config();
 
@@ -16,10 +20,18 @@ app.use(bodyParser.json());
 app.disable("etag");
 
 // Routes
-app.get("/", (req: Request, res: Response, next: NextFunction) => {
-    res.send("Hello World!");
-});
+app.use(router);
 
-app.listen(5000, () => {
+app.use(errorHandler);
+
+app.listen(PORT, async () => {
+    const uri = process.env.MONGODB_URI as string;
+    try {
+        await mongoose.connect(uri);
+        console.log(`Database connected`);
+    } catch (error: any) {
+        console.log("error: ", error.message);
+        process.exit(1);
+    }
     console.log(`running on http://localhost:${PORT}`);
 });
