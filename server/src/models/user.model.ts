@@ -17,7 +17,7 @@ import mongoose from "mongoose";
 @modelOptions({ schemaOptions: { collection: "users", timestamps: true }, options: { allowMixed: Severity.ALLOW } })
 export class User {
     @prop({ auto: true })
-    public _id?: mongoose.Schema.Types.ObjectId;
+    public _id?: mongoose.Types.ObjectId;
 
     @prop({ required: true })
     public username: string;
@@ -47,6 +47,9 @@ export class User {
 
     @prop({ required: true, default: false })
     isVerified: boolean;
+
+    @prop({ required: false, default: null })
+    refreshToken: string | null;
 }
 
 const UserModel = getModelForClass(User);

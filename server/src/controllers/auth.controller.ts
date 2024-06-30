@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import UserModel from "../models/user.model";
+import UserModel, { User } from "../models/user.model";
 import {
     CreateUserInput,
     LoginUserInput,
@@ -8,11 +8,16 @@ import {
     otpSchema,
     registerSchema,
 } from "../schemas/auth.schema";
-import { generateToken } from "../helpers/generateToken";
+import { generateToken } from "../helpers/jwt";
 import bcrypt from "bcrypt";
 import { sendEmail } from "../helpers/sendEmail";
 import otpGenerator from "otp-generator";
 import { OTPModel } from "../models/otp.model";
+import jwt from "jsonwebtoken";
+
+interface RequestWithUser extends Request {
+    user: User;
+}
 
 export async function registerHandler(req: Request, res: Response, next: NextFunction) {
     try {
@@ -107,10 +112,78 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
             return res.status(400).json({ statusCode: 400, message: "Invalid credentials" });
         }
 
-        const accessToken = generateToken(user, "access"); // Generate access token for the user
+        const accessToken = generateToken(user, "access");
         const refreshToken = generateToken(user, "refresh");
 
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
+
         return res.status(200).json({ statusCode: 200, user, accessToken, refreshToken });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function logoutHandler(req: RequestWithUser, res: Response, next: NextFunction) {
+    try {
+        if (!req?.user) {
+            return res.status(401).json({ statusCode: 401, message: "You are not authorized" });
+        }
+
+        // Update refreshToken to null in the database
+        await UserModel.findByIdAndUpdate(
+            req.user._id,
+            {
+                $set: { refreshToken: null },
+            },
+            { new: true }
+        );
+
+        return res.status(200).json({ statusCode: 200, message: "Logged out successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function refreshTokenHandler(req: Request, res: Response, next: NextFunction) {
+    // TODO: Implement refresh token logic
+    try {
+        let refreshToken = req.headers["authorization"]?.split(" ")[1];
+
+        if (!refreshToken) {
+            return res.status(401).json({ statusCode: 401, message: "You are not authorized" });
+        }
+
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY as string) as User & {
+            exp: number;
+            iat: number;
+        };
+
+        const user = await UserModel.findById(decoded._id);
+
+        if (!user) {
+            return res.status(404).json({ statusCode: 404, message: "User not found" });
+        }
+
+        if (user.refreshToken !== refreshToken) {
+            return res.status(401).json({ statusCode: 401, message: "Invalid refresh token" });
+        }
+
+        // Check if the refresh token is expired
+        const currentTime = Date.now() / 1000;
+        if (decoded.exp < currentTime) {
+            return res.status(401).json({ statusCode: 401, message: "Refresh token expired" });
+        }
+
+        const newAccessToken = generateToken(user, "access");
+        const newRefreshToken = generateToken(user, "refresh");
+
+        user.refreshToken = newRefreshToken;
+        await user.save({ validateBeforeSave: false });
+
+        return res
+            .status(200)
+            .json({ statusCode: 200, data: user, accessToken: newAccessToken, refreshToken: newRefreshToken });
     } catch (error) {
         next(error);
     }

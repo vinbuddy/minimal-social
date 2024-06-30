@@ -27,7 +27,7 @@ class OTP {
     @prop({ required: true })
     otp: string;
 
-    @prop({ default: Date.now, expires: "2m" })
+    @prop({ default: Date.now, expires: process.env.OTP_EXPIRATION ?? "5m" })
     createdAt: Date;
 }
 

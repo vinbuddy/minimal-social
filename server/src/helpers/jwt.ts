@@ -6,7 +6,7 @@ import { User } from "../models/user.model";
 dotenv.config();
 
 const generateToken = (user: User, type: "access" | "refresh" = "access"): string => {
-    const key = process.env.JWT_ACCESS_KEY as string;
+    const key = type == "access" ? (process.env.JWT_ACCESS_KEY as string) : (process.env.JWT_REFRESH_KEY as string);
 
     const accessToken = jwt.sign(
         {
