@@ -2,8 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { User } from "../models/user.model";
-import { Types } from "mongoose";
-import { error } from "console";
 
 dotenv.config();
 
@@ -27,17 +25,15 @@ export const verifyToken = (req: CustomRequest, res: Response, next: NextFunctio
     try {
         const accessKey = process.env.JWT_ACCESS_KEY as string;
         jwt.verify(accessToken, accessKey, (err, user) => {
-            if (err) {
-                return res.status(403).json({ message: "Invalid token", error: err.message });
+            if (err?.name === "TokenExpiredError") {
+                return res.status(401).json({ message: "Token expired" });
             }
 
-            console.log("user: ", user);
             req.user = user as User;
             next();
         });
-    } catch (error) {
-        console.log("error: ", error);
-        res.status(401).json({ message: "Invalid token" });
+    } catch (error: any) {
+        return res.status(401).json({ message: "Invalid token" });
     }
 };
 

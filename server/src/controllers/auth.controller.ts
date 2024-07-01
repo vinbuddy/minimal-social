@@ -124,8 +124,9 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
     }
 }
 
-export async function logoutHandler(req: RequestWithUser, res: Response, next: NextFunction) {
+export async function logoutHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         if (!req?.user) {
             return res.status(401).json({ statusCode: 401, message: "You are not authorized" });
         }
