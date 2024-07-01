@@ -18,7 +18,16 @@ export const otpSchema = z.object({
     email: z.string({ required_error: "Email is required" }).email(),
     otp: z.string({ required_error: "OTP is required" }),
 });
+export const otpResetPasswordSchema = z.object({
+    email: z.string({ required_error: "Email is required" }).email(),
+    otp: z.string({ required_error: "OTP is required" }),
+    password: z
+        .string({ required_error: "Password is required" })
+        .min(6, "Password is too short - should be min 6 chars")
+        .max(15),
+});
 
 export type CreateUserInput = z.infer<typeof registerSchema>;
 export type LoginUserInput = z.infer<typeof loginSchema>;
 export type OTPInput = z.infer<typeof otpSchema>;
+export type OTPResetPasswordInput = z.infer<typeof otpResetPasswordSchema>;

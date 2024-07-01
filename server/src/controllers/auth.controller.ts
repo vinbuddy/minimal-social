@@ -4,7 +4,9 @@ import {
     CreateUserInput,
     LoginUserInput,
     OTPInput,
+    OTPResetPasswordInput,
     loginSchema,
+    otpResetPasswordSchema,
     otpSchema,
     registerSchema,
 } from "../schemas/auth.schema";
@@ -32,10 +34,10 @@ export async function registerHandler(req: Request, res: Response, next: NextFun
         }
 
         // Check otp is already exists in the database
-        const otpExists = await OTPModel.findOne({ email: userInput.email });
+        const otpExists = await OTPModel.findOne({ email: userInput.email, type: "register" });
 
         if (otpExists) {
-            await OTPModel.findOneAndDelete({ email: userInput.email });
+            await OTPModel.findOneAndDelete({ email: userInput.email, type: "register" });
         }
 
         // Send OTP to the user's email address
@@ -50,7 +52,7 @@ export async function registerHandler(req: Request, res: Response, next: NextFun
             process.env.EMAIL_APP_USER as string,
             userInput.email,
             "OTP for Minimal Social",
-            `Your OTP is ${otp}. This OTP will expire in 2 minutes.`
+            `Your OTP is ${otp}. This OTP will expire in 5 minutes.`
         );
 
         // Create otp and save it to the database
@@ -59,6 +61,7 @@ export async function registerHandler(req: Request, res: Response, next: NextFun
             password: userInput.password,
             email: userInput.email,
             otp,
+            type: "register",
         });
 
         await otpModel.save();
@@ -188,6 +191,87 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
         return res
             .status(200)
             .json({ statusCode: 200, data: user, accessToken: newAccessToken, refreshToken: newRefreshToken });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function forgotPasswordHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ statusCode: 400, message: "Email is required" });
+        }
+
+        const user = await UserModel.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ statusCode: 404, message: "User not found" });
+        }
+
+        // Check otp is already exists in the database
+        const otpExists = await OTPModel.findOne({ email, type: "forgot" });
+
+        if (otpExists) {
+            await OTPModel.findOneAndDelete({ email: email, type: "forgot" });
+        }
+
+        // Send OTP to the user's email address
+        const otp = otpGenerator.generate(6, {
+            digits: true,
+            lowerCaseAlphabets: false,
+            upperCaseAlphabets: false,
+            specialChars: false,
+        });
+
+        await sendEmail(
+            process.env.EMAIL_APP_USER as string,
+            email,
+            "OTP for resetting password",
+            `Your OTP is ${otp}. This OTP will expire in 5 minutes.`
+        );
+
+        // Create otp and save it to the database
+        const otpModel = new OTPModel({
+            email: email,
+            otp,
+            type: "forgot",
+        });
+
+        await otpModel.save();
+
+        return res
+            .status(200)
+            .json({ statusCode: 200, message: "OTP sent to your email address", otp, toEmail: email });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function resetPasswordHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const otpInput: OTPResetPasswordInput = otpResetPasswordSchema.parse(req.body);
+        const { email, otp, password } = otpInput;
+
+        const otpData = await OTPModel.findOne({ email, type: "forgot" });
+
+        if (!otpData) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        const isMatch = await bcrypt.compare(otp, otpData.otp);
+
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid OTP" });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        await UserModel.findOneAndUpdate({ email }, { password: hashedPassword });
+
+        return res.status(200).json({ message: "Password reset successfully" });
     } catch (error) {
         next(error);
     }

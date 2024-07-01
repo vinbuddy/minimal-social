@@ -15,17 +15,20 @@ import bcrypt from "bcrypt";
 })
 @modelOptions({ schemaOptions: { collection: "otps", timestamps: true }, options: { allowMixed: Severity.ALLOW } })
 class OTP {
-    @prop({ required: true })
+    @prop({ required: false, default: "" })
     public username: string;
 
     @prop({ required: true, unique: true })
     public email: string;
 
-    @prop({ required: true })
+    @prop({ required: false, default: "" })
     public password: string;
 
     @prop({ required: true })
     otp: string;
+
+    @prop({ required: false, default: "register" })
+    type: "register" | "forgot";
 
     @prop({ default: Date.now, expires: process.env.OTP_EXPIRATION ?? "5m" })
     createdAt: Date;
