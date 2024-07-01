@@ -98,7 +98,7 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
     try {
         const { email, password }: LoginUserInput = loginSchema.parse(req.body);
 
-        const user = await UserModel.findOne({ email }); // Find user by email address in the database
+        const user = await UserModel.findOne({ email }).lean(); // Find user by email address in the database
 
         if (!user) {
             return res.status(400).json({ statusCode: 400, message: "User not found" });
@@ -116,9 +116,12 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
         const refreshToken = generateToken(user, "refresh");
 
         user.refreshToken = refreshToken;
-        await user.save({ validateBeforeSave: false });
+        // await user.save({ validateBeforeSave: false });
+        await UserModel.findByIdAndUpdate(user._id, { refreshToken });
 
-        return res.status(200).json({ statusCode: 200, user, accessToken, refreshToken });
+        const { password: _password, refreshToken: _refreshToken, ...userInfo } = user;
+
+        return res.status(200).json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
     } catch (error) {
         next(error);
     }
