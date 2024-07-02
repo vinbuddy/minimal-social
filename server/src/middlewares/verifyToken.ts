@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { User } from "../models/user.model";
+import cookieMode from "../configs/cookie";
 
 dotenv.config();
 
@@ -10,13 +11,15 @@ interface CustomRequest extends Request {
 }
 
 export const verifyToken = (req: CustomRequest, res: Response, next: NextFunction) => {
-    const token = req.headers["authorization"];
+    let token = null;
+    let accessToken = null;
 
-    if (!token) {
-        return res.status(401).json({ message: "No token provided" });
+    if (cookieMode.isCookieMode) {
+        accessToken = req.cookies["accessToken"];
+    } else {
+        token = req.headers["authorization"];
+        accessToken = token && token.split(" ")[1];
     }
-
-    const accessToken = token && token.split(" ")[1];
 
     if (!accessToken) {
         return res.status(401).json({ message: "No access token provided" });
@@ -24,7 +27,7 @@ export const verifyToken = (req: CustomRequest, res: Response, next: NextFunctio
 
     try {
         const accessKey = process.env.JWT_ACCESS_KEY as string;
-        jwt.verify(accessToken, accessKey, (err, user) => {
+        jwt.verify(accessToken, accessKey, (err: any, user: any) => {
             if (err?.name === "TokenExpiredError") {
                 return res.status(401).json({ message: "Token expired" });
             }

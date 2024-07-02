@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { CookieOptions, NextFunction, Request, Response } from "express";
 import UserModel, { User } from "../models/user.model";
 import {
     CreateUserInput,
@@ -16,6 +16,7 @@ import { sendEmail } from "../helpers/sendEmail";
 import otpGenerator from "otp-generator";
 import { OTPModel } from "../models/otp.model";
 import jwt from "jsonwebtoken";
+import cookieMode from "../configs/cookie";
 
 interface RequestWithUser extends Request {
     user: User;
@@ -123,6 +124,13 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
         await UserModel.findByIdAndUpdate(user._id, { refreshToken });
 
         const { password: _password, refreshToken: _refreshToken, ...userInfo } = user;
+        if (cookieMode.isCookieMode) {
+            return res
+                .cookie("accessToken", accessToken, cookieMode.options)
+                .cookie("refreshToken", refreshToken, cookieMode.options)
+                .status(200)
+                .json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
+        }
 
         return res.status(200).json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
     } catch (error) {
@@ -146,6 +154,14 @@ export async function logoutHandler(_req: Request, res: Response, next: NextFunc
             { new: true }
         );
 
+        if (cookieMode.isCookieMode) {
+            return res
+                .clearCookie("accessToken")
+                .clearCookie("refreshToken")
+                .status(200)
+                .json({ statusCode: 200, message: "Logged out successfully" });
+        }
+
         return res.status(200).json({ statusCode: 200, message: "Logged out successfully" });
     } catch (error) {
         next(error);
@@ -155,7 +171,13 @@ export async function logoutHandler(_req: Request, res: Response, next: NextFunc
 export async function refreshTokenHandler(req: Request, res: Response, next: NextFunction) {
     // TODO: Implement refresh token logic
     try {
-        let refreshToken = req.headers["authorization"]?.split(" ")[1];
+        let refreshToken = null;
+
+        if (cookieMode.isCookieMode) {
+            refreshToken = req.cookies.refreshToken;
+        } else {
+            refreshToken = req.headers["authorization"]?.split(" ")[1];
+        }
 
         if (!refreshToken) {
             return res.status(401).json({ statusCode: 401, message: "You are not authorized" });
@@ -187,6 +209,14 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
 
         user.refreshToken = newRefreshToken;
         await user.save({ validateBeforeSave: false });
+
+        if (cookieMode) {
+            return res
+                .cookie("accessToken", newAccessToken, cookieMode.options)
+                .cookie("refreshToken", newRefreshToken, cookieMode.options)
+                .status(200)
+                .json({ statusCode: 200, data: user, accessToken: newAccessToken, refreshToken: newRefreshToken });
+        }
 
         return res
             .status(200)
