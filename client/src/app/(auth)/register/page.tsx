@@ -1,6 +1,37 @@
+"use client";
 import { Button, Input } from "@nextui-org/react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+
+interface IUserRegister {
+    username: string;
+    password: string;
+    email: string;
+    confirm: string;
+}
+
 export default function RegisterPage() {
+    const [isVisible, setIsVisible] = useState<boolean>(false);
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = useForm<IUserRegister>();
+
+    const toggleVisibility = () => setIsVisible(!isVisible);
+
+    const onSubmitHandler = async (data: IUserRegister, e?: React.BaseSyntheticEvent): Promise<void> => {
+        e?.preventDefault();
+
+        try {
+        } catch (error) {
+            console.log("error: ", error);
+        }
+    };
+
     return (
         <div className="flex items-center justify-center py-12">
             <div className="mx-auto grid w-[350px] gap-6">
@@ -8,27 +39,134 @@ export default function RegisterPage() {
                     <h1 className="text-3xl font-bold">Sign up</h1>
                     <p className="text-balance text-muted-foreground">Enter your information to create an account</p>
                 </div>
-                <div className="grid gap-4">
+                <form onSubmit={handleSubmit(onSubmitHandler)} className="grid gap-4">
+                    <div className="grid gap-2">
+                        <label htmlFor="email">User name</label>
+                        <Input
+                            size="lg"
+                            classNames={{ inputWrapper: "px-0 overflow-hidden", input: "px-3" }}
+                            id="username"
+                            type="text"
+                            placeholder="John Doe"
+                            {...register("username", {
+                                required: true,
+                                maxLength: 50,
+                            })}
+                        />
+                        {errors?.username?.type === "required" && (
+                            <p className="text-red-500 text-tiny">Please enter user name</p>
+                        )}
+                    </div>
                     <div className="grid gap-2">
                         <label htmlFor="email">Email</label>
-                        <Input id="email" type="email" placeholder="m@example.com" required />
+                        <Input
+                            size="lg"
+                            classNames={{ inputWrapper: "px-0 overflow-hidden", input: "px-3" }}
+                            id="email"
+                            type="email"
+                            placeholder="m@example.com"
+                            {...register("email", {
+                                required: true,
+                                pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            })}
+                        />
+                        {errors.email?.type === "required" && (
+                            <p className="text-red-500 text-tiny">Please enter email address</p>
+                        )}
+                        {errors.email?.type === "pattern" && (
+                            <p className="text-red-500 text-tiny">Please enter a valid email address</p>
+                        )}
                     </div>
                     <div className="grid gap-2">
                         <div className="flex items-center">
                             <label htmlFor="password">Password</label>
-                            <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
-                                Forgot password?
-                            </Link>
                         </div>
-                        <Input id="password" type="password" required />
+                        <Input
+                            size="lg"
+                            classNames={{
+                                mainWrapper: "relative",
+                                inputWrapper: "px-0 overflow-hidden",
+                                input: "px-3",
+                            }}
+                            id="password"
+                            type={isVisible ? "text" : "password"}
+                            {...register("password", {
+                                required: true,
+                                minLength: 8,
+                                maxLength: 15,
+                            })}
+                            endContent={
+                                <button
+                                    className="focus:outline-none absolute bottom-[50%] translate-y-1/2 right-3"
+                                    type="button"
+                                    onClick={toggleVisibility}
+                                >
+                                    {isVisible ? (
+                                        <EyeOffIcon className="text-2xl text-default-400 pointer-events-none" />
+                                    ) : (
+                                        <EyeIcon className="text-2xl text-default-400 pointer-events-none" />
+                                    )}
+                                </button>
+                            }
+                        />
+                        {errors.password?.type === "required" && (
+                            <p className="text-red-500 text-tiny">Please enter password</p>
+                        )}
+                        {errors.password?.type === "minLength" && (
+                            <p className="text-red-500 text-tiny">Password must be at least 8 characters long</p>
+                        )}
+                        {errors.password?.type === "maxLength" && (
+                            <p className="text-red-500 text-tiny">Password must not exceed 15 characters</p>
+                        )}
                     </div>
-                    <Button color="primary" type="submit" className="w-full">
+                    <div className="grid gap-2">
+                        <div className="flex items-center">
+                            <label htmlFor="password">Confirm Password</label>
+                        </div>
+                        <Input
+                            size="lg"
+                            classNames={{
+                                mainWrapper: "relative",
+                                inputWrapper: "px-0 overflow-hidden",
+                                input: "px-3",
+                            }}
+                            id="confirm"
+                            type={isVisible ? "text" : "password"}
+                            {...register("confirm", {
+                                required: true,
+                                validate: (value) => {
+                                    if (watch("password") !== value || watch("password") === "")
+                                        return "Your password do not match";
+                                },
+                            })}
+                            endContent={
+                                <button
+                                    className="focus:outline-none absolute bottom-[50%] translate-y-1/2 right-3"
+                                    type="button"
+                                    onClick={toggleVisibility}
+                                >
+                                    {isVisible ? (
+                                        <EyeOffIcon className="text-2xl text-default-400 pointer-events-none" />
+                                    ) : (
+                                        <EyeIcon className="text-2xl text-default-400 pointer-events-none" />
+                                    )}
+                                </button>
+                            }
+                        />
+                        {errors.confirm?.type === "validate" && (
+                            <p className="text-red-500 text-tiny">{errors.confirm?.message}</p>
+                        )}
+                        {errors.confirm?.type === "required" && (
+                            <p className="text-red-500 text-tiny">Please enter confirm password</p>
+                        )}
+                    </div>
+                    <Button size="lg" color="primary" type="submit" className="w-full">
                         Create an account
                     </Button>
                     {/* <Button variant="bordered" className="w-full">
                         Login with Google
                     </Button> */}
-                </div>
+                </form>
                 <div className="mt-4 text-center text-sm">
                     Already have an account?{" "}
                     <Link href="/login" className="underline">
