@@ -2,6 +2,8 @@
 import ChatItem from "@/components/Conversation/ConversationItem";
 import EmojiPicker from "@/components/EmojiPicker";
 import MainLayout from "@/components/MainLayout";
+import useAuthStore from "@/libs/hooks/store/useAuthStore";
+import axiosInstance from "@/utils/httpRequest";
 import {
     Avatar,
     Badge,
@@ -14,25 +16,23 @@ import {
     Tooltip,
     User,
 } from "@nextui-org/react";
-import {
-    FileIcon,
-    ImageIcon,
-    ImagePlusIcon,
-    ImagesIcon,
-    Info,
-    PanelRight,
-    PaperclipIcon,
-    Phone,
-    PlusCircleIcon,
-    PlusIcon,
-    Search,
-    SendHorizonalIcon,
-    SmileIcon,
-    ThumbsUpIcon,
-    Video,
-} from "lucide-react";
+import { ImageIcon, PanelRight, PaperclipIcon, Phone, PlusIcon, Search, ThumbsUpIcon, Video } from "lucide-react";
+import { useEffect } from "react";
 
 export default function Home() {
+    const currentUser = useAuthStore((state) => state.currentUser);
+    useEffect(() => {
+        (async () => {
+            try {
+                // const res = await axiosInstance.get("/user");
+
+                // console.log("res: ", res.data);
+                console.log("currentUser: ", currentUser);
+            } catch (error) {
+                console.log("error: ", error);
+            }
+        })();
+    }, []);
     return (
         <MainLayout>
             <div className="grid grid-cols-12 h-full">

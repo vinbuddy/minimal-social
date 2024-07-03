@@ -1,9 +1,14 @@
 "use client";
+import useLoading from "@/libs/hooks/useLoading";
+import axiosInstance from "@/utils/httpRequest";
 import { Button, Input } from "@nextui-org/react";
+import axios from "axios";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface IUserRegister {
     username: string;
@@ -14,6 +19,8 @@ interface IUserRegister {
 
 export default function RegisterPage() {
     const [isVisible, setIsVisible] = useState<boolean>(false);
+    const { loading, startLoading, stopLoading } = useLoading();
+    const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -22,13 +29,36 @@ export default function RegisterPage() {
     } = useForm<IUserRegister>();
 
     const toggleVisibility = () => setIsVisible(!isVisible);
-
     const onSubmitHandler = async (data: IUserRegister, e?: React.BaseSyntheticEvent): Promise<void> => {
         e?.preventDefault();
 
         try {
-        } catch (error) {
+            // Send email otp
+            startLoading();
+            const response = await axios.post(
+                (process.env.NEXT_PUBLIC_API_BASE_URL as string) + "/auth/register",
+                {
+                    username: data.username,
+                    email: data.email,
+                    password: data.password,
+                },
+                { withCredentials: true }
+            );
+
+            toast.success("OTP sent to your email", {
+                position: "bottom-center",
+            });
+
+            if (response.status === 200) {
+                router.push(`/otp?type=register&toEmail=${data.email}`);
+            }
+        } catch (error: any) {
             console.log("error: ", error);
+            toast.error(error?.message, {
+                position: "bottom-center",
+            });
+        } finally {
+            stopLoading();
         }
     };
 
@@ -160,7 +190,7 @@ export default function RegisterPage() {
                             <p className="text-red-500 text-tiny">Please enter confirm password</p>
                         )}
                     </div>
-                    <Button size="lg" color="primary" type="submit" className="w-full">
+                    <Button isLoading={loading} size="lg" color="primary" type="submit" className="w-full">
                         Create an account
                     </Button>
                     {/* <Button variant="bordered" className="w-full">

@@ -1,9 +1,16 @@
 "use client";
+import useAuthStore from "@/libs/hooks/store/useAuthStore";
+import useLoading from "@/libs/hooks/useLoading";
+import { IUser } from "@/libs/types/user";
+import axiosInstance from "@/utils/httpRequest";
 import { Button, Input } from "@nextui-org/react";
+import axios from "axios";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface IUserLogin {
     password: string;
@@ -19,14 +26,45 @@ export default function LoginPage() {
         formState: { errors },
     } = useForm<IUserLogin>();
 
+    const router = useRouter();
+    const { loading, startLoading, stopLoading } = useLoading();
+    const { isAuthenticated, setAuth } = useAuthStore();
+
     const toggleVisibility = () => setIsVisible(!isVisible);
 
-    const onSubmitHandler = async (data: IUserLogin, e?: React.BaseSyntheticEvent): Promise<void> => {
+    const onSubmitHandler = async (formData: IUserLogin, e?: React.BaseSyntheticEvent): Promise<void> => {
         e?.preventDefault();
 
         try {
-        } catch (error) {
-            console.log("error: ", error);
+            startLoading();
+            const response = await axios.post(
+                process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/login",
+                {
+                    email: formData.email,
+                    password: formData.password,
+                },
+                { withCredentials: true }
+            );
+
+            console.log("response: ", response.data);
+
+            if (process.env.NEXT_PUBLIC_BASED_AUTH == "bearer-token") {
+                localStorage.setItem("refreshToken", response.data?.refreshToken);
+                localStorage.setItem("accessToken", response.data?.accessToken);
+            }
+
+            if (!isAuthenticated) {
+                const user = response.data?.data as IUser;
+                useAuthStore.setState({ currentUser: user, isAuthenticated: true });
+            }
+
+            router.push("/");
+        } catch (error: any) {
+            toast.error(error?.message, {
+                position: "bottom-center",
+            });
+        } finally {
+            stopLoading();
         }
     };
 
@@ -100,7 +138,7 @@ export default function LoginPage() {
                             <p className="text-red-500 text-tiny">Password must not exceed 15 characters</p>
                         )}
                     </div>
-                    <Button size="lg" color="primary" type="submit" className="w-full">
+                    <Button isLoading={loading} size="lg" color="primary" type="submit" className="w-full">
                         Login
                     </Button>
                     <Button size="lg" variant="bordered" className="w-full">

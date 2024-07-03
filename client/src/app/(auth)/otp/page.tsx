@@ -1,13 +1,24 @@
 "use client";
+import useAuthStore from "@/libs/hooks/store/useAuthStore";
+import useLoading from "@/libs/hooks/useLoading";
+import { IUser } from "@/libs/types/user";
+import axiosInstance from "@/utils/httpRequest";
 import { Button } from "@nextui-org/react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 const OTP_LENGTH = 6;
 
-export default function OtpPage({ searchParams }: { searchParams: { toEmail: string } }) {
+export default function OtpPage({ searchParams }: { searchParams: { type: "register" | "forgot"; toEmail: string } }) {
     const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
     const isDisabled = otp.some((value) => value === "");
     const inputsRef = useRef<HTMLInputElement[]>(Array(OTP_LENGTH).fill(null));
+
+    const { currentUser, setAuth } = useAuthStore();
+    const { loading, startLoading, stopLoading } = useLoading();
+    const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const value = e.target.value;
@@ -41,9 +52,35 @@ export default function OtpPage({ searchParams }: { searchParams: { toEmail: str
     const handleVerify = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Verify OTP register
+        if (searchParams.type === "register") {
+            handleVerifyRegister();
+        }
 
         // Verify OTP forgot password
+    };
+
+    const handleVerifyRegister = async () => {
+        // Verify OTP register
+        try {
+            startLoading();
+
+            const response = await axios.post(
+                process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/verify-otp",
+                {
+                    email: searchParams.toEmail,
+                    otp: otp.join(""),
+                },
+                { withCredentials: true }
+            );
+
+            if (response.status === 200) {
+                router.push("/login");
+            }
+        } catch (error: any) {
+            toast.error(error?.message, { position: "bottom-center" });
+        } finally {
+            stopLoading();
+        }
     };
 
     return (
@@ -83,6 +120,7 @@ export default function OtpPage({ searchParams }: { searchParams: { toEmail: str
                                 <div className="flex flex-col space-y-5">
                                     <div>
                                         <Button
+                                            isLoading={loading}
                                             type="submit"
                                             isDisabled={isDisabled}
                                             color={isDisabled ? "default" : "primary"}
