@@ -16,16 +16,18 @@ import {
     Tooltip,
     User,
 } from "@nextui-org/react";
+import { getCookie } from "cookies-next";
 import { ImageIcon, PanelRight, PaperclipIcon, Phone, PlusIcon, Search, ThumbsUpIcon, Video } from "lucide-react";
 import { useEffect } from "react";
-
 export default function Home() {
     const currentUser = useAuthStore((state) => state.currentUser);
+    const { accessToken, refreshToken } = useAuthStore();
+
     useEffect(() => {
         (async () => {
             try {
                 // const res = await axiosInstance.get("/user");
-
+                // console.log(getCookie("accessToken"));
                 // console.log("res: ", res.data);
                 console.log("currentUser: ", currentUser);
             } catch (error) {

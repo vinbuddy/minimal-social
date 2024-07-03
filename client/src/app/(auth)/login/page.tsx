@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { setCookie } from "cookies-next";
 
 interface IUserLogin {
     password: string;
@@ -51,11 +52,14 @@ export default function LoginPage() {
             if (process.env.NEXT_PUBLIC_BASED_AUTH == "bearer-token") {
                 localStorage.setItem("refreshToken", response.data?.refreshToken);
                 localStorage.setItem("accessToken", response.data?.accessToken);
+                return;
             }
 
             if (!isAuthenticated) {
                 const user = response.data?.data as IUser;
                 useAuthStore.setState({ currentUser: user, isAuthenticated: true });
+                setCookie("accessToken", response.data?.accessToken);
+                setCookie("refreshToken", response.data?.refreshToken);
             }
 
             router.push("/");

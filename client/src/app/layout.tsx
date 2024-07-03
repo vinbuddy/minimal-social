@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import MainLayout from "@/components/MainLayout";
-import { NextProvider as NextUIProvider } from "./providers";
+import { AuthClientApp, NextProvider as NextUIProvider } from "./providers";
 import { Toaster } from "sonner";
+import { AuthContextProvider } from "@/libs/contexts/AuthContext";
+import { cookies } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,8 +23,13 @@ export default function RootLayout({
         <html lang="en" className="light" suppressHydrationWarning>
             <body className={inter.className}>
                 <NextUIProvider>
-                    {children}
-                    <Toaster />
+                    <AuthClientApp
+                        accessToken={cookies().get("accessToken")?.value}
+                        refreshToken={cookies().get("refreshToken")?.value}
+                    >
+                        {children}
+                        <Toaster />
+                    </AuthClientApp>
                 </NextUIProvider>
             </body>
         </html>

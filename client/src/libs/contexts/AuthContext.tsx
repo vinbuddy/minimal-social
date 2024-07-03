@@ -2,16 +2,17 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import useAuthStore from "../hooks/store/useAuthStore";
 import axiosInstance from "@/utils/httpRequest";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { IUser } from "../types/user";
 
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
 
 export const AuthContextProvider = ({ children }: { children: any }) => {
-    const [loading, setLoading] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>(false);
     const { currentUser, isAuthenticated } = useAuthStore();
     const router = useRouter();
+    const path = usePathname();
 
     useEffect(() => {
         (async () => {
