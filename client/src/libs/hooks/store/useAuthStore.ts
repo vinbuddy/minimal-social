@@ -6,6 +6,7 @@ interface AuthState {
     currentUser: null | IUser;
     setAuth: (user: IUser) => void;
     isAuthenticated: boolean;
+    isLoaded: boolean;
     logout: () => Promise<boolean>;
     accessToken?: string | undefined;
     refreshToken?: string | undefined;
@@ -16,6 +17,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
     refreshToken: undefined,
     currentUser: null,
     isAuthenticated: false,
+    isLoaded: false,
     setAuth: (user: IUser) => set((state) => ({ currentUser: user, isAuthenticated: true })),
     logout: async () => {
         try {

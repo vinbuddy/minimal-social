@@ -12,6 +12,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { setCookie } from "cookies-next";
+import { jwtDecode } from "jwt-decode";
+import { getTokenExpire } from "@/utils/jwt";
 
 interface IUserLogin {
     password: string;
@@ -47,19 +49,23 @@ export default function LoginPage() {
                 { withCredentials: true }
             );
 
-            console.log("response: ", response.data);
-
-            if (process.env.NEXT_PUBLIC_BASED_AUTH == "bearer-token") {
-                localStorage.setItem("refreshToken", response.data?.refreshToken);
-                localStorage.setItem("accessToken", response.data?.accessToken);
-                return;
-            }
-
             if (!isAuthenticated) {
                 const user = response.data?.data as IUser;
-                useAuthStore.setState({ currentUser: user, isAuthenticated: true });
-                setCookie("accessToken", response.data?.accessToken);
-                setCookie("refreshToken", response.data?.refreshToken);
+                useAuthStore.setState({
+                    currentUser: user,
+                    isAuthenticated: true,
+                    accessToken: response.data?.accessToken,
+                    refreshToken: response.data?.refreshToken,
+                });
+
+                const expireAt = getTokenExpire(response.data?.accessToken);
+
+                setCookie("accessToken", response.data?.accessToken, {
+                    expires: new Date(expireAt ?? 0),
+                });
+                setCookie("refreshToken", response.data?.refreshToken, {
+                    expires: new Date(expireAt ?? 0),
+                });
             }
 
             router.push("/");

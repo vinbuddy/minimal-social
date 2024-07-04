@@ -22,15 +22,17 @@ export default function RootLayout({
     return (
         <html lang="en" className="light" suppressHydrationWarning>
             <body className={inter.className}>
-                <NextUIProvider>
-                    <AuthClientApp
-                        accessToken={cookies().get("accessToken")?.value}
-                        refreshToken={cookies().get("refreshToken")?.value}
-                    >
-                        {children}
-                        <Toaster />
-                    </AuthClientApp>
-                </NextUIProvider>
+                <AuthClientApp
+                    accessToken={cookies().get("accessToken")?.value}
+                    refreshToken={cookies().get("refreshToken")?.value}
+                >
+                    <AuthContextProvider>
+                        <NextUIProvider>
+                            {children}
+                            <Toaster />
+                        </NextUIProvider>
+                    </AuthContextProvider>
+                </AuthClientApp>
             </body>
         </html>
     );

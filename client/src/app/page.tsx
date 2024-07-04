@@ -26,9 +26,9 @@ export default function Home() {
     useEffect(() => {
         (async () => {
             try {
-                // const res = await axiosInstance.get("/user");
+                const res = await axiosInstance.get("/user");
                 // console.log(getCookie("accessToken"));
-                // console.log("res: ", res.data);
+                console.log("res: ", res.data);
                 console.log("currentUser: ", currentUser);
             } catch (error) {
                 console.log("error: ", error);
