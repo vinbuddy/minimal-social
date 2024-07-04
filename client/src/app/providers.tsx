@@ -16,7 +16,11 @@ export function AuthClientApp({ accessToken, refreshToken, children }: AuthClien
     useState(() => {
         if (typeof window !== "undefined") {
             // Set auth store
-            useAuthStore.setState((state) => ({ accessToken, refreshToken, isLoaded: true }));
+            useAuthStore.setState((state) => ({
+                accessToken,
+                refreshToken,
+                isLoaded: true,
+            }));
         }
     });
 

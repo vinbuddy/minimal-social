@@ -10,3 +10,19 @@ export async function getUsersHandler(req: Request, res: Response, next: NextFun
         next(error);
     }
 }
+
+export async function getUserHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({ statusCode: 400, message: "Id is required" });
+        }
+
+        const user = await UserModel.findById(id).select("-password -refreshToken");
+
+        return res.status(200).json({ statusCode: 200, data: user });
+    } catch (error) {
+        next(error);
+    }
+}

@@ -14,14 +14,11 @@ import {
     DropdownTrigger,
     Input,
     Tooltip,
-    User,
 } from "@nextui-org/react";
-import { getCookie } from "cookies-next";
 import { ImageIcon, PanelRight, PaperclipIcon, Phone, PlusIcon, Search, ThumbsUpIcon, Video } from "lucide-react";
 import { useEffect } from "react";
-export default function Home() {
+function Home() {
     const currentUser = useAuthStore((state) => state.currentUser);
-    const { accessToken, refreshToken } = useAuthStore();
 
     useEffect(() => {
         (async () => {
@@ -34,7 +31,7 @@ export default function Home() {
                 console.log("error: ", error);
             }
         })();
-    }, []);
+    }, [currentUser]);
     return (
         <MainLayout>
             <div className="grid grid-cols-12 h-full">
@@ -151,3 +148,5 @@ export default function Home() {
         </MainLayout>
     );
 }
+
+export default Home;

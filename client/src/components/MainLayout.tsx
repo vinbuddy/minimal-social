@@ -10,10 +10,52 @@ import {
     DropdownMenu,
     DropdownTrigger,
     Switch,
+    Spinner,
     Tooltip,
 } from "@nextui-org/react";
+import useAuthStore from "@/libs/hooks/store/useAuthStore";
+import axiosInstance from "@/utils/httpRequest";
+import { deleteCookie } from "cookies-next";
+import useLoading from "@/libs/hooks/useLoading";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+    const { currentUser } = useAuthStore();
+    const { startLoading, stopLoading, loading } = useLoading();
+    const router = useRouter();
+
+    const handleLogOut = async (): Promise<void> => {
+        try {
+            startLoading();
+
+            const response = await axiosInstance.post("/auth/logout");
+
+            if (response.status === 200) {
+                deleteCookie("accessToken");
+                deleteCookie("refreshToken");
+                useAuthStore.setState({
+                    currentUser: null,
+                    isAuthenticated: false,
+                    accessToken: undefined,
+                    refreshToken: undefined,
+                });
+
+                router.push("/login");
+
+                toast.success("Log out successfully", {
+                    position: "bottom-center",
+                });
+            }
+        } catch (error: any) {
+            toast.error(error.message, {
+                position: "bottom-center",
+            });
+        } finally {
+            stopLoading();
+        }
+    };
+
     return (
         <div className="flex min-h-screen w-full bg-muted/40">
             <aside className="flex flex-col h-screen border-r-1 border-divider bg-background">
@@ -49,10 +91,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 className="transition-transform"
                                 color="default"
                                 size="sm"
-                                src="https://ui.shadcn.com/avatars/02.png"
+                                src={currentUser?.photo}
                             />
                         </DropdownTrigger>
                         <DropdownMenu aria-label="Profile Actions" variant="flat">
+                            <DropdownItem key="profile" className="h-14 gap-2">
+                                <p className="font-semibold">Signed in as</p>
+                                <p className="font-semibold">{currentUser?.email}</p>
+                            </DropdownItem>
                             <DropdownItem startContent={<User size={16} />} as={Link} href="/profile" key="profile">
                                 Profile
                             </DropdownItem>
@@ -79,7 +125,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 key="logout"
                                 color="danger"
                                 className="text-danger"
-                                // onClick={handleSignOut}
+                                onClick={handleLogOut}
                             >
                                 Log out
                             </DropdownItem>

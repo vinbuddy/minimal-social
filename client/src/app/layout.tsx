@@ -26,12 +26,12 @@ export default function RootLayout({
                     accessToken={cookies().get("accessToken")?.value}
                     refreshToken={cookies().get("refreshToken")?.value}
                 >
-                    <AuthContextProvider>
-                        <NextUIProvider>
+                    <NextUIProvider>
+                        <AuthContextProvider>
                             {children}
                             <Toaster />
-                        </NextUIProvider>
-                    </AuthContextProvider>
+                        </AuthContextProvider>
+                    </NextUIProvider>
                 </AuthClientApp>
             </body>
         </html>
