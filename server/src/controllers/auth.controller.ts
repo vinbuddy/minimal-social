@@ -306,3 +306,21 @@ export async function resetPasswordHandler(req: Request, res: Response, next: Ne
         next(error);
     }
 }
+
+export async function getMeHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+        const id = req.user._id;
+
+        if (!id) {
+            return res.status(400).json({ statusCode: 400, message: "Id is required" });
+        }
+
+        const user = await UserModel.findById(id).select("-password -refreshToken");
+
+        return res.status(200).json({ statusCode: 200, data: user });
+        res.status(200).json({ statusCode: 200, data: "me" });
+    } catch (error) {
+        next(error);
+    }
+}

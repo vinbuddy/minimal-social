@@ -7,6 +7,7 @@ import {
     logoutHandler,
     forgotPasswordHandler,
     resetPasswordHandler,
+    getMeHandler,
 } from "../controllers/auth.controller";
 import { verifyToken } from "../middlewares/verifyToken";
 
@@ -22,5 +23,7 @@ router.post("/logout", verifyToken, logoutHandler);
 
 router.post("/forgot", forgotPasswordHandler);
 router.post("/reset", resetPasswordHandler);
+
+router.get("/me", verifyToken, getMeHandler);
 
 export default router;

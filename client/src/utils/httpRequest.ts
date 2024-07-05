@@ -1,6 +1,15 @@
 import useAuthStore from "@/libs/hooks/store/useAuthStore";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
+export async function fetchData(url: string) {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + url, {
+        method: "GET",
+        cache: "no-store",
+        credentials: "include",
+    });
+    return await response.json();
+}
+
 const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
     headers: {

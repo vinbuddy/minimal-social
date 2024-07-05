@@ -62,9 +62,11 @@ export default function LoginPage() {
 
                 setCookie("accessToken", response.data?.accessToken, {
                     expires: new Date(expireAt ?? 0),
+                    httpOnly: true,
                 });
                 setCookie("refreshToken", response.data?.refreshToken, {
                     expires: new Date(expireAt ?? 0),
+                    httpOnly: true,
                 });
             }
 
