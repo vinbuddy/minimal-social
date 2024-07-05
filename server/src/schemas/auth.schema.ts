@@ -20,7 +20,7 @@ export const otpSchema = z.object({
 });
 export const otpResetPasswordSchema = z.object({
     email: z.string({ required_error: "Email is required" }).email(),
-    otp: z.string({ required_error: "OTP is required" }),
+    // otp: z.string({ required_error: "OTP is required" }),
     password: z
         .string({ required_error: "Password is required" })
         .min(6, "Password is too short - should be min 6 chars")

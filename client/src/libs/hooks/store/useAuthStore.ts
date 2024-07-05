@@ -7,11 +7,13 @@ interface AuthState {
     setAuth: (user: IUser) => void;
     isAuthenticated: boolean;
     isLoaded: boolean;
+    forgotPasswordOTP: string | null;
     accessToken?: string | undefined;
     refreshToken?: string | undefined;
 }
 
 const useAuthStore = create<AuthState>((set, get) => ({
+    forgotPasswordOTP: null,
     accessToken: undefined,
     refreshToken: undefined,
     currentUser: null,

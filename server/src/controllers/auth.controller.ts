@@ -295,13 +295,12 @@ export async function forgotPasswordHandler(req: Request, res: Response, next: N
     }
 }
 
-export async function resetPasswordHandler(req: Request, res: Response, next: NextFunction) {
+export async function verifyForgotPasswordOTPHandler(req: Request, res: Response, next: NextFunction) {
     try {
-        const otpInput: OTPResetPasswordInput = otpResetPasswordSchema.parse(req.body);
-        const { email, otp, password } = otpInput;
+        const otpInput: OTPInput = otpSchema.parse(req.body);
+        const { email, otp } = otpInput;
 
         const otpData = await OTPModel.findOne({ email, type: "forgot" });
-
         if (!otpData) {
             return res.status(400).json({ message: "Invalid or expired OTP" });
         }
@@ -311,6 +310,17 @@ export async function resetPasswordHandler(req: Request, res: Response, next: Ne
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid OTP" });
         }
+
+        return res.status(200).json({ message: "User registered successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function resetPasswordHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const otpInput: OTPResetPasswordInput = otpResetPasswordSchema.parse(req.body);
+        const { email, password } = otpInput;
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);

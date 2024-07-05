@@ -26,6 +26,7 @@ export default function LoginPage() {
         register,
         handleSubmit,
         watch,
+        setError,
         formState: { errors },
     } = useForm<IUserLogin>();
 
@@ -57,22 +58,14 @@ export default function LoginPage() {
                     accessToken: response.data?.accessToken,
                     refreshToken: response.data?.refreshToken,
                 });
-
-                const accessTokenExpireAt = getTokenExpire(response.data?.accessToken);
-                const refreshAccessTokenExpireAt = getTokenExpire(response.data?.refreshToken);
-
-                // setCookie("accessToken", response.data?.accessToken, {
-                //     expires: new Date(accessTokenExpireAt ?? 0),
-                //     httpOnly: false,
-                // });
-                // setCookie("refreshToken", response.data?.refreshToken, {
-                //     expires: new Date(refreshAccessTokenExpireAt ?? 0),
-                //     httpOnly: false,
-                // });
             }
 
             router.push("/");
         } catch (error: any) {
+            setError("root.server", {
+                type: "server",
+                message: error?.response?.data?.message || error?.message,
+            });
             toast.error(error?.message, {
                 position: "bottom-center",
             });
@@ -112,6 +105,10 @@ export default function LoginPage() {
                     <div className="grid gap-2">
                         <div className="flex items-center">
                             <label htmlFor="password">Password</label>
+
+                            <Link href="/forgot" className="ml-auto text-sm underline">
+                                Forgot password?
+                            </Link>
                         </div>
                         <Input
                             size="lg"
@@ -151,6 +148,9 @@ export default function LoginPage() {
                             <p className="text-red-500 text-tiny">Password must not exceed 15 characters</p>
                         )}
                     </div>
+                    {errors.root?.server && (
+                        <p className="text-red-500 text-tiny my-2 text-center">{errors.root?.server?.message}</p>
+                    )}
                     <Button isLoading={loading} size="lg" color="primary" type="submit" className="w-full">
                         Login
                     </Button>

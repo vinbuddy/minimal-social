@@ -5,6 +5,7 @@ import { IUser } from "@/libs/types/user";
 import axiosInstance from "@/utils/httpRequest";
 import { Button } from "@nextui-org/react";
 import axios from "axios";
+import { setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -15,8 +16,8 @@ export default function OtpPage({ searchParams }: { searchParams: { type: "regis
     const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
     const isDisabled = otp.some((value) => value === "");
     const inputsRef = useRef<HTMLInputElement[]>(Array(OTP_LENGTH).fill(null));
+    const [errorResponse, setErrorResponse] = useState<string | null>(null);
 
-    const { currentUser, setAuth } = useAuthStore();
     const { loading, startLoading, stopLoading } = useLoading();
     const router = useRouter();
 
@@ -52,11 +53,12 @@ export default function OtpPage({ searchParams }: { searchParams: { type: "regis
     const handleVerify = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (searchParams.type === "register") {
+        if (searchParams?.type === "register") {
             handleVerifyRegister();
+        } else {
+            // Verify OTP forgot password
+            handleVerifyForgotPassword();
         }
-
-        // Verify OTP forgot password
     };
 
     const handleVerifyRegister = async () => {
@@ -67,17 +69,75 @@ export default function OtpPage({ searchParams }: { searchParams: { type: "regis
             const response = await axios.post(
                 process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/verify-otp",
                 {
-                    email: searchParams.toEmail,
+                    email: searchParams?.toEmail,
                     otp: otp.join(""),
                 },
                 { withCredentials: true }
             );
 
-            if (response.status === 200) {
-                router.push("/login");
+            if (response.status !== 200) {
+                setErrorResponse(response.data?.message);
+                // throw new Error(response.data?.message);
             }
+
+            toast.success("Account registered successfully", { position: "bottom-center" });
+            router.push("/login");
         } catch (error: any) {
             toast.error(error?.message, { position: "bottom-center" });
+        } finally {
+            stopLoading();
+        }
+    };
+
+    const handleVerifyForgotPassword = async () => {
+        // Verify OTP register
+        try {
+            startLoading();
+
+            const response = await axios.post(
+                process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/forgot/verify",
+                {
+                    email: searchParams?.toEmail,
+                    otp: otp.join(""),
+                },
+                { withCredentials: true }
+            );
+
+            useAuthStore.setState((state) => ({ forgotPasswordOTP: otp.join("") }));
+
+            toast.success("Verify successfully", { position: "bottom-center" });
+            router.push(`/reset?email=${searchParams?.toEmail}`);
+        } catch (error: any) {
+            setErrorResponse(error?.response?.data?.message || error?.message);
+
+            toast.error(error?.message, { position: "bottom-center" });
+        } finally {
+            stopLoading();
+        }
+    };
+
+    const resendOTP = async () => {
+        try {
+            startLoading();
+            let url =
+                searchParams?.type === "forgot"
+                    ? process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/forgot"
+                    : process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/register";
+            const response = await axios.post(url, {
+                email: searchParams?.toEmail,
+            });
+
+            if (response.status === 200) {
+                toast.success("Resend OTP successfully", {
+                    position: "bottom-center",
+                });
+            }
+        } catch (error: any) {
+            setErrorResponse(error?.response?.data?.message || error?.message);
+
+            toast.error(error?.message, {
+                position: "bottom-center",
+            });
         } finally {
             stopLoading();
         }
@@ -89,10 +149,10 @@ export default function OtpPage({ searchParams }: { searchParams: { type: "regis
                 <div className="mx-auto flex w-full max-w-lg flex-col space-y-16">
                     <div className="flex flex-col items-center justify-center text-center space-y-2">
                         <div className="font-semibold text-3xl">
-                            <p>Email Verification</p>
+                            <p>OTP Verification</p>
                         </div>
                         <div className="flex flex-row text-sm font-medium text-gray-400">
-                            <p>We have sent a code to your email ba**@dipainhouse.com</p>
+                            <p>We have sent a code to your email {searchParams?.toEmail}</p>
                         </div>
                     </div>
 
@@ -118,6 +178,9 @@ export default function OtpPage({ searchParams }: { searchParams: { type: "regis
                                 </div>
 
                                 <div className="flex flex-col space-y-5">
+                                    {errorResponse && (
+                                        <p className="text-red-500 text-tiny my-2 text-center">{errorResponse}</p>
+                                    )}
                                     <div>
                                         <Button
                                             isLoading={loading}
@@ -127,20 +190,18 @@ export default function OtpPage({ searchParams }: { searchParams: { type: "regis
                                             size="lg"
                                             fullWidth
                                         >
-                                            Verify Account
+                                            Verify OTP
                                         </Button>
                                     </div>
 
                                     <div className="flex flex-row items-center justify-center text-center text-sm font-medium space-x-1 text-gray-500">
                                         <p>Did not recieve code?</p>{" "}
-                                        <a
-                                            className="flex flex-row items-center text-blue-600"
-                                            href="http://"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
+                                        <p
+                                            onClick={resendOTP}
+                                            className="flex flex-row items-center text-blue-600 cursor-pointer"
                                         >
                                             Resend
-                                        </a>
+                                        </p>
                                     </div>
                                 </div>
                             </div>

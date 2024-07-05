@@ -1,6 +1,6 @@
 "use client";
+import useAuthStore from "@/libs/hooks/store/useAuthStore";
 import useLoading from "@/libs/hooks/useLoading";
-import axiosInstance from "@/utils/httpRequest";
 import { Button, Input } from "@nextui-org/react";
 import axios from "axios";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
@@ -10,14 +10,13 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-interface IUserRegister {
-    username: string;
+interface IUserResetPassword {
     password: string;
     email: string;
     confirm: string;
 }
 
-export default function RegisterPage() {
+export default function ResetPage({ searchParams }: { searchParams: { toEmail: string } }) {
     const [isVisible, setIsVisible] = useState<boolean>(false);
     const { loading, startLoading, stopLoading } = useLoading();
     const router = useRouter();
@@ -27,29 +26,41 @@ export default function RegisterPage() {
         watch,
         setError,
         formState: { errors },
-    } = useForm<IUserRegister>();
+    } = useForm<IUserResetPassword>();
+    const { forgotPasswordOTP } = useAuthStore();
 
     const toggleVisibility = () => setIsVisible(!isVisible);
-    const onSubmitHandler = async (data: IUserRegister, e?: React.BaseSyntheticEvent): Promise<void> => {
+    const onSubmitHandler = async (data: IUserResetPassword, e?: React.BaseSyntheticEvent): Promise<void> => {
         e?.preventDefault();
 
         try {
             // Send email otp
+
+            if (!forgotPasswordOTP) {
+                toast.error("You must to verify otp to reset password", {
+                    position: "bottom-center",
+                });
+                return;
+            }
+
             startLoading();
+
+            if (!searchParams?.toEmail) return;
+
             const response = await axios.post(
-                (process.env.NEXT_PUBLIC_API_BASE_URL as string) + "/auth/register",
+                (process.env.NEXT_PUBLIC_API_BASE_URL as string) + "/auth/reset",
                 {
-                    username: data.username,
-                    email: data.email,
+                    email: searchParams?.toEmail,
                     password: data.password,
                 },
                 { withCredentials: true }
             );
 
-            toast.success("OTP sent to your email", {
+            useAuthStore.setState((state) => ({ forgotPasswordOTP: null }));
+            toast.success("Reset password successfully", {
                 position: "bottom-center",
             });
-            router.push(`/otp?type=register&toEmail=${data.email}`);
+            router.push("/login");
         } catch (error: any) {
             console.log("error: ", error);
             setError("root.server", {
@@ -68,27 +79,10 @@ export default function RegisterPage() {
         <div className="flex items-center justify-center py-12">
             <div className="mx-auto grid w-[350px] gap-6">
                 <div className="grid gap-2 text-center">
-                    <h1 className="text-3xl font-bold">Sign up</h1>
-                    <p className="text-balance text-muted-foreground">Enter your information to create an account</p>
+                    <h1 className="text-3xl font-bold">Reset password</h1>
+                    <p className="text-balance text-muted-foreground">Enter your new password to reset</p>
                 </div>
                 <form onSubmit={handleSubmit(onSubmitHandler)} className="grid gap-4">
-                    <div className="grid gap-2">
-                        <label htmlFor="email">User name</label>
-                        <Input
-                            size="lg"
-                            classNames={{ inputWrapper: "px-0 overflow-hidden", input: "px-3" }}
-                            id="username"
-                            type="text"
-                            placeholder="John Doe"
-                            {...register("username", {
-                                required: true,
-                                maxLength: 50,
-                            })}
-                        />
-                        {errors?.username?.type === "required" && (
-                            <p className="text-red-500 text-tiny">Please enter user name</p>
-                        )}
-                    </div>
                     <div className="grid gap-2">
                         <label htmlFor="email">Email</label>
                         <Input
@@ -96,18 +90,17 @@ export default function RegisterPage() {
                             classNames={{ inputWrapper: "px-0 overflow-hidden", input: "px-3" }}
                             id="email"
                             type="email"
+                            isDisabled
+                            variant="bordered"
+                            value={searchParams?.toEmail}
                             placeholder="m@example.com"
-                            {...register("email", {
-                                required: true,
-                                pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            })}
                         />
-                        {errors.email?.type === "required" && (
+                        {/* {errors.email?.type === "required" && (
                             <p className="text-red-500 text-tiny">Please enter email address</p>
                         )}
                         {errors.email?.type === "pattern" && (
                             <p className="text-red-500 text-tiny">Please enter a valid email address</p>
-                        )}
+                        )} */}
                     </div>
                     <div className="grid gap-2">
                         <div className="flex items-center">
@@ -197,11 +190,8 @@ export default function RegisterPage() {
                     )}
 
                     <Button isLoading={loading} size="lg" color="primary" type="submit" className="w-full">
-                        Create an account
+                        Reset password
                     </Button>
-                    {/* <Button variant="bordered" className="w-full">
-                        Login with Google
-                    </Button> */}
                 </form>
                 <div className="mt-4 text-center text-sm">
                     Already have an account?{" "}
