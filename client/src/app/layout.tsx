@@ -6,6 +6,7 @@ import { AuthClientApp, NextProvider as NextUIProvider } from "./providers";
 import { Toaster } from "sonner";
 import { AuthContextProvider } from "@/libs/contexts/AuthContext";
 import { cookies } from "next/headers";
+import TokenRefresher from "@/components/TokenRefresher";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function RootLayout({
                         <AuthContextProvider>
                             {children}
                             <Toaster />
+                            <TokenRefresher />
                         </AuthContextProvider>
                     </NextUIProvider>
                 </AuthClientApp>

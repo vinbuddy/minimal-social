@@ -125,9 +125,17 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
 
         const { password: _password, refreshToken: _refreshToken, ...userInfo } = user;
         if (cookieMode.isCookieMode) {
+            const decodedAccessToken = jwt.decode(accessToken) as User & { exp: number; iat: number };
+            const decodedRefreshToken = jwt.decode(refreshToken) as User & { exp: number; iat: number };
             return res
-                .cookie("accessToken", accessToken, cookieMode.options)
-                .cookie("refreshToken", refreshToken, cookieMode.options)
+                .cookie("accessToken", accessToken, {
+                    ...cookieMode.options,
+                    expires: new Date(decodedAccessToken.exp * 1000),
+                })
+                .cookie("refreshToken", refreshToken, {
+                    ...cookieMode.options,
+                    expires: new Date(decodedRefreshToken.exp * 1000),
+                })
                 .status(200)
                 .json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
         }
@@ -211,9 +219,17 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
         await user.save({ validateBeforeSave: false });
 
         if (cookieMode) {
+            const decodedAccessToken = jwt.decode(newAccessToken) as User & { exp: number; iat: number };
+            const decodedRefreshToken = jwt.decode(newRefreshToken) as User & { exp: number; iat: number };
             return res
-                .cookie("accessToken", newAccessToken, cookieMode.options)
-                .cookie("refreshToken", newRefreshToken, cookieMode.options)
+                .cookie("accessToken", newAccessToken, {
+                    ...cookieMode.options,
+                    expires: new Date(decodedAccessToken.exp * 1000),
+                })
+                .cookie("refreshToken", newRefreshToken, {
+                    ...cookieMode.options,
+                    expires: new Date(decodedRefreshToken.exp * 1000),
+                })
                 .status(200)
                 .json({ statusCode: 200, data: user, accessToken: newAccessToken, refreshToken: newRefreshToken });
         }

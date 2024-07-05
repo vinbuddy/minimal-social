@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { LogOut, Send, Smile, Sun, SunDim, User, UsersRound } from "lucide-react";
+import { LogOut, Send, Smile, SunDim, User, UsersRound } from "lucide-react";
 import Link from "next/link";
 import {
     Avatar,
@@ -15,7 +15,6 @@ import {
 } from "@nextui-org/react";
 import useAuthStore from "@/libs/hooks/store/useAuthStore";
 import axiosInstance from "@/utils/httpRequest";
-import { deleteCookie } from "cookies-next";
 import useLoading from "@/libs/hooks/useLoading";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -32,8 +31,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             const response = await axiosInstance.post("/auth/logout");
 
             if (response.status === 200) {
-                deleteCookie("accessToken");
-                deleteCookie("refreshToken");
                 useAuthStore.setState({
                     currentUser: null,
                     isAuthenticated: false,
@@ -95,14 +92,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             />
                         </DropdownTrigger>
                         <DropdownMenu aria-label="Profile Actions" variant="flat">
-                            <DropdownItem key="profile" className="h-14 gap-2">
+                            <DropdownItem textValue="" key="header" className="h-14 gap-2">
                                 <p className="font-semibold">Signed in as</p>
                                 <p className="font-semibold">{currentUser?.email}</p>
                             </DropdownItem>
-                            <DropdownItem startContent={<User size={16} />} as={Link} href="/profile" key="profile">
+                            <DropdownItem
+                                textValue=""
+                                startContent={<User size={16} />}
+                                as={Link}
+                                href="/profile"
+                                key="profile"
+                            >
                                 Profile
                             </DropdownItem>
                             <DropdownItem
+                                textValue=""
                                 isReadOnly
                                 startContent={<SunDim size={16} />}
                                 endContent={
@@ -121,6 +125,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             </DropdownItem>
 
                             <DropdownItem
+                                textValue=""
                                 startContent={<LogOut size={16} />}
                                 key="logout"
                                 color="danger"

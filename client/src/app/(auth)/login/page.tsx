@@ -58,16 +58,17 @@ export default function LoginPage() {
                     refreshToken: response.data?.refreshToken,
                 });
 
-                const expireAt = getTokenExpire(response.data?.accessToken);
+                const accessTokenExpireAt = getTokenExpire(response.data?.accessToken);
+                const refreshAccessTokenExpireAt = getTokenExpire(response.data?.refreshToken);
 
-                setCookie("accessToken", response.data?.accessToken, {
-                    expires: new Date(expireAt ?? 0),
-                    httpOnly: true,
-                });
-                setCookie("refreshToken", response.data?.refreshToken, {
-                    expires: new Date(expireAt ?? 0),
-                    httpOnly: true,
-                });
+                // setCookie("accessToken", response.data?.accessToken, {
+                //     expires: new Date(accessTokenExpireAt ?? 0),
+                //     httpOnly: false,
+                // });
+                // setCookie("refreshToken", response.data?.refreshToken, {
+                //     expires: new Date(refreshAccessTokenExpireAt ?? 0),
+                //     httpOnly: false,
+                // });
             }
 
             router.push("/");
