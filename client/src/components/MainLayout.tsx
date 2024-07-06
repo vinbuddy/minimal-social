@@ -1,28 +1,43 @@
 "use client";
 import * as React from "react";
-import { LogOut, Send, Smile, SunDim, User, UsersRound } from "lucide-react";
+import { HeartIcon, LogOut, SearchIcon, Send, Smile, SunDim, User } from "lucide-react";
 import Link from "next/link";
-import {
-    Avatar,
-    Button,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownTrigger,
-    Switch,
-    Spinner,
-    Tooltip,
-} from "@nextui-org/react";
+import { Avatar, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 import useAuthStore from "@/libs/hooks/store/useAuthStore";
 import axiosInstance from "@/utils/httpRequest";
 import useLoading from "@/libs/hooks/useLoading";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { HomeIcon } from "@/assets/icons";
+
+const navLinks = [
+    {
+        content: "Home",
+        href: "/",
+        icon: <HomeIcon />,
+    },
+    {
+        content: "Conversation",
+        href: "/conversation",
+        icon: <Send />,
+    },
+    {
+        content: "search",
+        href: "/search",
+        icon: <SearchIcon />,
+    },
+    {
+        content: "Notification",
+        href: "/notification",
+        icon: <HeartIcon />,
+    },
+];
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const { currentUser } = useAuthStore();
     const { startLoading, stopLoading, loading } = useLoading();
     const router = useRouter();
+    const pathName = usePathname();
 
     const handleLogOut = async (): Promise<void> => {
         try {
@@ -54,8 +69,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     };
 
     return (
-        <div className="flex min-h-screen w-full bg-muted/40">
-            <aside className="flex flex-col h-screen border-r-1 border-divider bg-background">
+        <div className="flex h-screen w-full bg-muted/40">
+            <aside className="w-[80px] fixed top-0 left-0 bottom-0 flex flex-col justify-between h-full border-r-1 border-divider bg-background">
                 <nav className="flex flex-col items-center px-4 sm:py-4">
                     <header className="h-[40px] flex items-center mb-5">
                         <Link
@@ -66,20 +81,30 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             <span className="sr-only">Acme Inc</span>
                         </Link>
                     </header>
-                    <div className="flex flex-col items-center gap-3">
-                        <Tooltip showArrow color="default" content="Messages" placement="right">
-                            <Button isIconOnly color="primary">
-                                <Send />
-                            </Button>
-                        </Tooltip>
-                        <Tooltip showArrow color="default" content="Users" placement="right">
-                            <Button isIconOnly color="default" variant="light">
-                                <UsersRound />
-                            </Button>
-                        </Tooltip>
+                </nav>
+                <nav className="">
+                    <div className="flex flex-col items-center gap-4">
+                        {navLinks.map((navLink, index) => {
+                            let isActive = pathName === navLink.href;
+                            return (
+                                <Button
+                                    key={index}
+                                    size="lg"
+                                    title={navLink.content}
+                                    as={Link}
+                                    href={navLink.href}
+                                    radius="sm"
+                                    isIconOnly
+                                    color={isActive ? "primary" : "default"}
+                                    variant={isActive ? undefined : "light"}
+                                >
+                                    <>{navLink.icon}</>
+                                </Button>
+                            );
+                        })}
                     </div>
                 </nav>
-                <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-4">
+                <nav className="flex flex-col items-center gap-4 px-2 sm:py-4">
                     <Dropdown placement="bottom-end">
                         <DropdownTrigger>
                             <Avatar
@@ -139,7 +164,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 </nav>
             </aside>
 
-            <div className="flex-1">
+            <div className="flex-1 ps-[80px]">
                 <div>{children}</div>
             </div>
         </div>

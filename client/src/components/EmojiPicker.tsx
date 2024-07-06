@@ -4,18 +4,42 @@ import { Button, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/rea
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import { SmileIcon } from "lucide-react";
+import React, { ReactElement, ReactNode } from "react";
+
+type Placement =
+    | "top"
+    | "bottom"
+    | "right"
+    | "left"
+    | "top-start"
+    | "top-end"
+    | "bottom-start"
+    | "bottom-end"
+    | "left-start"
+    | "left-end"
+    | "right-start"
+    | "right-end";
 
 interface IProps {
     onChange: (value: string) => void;
+    button?: ReactNode | ReactElement | JSX.Element;
+    placement?: Placement;
 }
 
-export default function EmojiPicker({ onChange }: IProps) {
+export default function EmojiPicker({ placement = "top-end", onChange, button }: IProps) {
     return (
-        <Popover placement="top-end" offset={10}>
+        <Popover placement={placement} offset={10}>
             <PopoverTrigger>
-                <Button isIconOnly variant="light" radius="full">
+                {/* <Button className={buttonClassName} isIconOnly variant="light" radius="full">
                     <SmileIcon className="text-muted-foreground" size={18} />
-                </Button>
+                </Button> */}
+                {button ? (
+                    button
+                ) : (
+                    <Button isIconOnly variant="light" radius="full">
+                        <SmileIcon className="text-muted-foreground" size={18} />
+                    </Button>
+                )}
             </PopoverTrigger>
             <PopoverContent className="p-0">
                 <Picker

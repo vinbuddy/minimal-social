@@ -17,3 +17,25 @@
     border-radius: 0;
     background-color: rgba(0, 0, 0, 0);
 }
+
+[contenteditable="true"] {
+    white-space: pre-wrap;
+}
+
+[contenteditable="true"]:empty:before {
+    /* display: inline-block; */
+    content: attr(aria-placeholder);
+    pointer-events: none;
+    user-select: text;
+    display: block; /* For Firefox */
+    color: #999;
+    /* white-space: pre-wrap; */
+}
+
+[contenteditable="true"]:focus {
+    /* display: inline-block; */
+    outline: 0px solid transparent;
+    border: 0px solid transparent;
+    color: #000;
+    /* white-space: pre-wrap; */
+}
