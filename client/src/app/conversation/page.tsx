@@ -2,7 +2,7 @@
 import ChatItem from "@/components/Conversation/ConversationItem";
 import EmojiPicker from "@/components/EmojiPicker";
 import MainLayout from "@/components/MainLayout";
-import useAuthStore from "@/libs/hooks/store/useAuthStore";
+import useAuthStore from "@/hooks/store/useAuthStore";
 import axiosInstance from "@/utils/httpRequest";
 import {
     Avatar,

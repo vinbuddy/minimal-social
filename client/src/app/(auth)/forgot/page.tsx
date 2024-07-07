@@ -1,6 +1,6 @@
 "use client";
 
-import useLoading from "@/libs/hooks/useLoading";
+import useLoading from "@/hooks/useLoading";
 import { Button, Input } from "@nextui-org/react";
 import axios from "axios";
 import Link from "next/link";

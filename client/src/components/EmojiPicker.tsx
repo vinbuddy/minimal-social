@@ -5,6 +5,7 @@ import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import { SmileIcon } from "lucide-react";
 import React, { ReactElement, ReactNode } from "react";
+import { setCaretAtTheEnd } from "@/utils/editor";
 
 type Placement =
     | "top"
@@ -21,12 +22,25 @@ type Placement =
     | "right-end";
 
 interface IProps {
-    onChange: (value: string) => void;
+    onChange?: (value: string) => void;
     button?: ReactNode | ReactElement | JSX.Element;
     placement?: Placement;
+    contentRef?: React.RefObject<HTMLDivElement>;
+    onAfterPicked?: () => void;
 }
 
-export default function EmojiPicker({ placement = "top-end", onChange, button }: IProps) {
+export default function EmojiPicker({ placement = "top-end", button, contentRef, onChange, onAfterPicked }: IProps) {
+    const handlePickEmoji = (emoji: any) => {
+        onChange && onChange(emoji.native);
+
+        if (contentRef && contentRef.current) {
+            contentRef.current.innerHTML += emoji.native;
+
+            setCaretAtTheEnd(contentRef.current);
+            onAfterPicked && onAfterPicked();
+        }
+    };
+
     return (
         <Popover placement={placement} offset={10}>
             <PopoverTrigger>
@@ -42,13 +56,7 @@ export default function EmojiPicker({ placement = "top-end", onChange, button }:
                 )}
             </PopoverTrigger>
             <PopoverContent className="p-0">
-                <Picker
-                    emojiSize={18}
-                    theme="light"
-                    data={data}
-                    maxFrequentRows={1}
-                    onEmojiSelect={(emoji: any) => onChange(emoji.native)}
-                />
+                <Picker emojiSize={18} theme="light" data={data} maxFrequentRows={1} onEmojiSelect={handlePickEmoji} />
             </PopoverContent>
         </Popover>
     );

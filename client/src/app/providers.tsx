@@ -1,6 +1,6 @@
 "use client";
 
-import useAuthStore from "@/libs/hooks/store/useAuthStore";
+import useAuthStore from "@/hooks/store/useAuthStore";
 import { NextUIProvider } from "@nextui-org/react";
 import { useState } from "react";
 export function NextProvider({ children }: { children: React.ReactNode }) {

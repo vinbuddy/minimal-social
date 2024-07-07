@@ -1,4 +1,4 @@
-import useAuthStore from "@/libs/hooks/store/useAuthStore";
+import useAuthStore from "@/hooks/store/useAuthStore";
 import axios, { AxiosError, AxiosRequestConfig } from "axios";
 
 export async function fetchData(url: string) {

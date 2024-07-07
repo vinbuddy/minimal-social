@@ -7,6 +7,7 @@ import { ChangeEvent, useRef, useState } from "react";
 import { IMediaFile, IPost } from "@/libs/types/post";
 import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
 import MediaFileUploaderButton from "../Media/MediaFileUploaderButton";
+import RichTextEditor from "../RichTextEditor";
 
 interface IProps {
     type?: "create" | "edit";
@@ -17,8 +18,10 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
     const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>(post?.mediaFiles ?? []);
+    const [caption, setCaption] = useState<string>(post?.caption ?? "");
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
 
     const uploadMediaFiles = async (e: ChangeEvent<HTMLInputElement>) => {
         const files: any = e.target.files;
@@ -89,13 +92,17 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
                             </section>
                             <section className="ms-4 flex-1 max-w-full overflow-hidden">
                                 <h4 className="text-sm font-semibold mb-1">Vinbuddy</h4>
-                                <div
-                                    suppressContentEditableWarning={true}
-                                    // ref={inputInnerRef}
-                                    className={`text-sm input-editor`}
-                                    aria-placeholder="What's on your mind?"
-                                    contentEditable={true}
-                                ></div>
+
+                                <RichTextEditor
+                                    value={post?.caption || ""}
+                                    isMention={true}
+                                    isTag={true}
+                                    ref={contentRef}
+                                    handleInputChange={(value) => {
+                                        setCaption(value);
+                                    }}
+                                    className="w-full"
+                                />
                                 <div className="mt-2">
                                     <EmojiPicker
                                         placement="top"
@@ -111,7 +118,10 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
                                                 <SmileIcon size={20} className="text-default-500" />
                                             </Button>
                                         }
-                                        onChange={() => {}}
+                                        contentRef={contentRef}
+                                        onAfterPicked={() => {
+                                            setCaption(contentRef.current?.innerHTML ?? "");
+                                        }}
                                     />
                                     {/* <Button
                                             disableRipple
@@ -132,7 +142,7 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
                                             color: "default",
                                             children: (
                                                 <>
-                                                    <label htmlFor="file-input">
+                                                    <label htmlFor="file-input" className="cursor-pointer w-full">
                                                         <ImagePlusIcon size={20} className="text-default-500" />
                                                     </label>
                                                 </>
@@ -155,7 +165,14 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
                             </section>
                         </div>
                         <div className="flex justify-end mt-4">
-                            <Button isDisabled color="default" variant="bordered">
+                            <Button
+                                isDisabled={
+                                    caption.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0 &&
+                                    mediaFiles.length === 0
+                                }
+                                color="default"
+                                variant="bordered"
+                            >
                                 Post
                             </Button>
                         </div>

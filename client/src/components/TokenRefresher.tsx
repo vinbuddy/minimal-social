@@ -1,5 +1,5 @@
 "use client";
-import useAuthStore from "@/libs/hooks/store/useAuthStore";
+import useAuthStore from "@/hooks/store/useAuthStore";
 import axiosInstance from "@/utils/httpRequest";
 import { getTokenExpire, refreshAccessToken } from "@/utils/jwt";
 import { deleteCookie, setCookie } from "cookies-next";

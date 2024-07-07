@@ -17,6 +17,11 @@ const config: Config = {
             fontFamily: {
                 teko: ["var(--font-teko)"],
             },
+            colors: {
+                link: "#0095f6",
+                like: "#ff3040",
+                verify: "#0095f6",
+            },
         },
         container: {
             // you can configure the container to be centered

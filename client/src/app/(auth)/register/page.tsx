@@ -1,5 +1,5 @@
 "use client";
-import useLoading from "@/libs/hooks/useLoading";
+import useLoading from "@/hooks/useLoading";
 import axiosInstance from "@/utils/httpRequest";
 import { Button, Input } from "@nextui-org/react";
 import axios from "axios";

@@ -1,6 +1,6 @@
 "use client";
-import useAuthStore from "@/libs/hooks/store/useAuthStore";
-import useLoading from "@/libs/hooks/useLoading";
+import useAuthStore from "@/hooks/store/useAuthStore";
+import useLoading from "@/hooks/useLoading";
 import { Button, Input } from "@nextui-org/react";
 import axios from "axios";
 import { EyeIcon, EyeOffIcon } from "lucide-react";

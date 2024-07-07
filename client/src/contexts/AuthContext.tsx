@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import useAuthStore from "../hooks/store/useAuthStore";
 import axiosInstance from "@/utils/httpRequest";
-import { IUser } from "../types/user";
+import { IUser } from "../libs/types/user";
 import PageLoading from "@/components/PageLoading";
 import { refreshAccessToken } from "@/utils/jwt";
 export const AuthContext = createContext({});

@@ -4,7 +4,7 @@ import "./globals.css";
 import MainLayout from "@/components/MainLayout";
 import { AuthClientApp, NextProvider as NextUIProvider } from "./providers";
 import { Toaster } from "sonner";
-import { AuthContextProvider } from "@/libs/contexts/AuthContext";
+import { AuthContextProvider } from "@/contexts/AuthContext";
 import { cookies } from "next/headers";
 import TokenRefresher from "@/components/TokenRefresher";
 
