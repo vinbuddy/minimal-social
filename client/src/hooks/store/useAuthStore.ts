@@ -1,4 +1,4 @@
-import { IUser } from "@/libs/types/user";
+import { IUser } from "@/types/user";
 import axiosInstance from "@/utils/httpRequest";
 import { create } from "zustand";
 

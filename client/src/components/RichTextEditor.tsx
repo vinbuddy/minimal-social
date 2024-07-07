@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "re
 
 // import { fallbackAvatar } from "@/assets/images";
 import { Avatar, Popover, PopoverContent, PopoverTrigger, Spinner } from "@nextui-org/react";
-import { IUser } from "@/libs/types/user";
+import { IUser } from "@/types/user";
 import { setCaretAtTheEnd } from "@/utils/editor";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 

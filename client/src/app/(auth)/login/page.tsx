@@ -1,7 +1,7 @@
 "use client";
 import useAuthStore from "@/hooks/store/useAuthStore";
 import useLoading from "@/hooks/useLoading";
-import { IUser } from "@/libs/types/user";
+import { IUser } from "@/types/user";
 import axiosInstance from "@/utils/httpRequest";
 import { Button, Input } from "@nextui-org/react";
 import axios from "axios";

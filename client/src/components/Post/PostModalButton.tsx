@@ -4,7 +4,7 @@ import EmojiPicker from "../EmojiPicker";
 import { ImagePlusIcon, SmileIcon } from "lucide-react";
 import MediaFileSlider from "../Media/MediaFileSlider";
 import { ChangeEvent, useRef, useState } from "react";
-import { IMediaFile, IPost } from "@/libs/types/post";
+import { IMediaFile, IPost } from "@/types/post";
 import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
 import MediaFileUploaderButton from "../Media/MediaFileUploaderButton";
 import RichTextEditor from "../RichTextEditor";

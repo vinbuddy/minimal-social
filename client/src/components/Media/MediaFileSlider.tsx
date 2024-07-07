@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-import { IMediaFile } from "@/libs/types/post";
+import { IMediaFile } from "@/types/post";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, A11y, Mousewheel } from "swiper/modules";
