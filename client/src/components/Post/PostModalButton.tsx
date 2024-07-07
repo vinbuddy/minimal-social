@@ -1,27 +1,79 @@
 "use client";
-import {
-    Button,
-    Modal,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    useDisclosure,
-    Image,
-    ButtonProps,
-    Popover,
-    PopoverTrigger,
-    PopoverContent,
-    Avatar,
-} from "@nextui-org/react";
+import { Button, useDisclosure, Popover, PopoverTrigger, PopoverContent, Avatar } from "@nextui-org/react";
 import EmojiPicker from "../EmojiPicker";
 import { ImagePlusIcon, SmileIcon } from "lucide-react";
+import MediaFileSlider from "../Media/MediaFileSlider";
+import { ChangeEvent, useRef, useState } from "react";
+import { IMediaFile, IPost } from "@/libs/types/post";
+import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
+import MediaFileUploaderButton from "../Media/MediaFileUploaderButton";
 
-interface IDefaultProps {
-    buttonProps?: ButtonProps;
+interface IProps {
+    type?: "create" | "edit";
+    post?: IPost;
 }
 
-export default function PostModalButton(): React.ReactNode {
+export default function PostModalButton({ type = "create", post }: IProps): React.ReactNode {
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+
+    const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>(post?.mediaFiles ?? []);
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const uploadMediaFiles = async (e: ChangeEvent<HTMLInputElement>) => {
+        const files: any = e.target.files;
+
+        if (!files) {
+            return;
+        }
+
+        const fileInfos: IMediaFile[] = [];
+        for (let i = 0; i < files?.length; i++) {
+            const file = files.item(i);
+
+            if (!checkLimitSize(file)) {
+                alert("LIMIT");
+                return;
+            }
+
+            const localURL = URL.createObjectURL(file);
+            const dimension: any = await getFileDimension(file);
+
+            fileInfos.push({
+                url: localURL,
+                file: file,
+                width: dimension.width,
+                height: dimension.height,
+                type: getFileFormat(file.type),
+            });
+        }
+
+        // Preview
+        setMediaFiles((prev) => [...prev, ...fileInfos]);
+    };
+
+    const removeMediaFiles = (index: number) => {
+        // Remove from FileList
+        if (fileInputRef.current) {
+            const newFileList = new DataTransfer();
+            const updatedFileList = Array.from(fileInputRef.current.files!);
+
+            updatedFileList.splice(index, 1);
+            updatedFileList.forEach((file) => newFileList.items.add(file));
+
+            fileInputRef.current.files = newFileList.files;
+        }
+
+        let removedFile: any;
+        setMediaFiles((prev) => {
+            removedFile = prev.splice(index, 1); // Remove from state
+
+            return [...prev];
+        });
+
+        // Remove URL after set state mediaFiles
+        if (removedFile?.url) URL.revokeObjectURL(removedFile.url);
+    };
 
     return (
         <>
@@ -29,13 +81,13 @@ export default function PostModalButton(): React.ReactNode {
                 <PopoverTrigger>
                     <Button color="primary">Create</Button>
                 </PopoverTrigger>
-                <PopoverContent>
-                    <div className="w-[580px] p-4">
-                        <div className="flex gap-4">
-                            <div>
+                <PopoverContent className="p-0">
+                    <div className="w-[598px] p-4 ">
+                        <div className="flex">
+                            <section>
                                 <Avatar size="lg" src="https://avatars.githubusercontent.com/u/94288269?v=4" />
-                            </div>
-                            <div className="flex-1">
+                            </section>
+                            <section className="ms-4 flex-1 max-w-full overflow-hidden">
                                 <h4 className="text-sm font-semibold mb-1">Vinbuddy</h4>
                                 <div
                                     suppressContentEditableWarning={true}
@@ -61,20 +113,48 @@ export default function PostModalButton(): React.ReactNode {
                                         }
                                         onChange={() => {}}
                                     />
-                                    <Button
-                                        disableRipple
-                                        className="bg-transparent p-0 gap-0 justify-start"
-                                        isIconOnly
-                                        size="sm"
-                                        color="default"
-                                        aria-label="Like"
-                                    >
-                                        <ImagePlusIcon size={20} className="text-default-500" />
-                                    </Button>
+                                    {/* <Button
+                                            disableRipple
+                                            className="bg-transparent p-0 gap-0 justify-start"
+                                            isIconOnly
+                                            size="sm"
+                                            color="default"
+                                            aria-label="Like"
+                                        >
+                                            <ImagePlusIcon size={20} className="text-default-500" />
+                                        </Button> */}
+                                    <MediaFileUploaderButton
+                                        buttonProps={{
+                                            disableRipple: true,
+                                            className: "bg-transparent p-0 gap-0 justify-start",
+                                            isIconOnly: true,
+                                            size: "sm",
+                                            color: "default",
+                                            children: (
+                                                <>
+                                                    <label htmlFor="file-input">
+                                                        <ImagePlusIcon size={20} className="text-default-500" />
+                                                    </label>
+                                                </>
+                                            ),
+                                        }}
+                                        ref={fileInputRef}
+                                        onUpload={uploadMediaFiles}
+                                    />
                                 </div>
-                            </div>
+                                <div className="max-w-full overflow-hidden">
+                                    <div className="mt-2">
+                                        <MediaFileSlider
+                                            scrollHorizontally
+                                            videoPreview={true}
+                                            mediaFiles={mediaFiles}
+                                            onRemoveMediaFile={type === "create" ? removeMediaFiles : undefined}
+                                        />
+                                    </div>
+                                </div>
+                            </section>
                         </div>
-                        <div className="flex justify-end">
+                        <div className="flex justify-end mt-4">
                             <Button isDisabled color="default" variant="bordered">
                                 Post
                             </Button>
@@ -82,22 +162,6 @@ export default function PostModalButton(): React.ReactNode {
                     </div>
                 </PopoverContent>
             </Popover>
-            {/* <Button onPress={onOpen} color="primary">
-                Create
-            </Button> */}
-
-            {/* <Modal size="xl" isOpen={isOpen} onOpenChange={onOpenChange}>
-                <ModalContent>
-                    {(onClose) => (
-                        <>
-                            <ModalHeader className="flex flex-col gap-1">Create new post</ModalHeader>
-                            <ModalBody className="pt-0 px-6 pb-6">
-                                <div></div>
-                            </ModalBody>
-                        </>
-                    )}
-                </ModalContent>
-            </Modal> */}
         </>
     );
 }
