@@ -8,6 +8,12 @@ import { IMediaFile, IPost } from "@/types/post";
 import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
 import MediaFileUploaderButton from "../Media/MediaFileUploaderButton";
 import RichTextEditor from "../RichTextEditor";
+import useAuthStore from "@/hooks/store/useAuthStore";
+import axiosInstance from "@/utils/httpRequest";
+import axios from "axios";
+import useLoading from "@/hooks/useLoading";
+import { toast } from "sonner";
+import { set } from "react-hook-form";
 
 interface IProps {
     type?: "create" | "edit";
@@ -15,7 +21,10 @@ interface IProps {
 }
 
 export default function PostModalButton({ type = "create", post }: IProps): React.ReactNode {
-    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    // const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const { currentUser } = useAuthStore();
+    const { startLoading, stopLoading, loading } = useLoading();
 
     const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>(post?.mediaFiles ?? []);
     const [caption, setCaption] = useState<string>(post?.caption ?? "");
@@ -78,9 +87,95 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
         if (removedFile?.url) URL.revokeObjectURL(removedFile.url);
     };
 
+    const reset = () => {
+        if (loading) return;
+
+        if (!contentRef.current) return;
+
+        if (post?.caption) {
+            contentRef.current.innerHTML = post.caption;
+        } else {
+            contentRef.current.innerHTML = "";
+        }
+
+        setMediaFiles([]);
+        setCaption("");
+
+        if (fileInputRef.current) {
+            const emptyFileList = new DataTransfer();
+            fileInputRef.current.files = emptyFileList.files;
+        }
+        setIsOpen(false);
+    };
+
+    const handleOpenChange = (open: boolean) => {
+        const isEmptyPost = caption.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0 && mediaFiles.length === 0;
+
+        if (isOpen && !isEmptyPost) {
+            if (window.confirm("Are you sure you want to discard this post?")) {
+                reset();
+            } else setIsOpen(true);
+        } else {
+            setIsOpen(open);
+        }
+    };
+
+    const handleCreatePost = async () => {
+        if (!currentUser) {
+            alert("Please login to create a post.");
+            return;
+        }
+
+        if (caption.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0 && mediaFiles.length === 0) {
+            alert("Caption and media files cannot be both empty.");
+            return;
+        }
+
+        startLoading();
+
+        const formData = new FormData();
+
+        formData.append("caption", caption);
+        formData.append("postBy", currentUser._id);
+
+        if (mediaFiles.length > 0) {
+            mediaFiles.forEach((mediaFile) => {
+                formData.append("mediaFiles", mediaFile.file!);
+            });
+        }
+
+        try {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/post`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            });
+
+            console.log(response.data);
+            reset();
+
+            toast.success("Post created successfully.", { position: "bottom-center" });
+        } catch (error: any) {
+            toast.error("Failed to create post.", { position: "bottom-center" });
+            toast.error(error.response.data.message, { position: "bottom-center" });
+
+            console.log(error);
+        } finally {
+            stopLoading();
+        }
+    };
+
     return (
         <>
-            <Popover placement="top-end" size="lg" backdrop="opaque" offset={20}>
+            <Popover
+                placement="top-end"
+                size="lg"
+                backdrop="opaque"
+                offset={20}
+                isOpen={isOpen}
+                onOpenChange={handleOpenChange}
+            >
                 <PopoverTrigger>
                     <Button color="primary">Create</Button>
                 </PopoverTrigger>
@@ -88,10 +183,10 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
                     <div className="w-[598px] p-4 ">
                         <div className="flex">
                             <section>
-                                <Avatar size="lg" src="https://avatars.githubusercontent.com/u/94288269?v=4" />
+                                <Avatar size="lg" src={currentUser?.photo} />
                             </section>
                             <section className="ms-4 flex-1 max-w-full overflow-hidden">
-                                <h4 className="text-sm font-semibold mb-1">Vinbuddy</h4>
+                                <h4 className="text-sm font-semibold mb-1">{currentUser?.username || "Anonymous"}</h4>
 
                                 <RichTextEditor
                                     value={post?.caption || ""}
@@ -166,12 +261,14 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
                         </div>
                         <div className="flex justify-end mt-4">
                             <Button
+                                onClick={handleCreatePost}
                                 isDisabled={
                                     caption.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0 &&
                                     mediaFiles.length === 0
                                 }
                                 color="default"
                                 variant="bordered"
+                                isLoading={loading}
                             >
                                 Post
                             </Button>

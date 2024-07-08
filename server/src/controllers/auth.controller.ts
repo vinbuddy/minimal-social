@@ -89,7 +89,7 @@ export async function verifyOTPHandler(req: Request, res: Response, next: NextFu
             return res.status(400).json({ message: "Invalid OTP" });
         }
 
-        const newUser = new UserModel({ email: otpData.email, username: otpData.email, password: otpData.password });
+        const newUser = new UserModel({ email: otpData.email, username: otpData.username, password: otpData.password });
         await newUser.save();
 
         return res.status(200).json({ message: "User registered successfully", data: newUser });
