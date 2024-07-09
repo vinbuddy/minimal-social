@@ -56,3 +56,26 @@ export async function createPost(_req: Request, res: Response, next: NextFunctio
         next(error);
     }
 }
+
+export async function getAllPosts(req: Request, res: Response, next: NextFunction) {
+    try {
+        const page = req.body.page ?? 1;
+        const limit = req.body.limit ?? 15;
+
+        const skip = (Number(page) - 1) * limit;
+        const totalPosts = await PostModel.countDocuments();
+        const totalPages = Math.ceil(totalPosts / limit);
+
+        const posts = await PostModel.find()
+            .populate(["postBy", "mentions"])
+            .sort({ createdAt: "desc" })
+            .skip(skip)
+            .limit(limit);
+
+        return res
+            .status(200)
+            .json({ message: "Get all posts successfully", data: posts, totalPosts, totalPages, page, limit });
+    } catch (error) {
+        next(error);
+    }
+}

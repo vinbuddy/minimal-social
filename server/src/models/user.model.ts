@@ -37,10 +37,10 @@ export class User {
     public isAdmin?: boolean;
 
     @prop({ ref: () => User })
-    public friendRequests: Ref<User>[];
+    public followings: Ref<User>[];
 
     @prop({ ref: () => User })
-    public friends: Ref<User>[];
+    public followers: Ref<User>[];
 
     @prop({ required: true, default: "I am a new user" })
     public bio: string;
