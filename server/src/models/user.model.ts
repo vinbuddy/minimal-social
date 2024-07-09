@@ -2,6 +2,8 @@ import { prop, getModelForClass, modelOptions, Severity, Ref, pre } from "@typeg
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
+export const USER_MODEL_HIDDEN_FIELDS: string = "-password -refreshToken";
+
 @pre<User>("save", async function () {
     if (!this.isModified("password")) {
         return;

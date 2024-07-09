@@ -62,7 +62,8 @@ const config: Config = {
                             foreground: "#000",
                         },
                         // foreground: "#fff",
-                        background: "#191B19", // Nền đen
+                        // background: "#191B19", // Nền đen
+                        background: "#0a0a0a",
                         foreground: "#fafafa",
                     },
                 },

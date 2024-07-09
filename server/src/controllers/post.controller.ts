@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import PostModel, { MediaFile } from "../models/post.model";
 import { extractMentionsAndTags, replaceHrefs } from "../helpers/textParser";
-import UserModel from "../models/user.model";
+import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
 import { createPostInput, createPostSchema } from "../schemas/post.schema";
 import { uploadToCloudinary } from "../helpers/cloudinary";
@@ -49,7 +49,10 @@ export async function createPost(_req: Request, res: Response, next: NextFunctio
 
         await newPost.save();
 
-        const post = await PostModel.populate(newPost, [{ path: "postBy" }, { path: "mentions" }]);
+        const post = await PostModel.populate(newPost, [
+            { path: "postBy", select: USER_MODEL_HIDDEN_FIELDS },
+            { path: "mentions", select: USER_MODEL_HIDDEN_FIELDS },
+        ]);
 
         return res.status(200).json({ message: "Create post successfully", data: post });
     } catch (error) {
@@ -59,15 +62,18 @@ export async function createPost(_req: Request, res: Response, next: NextFunctio
 
 export async function getAllPosts(req: Request, res: Response, next: NextFunction) {
     try {
-        const page = req.body.page ?? 1;
-        const limit = req.body.limit ?? 15;
+        const page = Number(req.query.page) ?? 1;
+        const limit = Number(req.query.limit) ?? 15;
 
         const skip = (Number(page) - 1) * limit;
         const totalPosts = await PostModel.countDocuments();
         const totalPages = Math.ceil(totalPosts / limit);
 
         const posts = await PostModel.find()
-            .populate(["postBy", "mentions"])
+            .populate([
+                { path: "postBy", select: USER_MODEL_HIDDEN_FIELDS },
+                { path: "mentions", select: USER_MODEL_HIDDEN_FIELDS },
+            ])
             .sort({ createdAt: "desc" })
             .skip(skip)
             .limit(limit);

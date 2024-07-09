@@ -7,6 +7,7 @@ import { Avatar, Popover, PopoverContent, PopoverTrigger, Spinner } from "@nextu
 import { IUser } from "@/types/user";
 import { setCaretAtTheEnd } from "@/utils/editor";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
+import axiosInstance from "@/utils/httpRequest";
 
 interface IProps {
     className?: string;
@@ -32,7 +33,9 @@ function RichTextEditor(
     const dropdownMentionRef = useRef<HTMLDivElement>(null);
     const contentInnerRef = useRef<HTMLDivElement>(null);
 
-    const debouncedSearch = useSearchDebounce(userName, 550);
+    const debouncedSearch = useSearchDebounce(userName, 750);
+
+    const isOpenMention = isTypingMention === true && debouncedSearch.length > 0 && suggestions.length > 0;
 
     // Using forward ref inside it
     useImperativeHandle(ref, () => contentInnerRef.current!, []);
@@ -65,12 +68,10 @@ function RichTextEditor(
             try {
                 setMentionLoading(true);
 
-                const res = await fetch(`/api/users/search?query=${encodeURIComponent(debouncedSearch)}`, {
-                    cache: "no-store",
-                });
+                const response = await axiosInstance(`/user/search?query=${encodeURIComponent(debouncedSearch)}`);
 
-                const resData = await res.json();
-                setSuggestions(resData.data);
+                // const resData = await res.json();
+                setSuggestions(response.data.data);
                 setMentionLoading(false);
             } catch (error) {
                 setMentionLoading(false);
@@ -172,7 +173,7 @@ function RichTextEditor(
         return (
             <div
                 ref={dropdownMentionRef}
-                className="px-2 py-3 rounded-xl bg-white flex flex-col antd-dropdown-boxshadow max-h-[250px] overflow-auto"
+                className="rounded-lg bg-content1 flex flex-col  max-h-[120px] overflow-auto scrollbar"
             >
                 {mentionLoading ? (
                     <Spinner />
@@ -181,10 +182,11 @@ function RichTextEditor(
                         {suggestions.map((user: IUser) => (
                             <div
                                 key={user._id}
-                                className="!text-sm tw-dropdown-item !rounded-lg"
+                                className="hover:bg-content2 transition ease-in px-3 flex items-center gap-3 py-2 cursor-pointer"
                                 onClick={() => selectMention(user?.username)}
                             >
                                 <Avatar
+                                    size="sm"
                                     key={user._id}
                                     onClick={() => selectMention(user?.username)}
                                     src={user?.photo}
@@ -196,7 +198,7 @@ function RichTextEditor(
                     </>
                 )}
 
-                {/* {suggestions.length <= 0 && <Empty />} */}
+                {suggestions.length <= 0 && <p className="text-default-500">Users not found</p>}
             </div>
         );
     };
@@ -232,23 +234,25 @@ function RichTextEditor(
         <>
             {isMention ? (
                 <>
-                    <Popover isOpen={false} placement="bottom">
-                        <PopoverTrigger>
-                            <div
-                                suppressContentEditableWarning={true}
-                                ref={contentInnerRef}
-                                className={`${className} text-sm input-editor`}
-                                aria-placeholder={placeholder}
-                                contentEditable={true}
-                                onKeyUp={handleInput}
-                            >
-                                {parse(value)}
-                            </div>
-                        </PopoverTrigger>
-                        <PopoverContent>
-                            <div className="px-1 py-2">{renderMentions()}</div>
-                        </PopoverContent>
-                    </Popover>
+                    <div className="relative">
+                        <div
+                            suppressContentEditableWarning={true}
+                            ref={contentInnerRef}
+                            className={`${className} dark:text-white text-black text-sm input-editor`}
+                            aria-placeholder={placeholder}
+                            contentEditable={true}
+                            onKeyUp={handleInput}
+                        >
+                            {parse(value)}
+                        </div>
+                        <div
+                            className={`mt-3 w-full overflow-hidden scrollbar border-divider border rounded-lg ${
+                                isOpenMention ? "block" : "hidden"
+                            }`}
+                        >
+                            {renderMentions()}
+                        </div>
+                    </div>
                 </>
             ) : (
                 <div
