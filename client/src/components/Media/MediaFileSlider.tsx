@@ -11,7 +11,7 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import NextImage from "next/image";
 import { XIcon } from "lucide-react";
-// import VideoPlayer from "../Video/VideoPlayer";
+import VideoPlayer from "./VideoPlayer";
 
 interface IProps {
     mediaFiles: IMediaFile[];
@@ -72,13 +72,14 @@ function MediaFileSlider({
                                             alt="Preview Image"
                                         />
                                     ) : (
-                                        // <VideoPlayer
-                                        //     src={file.url}
-                                        //     timeline={videoPreview && false}
-                                        //     playOrPause={videoPreview && false}
-                                        //     className="w-full h-full block rounded-xl"
-                                        // />
-                                        <></>
+                                        <>
+                                            <VideoPlayer
+                                                src={file.url}
+                                                timeline={videoPreview && false}
+                                                playOrPause={videoPreview && true}
+                                                className="w-full h-full block rounded-xl"
+                                            />
+                                        </>
                                     )}
 
                                     {!!onRemoveMediaFile && (
