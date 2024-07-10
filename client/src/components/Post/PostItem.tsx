@@ -1,6 +1,6 @@
 "use client";
 import { IPost } from "@/types/post";
-import { Avatar, Button, Tooltip } from "@nextui-org/react";
+import { Avatar, Button, Tooltip, user } from "@nextui-org/react";
 import { EllipsisIcon, WandSparklesIcon } from "lucide-react";
 import TimeAgo from "../TimeAgo";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
@@ -9,6 +9,10 @@ import MediaFileSlider from "../Media/MediaFileSlider";
 import { useState } from "react";
 import useVisibility from "@/hooks/useVisibility";
 import FullScreenMediaSlider from "../Media/FullScreenMediaSlider";
+import UserProfileCard from "../User/UserProfileCard";
+import PostMenuDropdown from "./PostMenuDropdown";
+import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
+import UserName from "../User/UserName";
 
 interface IProps {
     post: IPost;
@@ -31,7 +35,7 @@ export default function PostItem({ post }: IProps) {
 
             if (attribs.class === "text-link") {
                 return (
-                    <Link href={attribs.href} className="text-link">
+                    <Link href={attribs.href} className="text-link hover:underline">
                         {domToReact(children, parserOptions)}
                     </Link>
                 );
@@ -47,9 +51,10 @@ export default function PostItem({ post }: IProps) {
                 activeSlideIndex={activeIndex}
                 mediaFiles={post?.mediaFiles}
             />
-            <div className="flex">
-                <section className="flex flex-col ">
+            <div className="flex px-1">
+                <section className="flex">
                     <Avatar
+                        isBordered
                         src={post?.postBy?.photo}
                         alt={post?.postBy?.username}
                         size="md"
@@ -58,18 +63,9 @@ export default function PostItem({ post }: IProps) {
                 </section>
                 <section className="ms-4 flex-1 max-w-full overflow-hidden">
                     <div className="flex items-start justify-between">
-                        <Tooltip
-                            delay={500}
-                            placement="bottom"
-                            content={
-                                <div className="px-1 py-2">
-                                    <div className="text-small font-bold">Custom Content</div>
-                                    <div className="text-tiny">This is a custom tooltip content</div>
-                                </div>
-                            }
-                        >
-                            <h4 className="font-semibold hover:underline cursor-pointer leading-none">
-                                {post?.postBy?.username}
+                        <Tooltip delay={500} placement="bottom-start" content={<UserProfileCard user={post?.postBy} />}>
+                            <h4>
+                                <UserName className="leading-none" user={post?.postBy} />
                             </h4>
                         </Tooltip>
 
@@ -86,12 +82,11 @@ export default function PostItem({ post }: IProps) {
                             </p>
 
                             {/* Menu */}
-                            <button className="animation-tap rounded-full tw-hover-effect">
-                                <EllipsisIcon size={16} />
-                            </button>
-                            {/* <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                                <EllipsisIcon size={16} />
-                            </Button> */}
+                            <PostMenuDropdown post={post}>
+                                <button className="outline-none rounded-full z-[1]">
+                                    <EllipsisIcon size={16} />
+                                </button>
+                            </PostMenuDropdown>
                         </div>
                     </div>
 
@@ -103,6 +98,30 @@ export default function PostItem({ post }: IProps) {
                             videoPreview={true}
                             scrollHorizontally={false}
                         />
+                    </div>
+                    {/* Like, Share, Save,... */}
+                    <div className="mt-2">
+                        <Button
+                            size="sm"
+                            radius="full"
+                            color="default"
+                            variant="light"
+                            startContent={<HeartIcon isFilled={false} size={18} />}
+                        >
+                            3,4k
+                        </Button>
+                        <Button
+                            size="sm"
+                            radius="full"
+                            variant="light"
+                            startContent={<CommentIcon isFilled={false} size={18} />}
+                        >
+                            30
+                        </Button>
+
+                        <Button size="sm" radius="full" variant="light" startContent={<RepostIcon size={18} />}>
+                            30
+                        </Button>
                     </div>
                 </section>
             </div>
