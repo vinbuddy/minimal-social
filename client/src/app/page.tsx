@@ -1,46 +1,39 @@
 "use client";
-import ChatItem from "@/components/Conversation/ConversationItem";
-import EmojiPicker from "@/components/EmojiPicker";
+import { Spinner, Tab, Tabs } from "@nextui-org/react";
+import { ImageIcon, PanelRight, PaperclipIcon, Phone, PlusIcon, Search, ThumbsUpIcon, Video } from "lucide-react";
+import { Fragment, useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import MainLayout from "@/components/MainLayout";
 import PostModalButton from "@/components/Post/PostModalButton";
 import useAuthStore from "@/hooks/store/useAuthStore";
-import axiosInstance from "@/utils/httpRequest";
-import {
-    Avatar,
-    Badge,
-    Button,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownTrigger,
-    Input,
-    Tab,
-    Tabs,
-    Tooltip,
-} from "@nextui-org/react";
-import { ImageIcon, PanelRight, PaperclipIcon, Phone, PlusIcon, Search, ThumbsUpIcon, Video } from "lucide-react";
-import { useEffect } from "react";
+import usePagination from "@/hooks/usePagination";
+import { IPost } from "@/types/post";
+import PostItem from "@/components/Post/PostItem";
 function Home() {
-    const currentUser = useAuthStore((state) => state.currentUser);
+    const [postType, setPostType] = useState<"feed" | "following" | "liked">("feed");
+    const {
+        data: posts,
+        loadingMore,
+        error,
+        isReachedEnd,
+        size,
+        setSize: setPage,
+        mutate,
+    } = usePagination<IPost>("/post");
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const res = await axiosInstance.get("/user");
-                // console.log(getCookie("accessToken"));
-                console.log("res: ", res.data);
-                console.log("currentUser: ", currentUser);
-            } catch (error) {
-                console.log("error: ", error);
-            }
-        })();
-    }, [currentUser]);
+    console.log(posts);
+
     return (
         <MainLayout>
             <div className="flex justify-center w-full">
                 <div className="min-w-[630px]">
-                    <header className="sticky top-0 p-4 flex justify-between items-center">
-                        <Tabs color="default" aria-label="Tabs colors" radius="md">
+                    <header className="sticky top-0 z-10 p-4 flex justify-between items-center bg-background">
+                        <Tabs
+                            onSelectionChange={(key) => setPostType(key.toString() as typeof postType)}
+                            color="default"
+                            aria-label="Tabs colors"
+                            radius="md"
+                        >
                             <Tab key="feed" title="Feed" />
                             <Tab key="following" title="Following" />
                             <Tab key="liked" title="Liked" />
@@ -49,7 +42,24 @@ function Home() {
                         <PostModalButton />
                     </header>
 
-                    <div className="min-h-[4000px]"></div>
+                    <main className="px-4 pb-4">
+                        <InfiniteScroll
+                            next={() => setPage(size + 1)}
+                            hasMore={!isReachedEnd}
+                            loader={
+                                <div className="flex justify-center">
+                                    <Spinner size="sm" />
+                                </div>
+                            }
+                            dataLength={posts?.length ?? 0}
+                        >
+                            {posts.map((post) => (
+                                <Fragment key={post?._id}>
+                                    <PostItem post={post} />
+                                </Fragment>
+                            ))}
+                        </InfiniteScroll>
+                    </main>
                 </div>
             </div>
         </MainLayout>

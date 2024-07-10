@@ -23,7 +23,7 @@ interface IProps {
 
 function MediaFileSlider({
     mediaFiles,
-    scrollHorizontally = false,
+    scrollHorizontally = true,
     videoPreview = true,
     onMediaFileClick,
     onRemoveMediaFile,
@@ -39,7 +39,7 @@ function MediaFileSlider({
                     allowTouchMove={false}
                     freeMode={true}
                     mousewheel={{
-                        forceToAxis: scrollHorizontally,
+                        forceToAxis: !scrollHorizontally,
                     }}
                 >
                     {mediaFiles?.map((file, index) => {

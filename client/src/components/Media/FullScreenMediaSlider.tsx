@@ -40,8 +40,8 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
 
     return (
         <div
-            className={`animate-[fadeIn_0.2s_ease-in] fixed top-0 left-0 right-0 bottom-0 z-10 flex justify-center w-screen h-screen bg-black ${
-                isOpen ? "flex" : "hidden"
+            className={`animate-[fadeIn_0.2s_ease-in] fixed top-0 left-0 right-0 bottom-0 z-10 flex justify-center w-screen h-screen bg-black fade ${
+                isOpen ? "show pointer-events-auto" : "pointer-events-none"
             }`}
         >
             {/* Exit button */}
@@ -93,6 +93,7 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
                                     width={file.width}
                                     height={file.height}
                                     placeholder="blur"
+                                    blurDataURL={file?.url}
                                     alt=""
                                 />
                             ) : (

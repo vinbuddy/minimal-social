@@ -38,6 +38,10 @@ axiosInstance.interceptors.request.use(
     }
 );
 
+export function fetcher(url: string) {
+    return axiosInstance.get(url).then((res) => res.data);
+}
+
 // // Response interceptor
 // axiosInstance.interceptors.response.use(
 //     (response) => response,

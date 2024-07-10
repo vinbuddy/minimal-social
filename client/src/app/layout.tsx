@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import MainLayout from "@/components/MainLayout";
-import { AuthClientApp, NextProvider as NextUIProvider } from "./providers";
+import { AuthClientApp, NextProvider as NextUIProvider, SWRConfigProvider } from "./providers";
 import { Toaster } from "sonner";
 import { AuthContextProvider } from "@/contexts/AuthContext";
 import { cookies } from "next/headers";
@@ -28,11 +28,13 @@ export default function RootLayout({
                     refreshToken={cookies().get("refreshToken")?.value}
                 >
                     <NextUIProvider>
-                        <AuthContextProvider>
-                            {children}
-                            <Toaster />
-                            <TokenRefresher />
-                        </AuthContextProvider>
+                        <SWRConfigProvider>
+                            <AuthContextProvider>
+                                {children}
+                                <Toaster />
+                                <TokenRefresher />
+                            </AuthContextProvider>
+                        </SWRConfigProvider>
                     </NextUIProvider>
                 </AuthClientApp>
             </body>
