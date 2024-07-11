@@ -1,9 +1,19 @@
 "use client";
-import { Button, useDisclosure, Popover, PopoverTrigger, PopoverContent, Avatar } from "@nextui-org/react";
+import {
+    Button,
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    Avatar,
+    Modal,
+    ModalContent,
+    ModalBody,
+    useDisclosure,
+} from "@nextui-org/react";
 import EmojiPicker from "../EmojiPicker";
 import { ImagePlusIcon, SmileIcon } from "lucide-react";
 import MediaFileSlider from "../Media/MediaFileSlider";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { IMediaFile, IPost } from "@/types/post";
 import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
 import MediaFileUploaderButton from "../Media/MediaFileUploaderButton";
@@ -13,24 +23,53 @@ import axiosInstance from "@/utils/httpRequest";
 import axios from "axios";
 import useLoading from "@/hooks/useLoading";
 import { toast } from "sonner";
-import { set } from "react-hook-form";
+import { mutate, useSWRConfig } from "swr";
+import useGlobalMutation from "@/hooks/useGlobalMutation";
 
 interface IProps {
     type?: "create" | "edit";
     post?: IPost;
+    children?: React.ReactNode;
+    open?: boolean;
+    setOpen?: Dispatch<SetStateAction<boolean>>;
 }
-
-export default function PostModalButton({ type = "create", post }: IProps): React.ReactNode {
-    // const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+export default function PostModalButton({ type = "create", post, children, open, setOpen }: IProps) {
+    const [isOpen, setIsOpen] = useState<boolean>(!!open);
     const { currentUser } = useAuthStore();
     const { startLoading, stopLoading, loading } = useLoading();
+    // const { mutate, cache } = useSWRConfig();
+    const mutate = useGlobalMutation();
 
     const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>(post?.mediaFiles ?? []);
     const [caption, setCaption] = useState<string>(post?.caption ?? "");
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
+    const popoverRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        setIsOpen(open ?? false);
+    }, [open]);
+
+    useEffect(() => {
+        const clickOutsidePopover = (event: MouseEvent) => {
+            const isClickInsidePopover = popoverRef.current?.contains(event.target as Node);
+
+            const emojiPickerElement = document.querySelector("em-emoji-picker");
+            const isClickInsideEmojiPicker = emojiPickerElement?.contains(event.target as Node);
+
+            // Determine if the click is outside both popover and emoji picker
+            if (type === "edit" && !isClickInsidePopover && !isClickInsideEmojiPicker) {
+                handleOpenChange(false);
+            }
+        };
+
+        document.addEventListener("click", clickOutsidePopover);
+
+        return () => {
+            document.removeEventListener("click", clickOutsidePopover);
+        };
+    }, [popoverRef.current, type]);
 
     const uploadMediaFiles = async (e: ChangeEvent<HTMLInputElement>) => {
         const files: any = e.target.files;
@@ -101,28 +140,29 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
         setMediaFiles([]);
         setCaption("");
 
-        if (fileInputRef.current) {
+        if (fileInputRef.current && type === "create") {
             const emptyFileList = new DataTransfer();
             fileInputRef.current.files = emptyFileList.files;
         }
-        setIsOpen(false);
     };
 
-    const handleOpenChange = (open: boolean) => {
-        const isEmptyPost = caption.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0 && mediaFiles.length === 0;
-
-        if (isOpen && !isEmptyPost) {
-            if (window.confirm("Are you sure you want to discard this post?")) {
-                reset();
-            } else setIsOpen(true);
-        } else {
-            setIsOpen(open);
-        }
+    const handleOpenChange = (_open: boolean) => {
+        setIsOpen(_open);
+        setOpen && setOpen(_open);
     };
+
+    // const handleRevalidatePost = () => {
+
+    //     for (const key of cache.keys() as any) {
+    //         if (key.includes("/post")) {
+    //             mutate(key);
+    //         }
+    //     }
+    // }
 
     const handleCreatePost = async () => {
         if (!currentUser) {
-            alert("Please login to create a post.");
+            alert("Unauthenticated user found.");
             return;
         }
 
@@ -152,8 +192,12 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
                 withCredentials: true,
             });
 
+            mutate((key) => typeof key === "string" && key.includes("/post"));
+
             console.log(response.data);
             reset();
+            setIsOpen(false);
+            setOpen && setOpen(false);
 
             toast.success("Post created successfully.", { position: "bottom-center" });
         } catch (error: any) {
@@ -166,113 +210,161 @@ export default function PostModalButton({ type = "create", post }: IProps): Reac
         }
     };
 
+    const handleEditPost = async () => {
+        if (!currentUser || !post?._id) {
+            alert("Please login or post data.");
+            return;
+        }
+
+        if (caption.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0) {
+            alert("Caption cannot be both empty.");
+            return;
+        }
+
+        startLoading();
+
+        try {
+            const response = await axiosInstance.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/post`, {
+                caption,
+                postId: post?._id,
+            });
+
+            mutate((key) => typeof key === "string" && key.includes("/post"));
+
+            console.log(response.data);
+            reset();
+            setIsOpen(false);
+            setOpen && setOpen(false);
+
+            toast.success("Post edited successfully.", { position: "bottom-center" });
+        } catch (error: any) {
+            toast.error("Failed to edit post.", { position: "bottom-center" });
+            toast.error(error.response.data.message, { position: "bottom-center" });
+
+            console.log(error);
+        } finally {
+            stopLoading();
+        }
+    };
+
+    const renderPostForm = () => {
+        return (
+            <>
+                <div className="flex">
+                    <section>
+                        <Avatar size="lg" src={currentUser?.photo} />
+                    </section>
+                    <section className="ms-4 flex-1 max-w-full overflow-hidden">
+                        <h4 className="text-sm font-semibold mb-1">{currentUser?.username || "Anonymous"}</h4>
+
+                        <RichTextEditor
+                            value={post?.caption || ""}
+                            isMention={true}
+                            isTag={true}
+                            ref={contentRef}
+                            handleInputChange={(value) => {
+                                setCaption(value);
+                            }}
+                            className="w-full"
+                        />
+                        <div className="mt-2">
+                            <EmojiPicker
+                                placement="top"
+                                button={
+                                    <Button
+                                        disableRipple
+                                        className="bg-transparent p-0 gap-0 justify-start"
+                                        isIconOnly
+                                        size="sm"
+                                        color="default"
+                                        aria-label="Like"
+                                    >
+                                        <SmileIcon size={20} className="text-default-500" />
+                                    </Button>
+                                }
+                                contentRef={contentRef}
+                                onAfterPicked={() => {
+                                    setCaption(contentRef.current?.innerHTML ?? "");
+                                }}
+                            />
+
+                            {type === "create" && (
+                                <MediaFileUploaderButton
+                                    buttonProps={{
+                                        disableRipple: true,
+                                        className: "bg-transparent p-0 gap-0 justify-start",
+                                        isIconOnly: true,
+                                        size: "sm",
+                                        color: "default",
+                                        children: (
+                                            <>
+                                                <label htmlFor="file-input" className="cursor-pointer w-full">
+                                                    <ImagePlusIcon size={20} className="text-default-500" />
+                                                </label>
+                                            </>
+                                        ),
+                                    }}
+                                    ref={fileInputRef}
+                                    onUpload={uploadMediaFiles}
+                                />
+                            )}
+                        </div>
+                        <div className="max-w-full overflow-hidden">
+                            <div className="mt-2">
+                                <MediaFileSlider
+                                    scrollHorizontally
+                                    videoPreview={true}
+                                    mediaFiles={mediaFiles}
+                                    onRemoveMediaFile={type === "create" ? removeMediaFiles : undefined}
+                                />
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div className="flex justify-end mt-4 gap-2">
+                    <Button
+                        variant="light"
+                        color="default"
+                        onClick={() => {
+                            setIsOpen(false);
+                            setOpen && setOpen(false);
+                        }}
+                    >
+                        Close
+                    </Button>
+                    <Button
+                        onClick={type === "create" ? handleCreatePost : handleEditPost}
+                        isDisabled={
+                            caption.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0 && mediaFiles.length === 0
+                        }
+                        color="default"
+                        variant="bordered"
+                        isLoading={loading}
+                    >
+                        {type === "create" ? "Post" : "Edit"}
+                    </Button>
+                </div>
+            </>
+        );
+    };
+
     return (
         <>
             <Popover
                 placement="top-end"
                 size="lg"
+                shouldFlip
                 backdrop="opaque"
-                offset={20}
+                offset={type === "create" ? 20 : -20}
+                defaultOpen={isOpen}
                 isOpen={isOpen}
                 onOpenChange={handleOpenChange}
+                shouldCloseOnBlur
             >
-                <PopoverTrigger>
-                    <Button color="primary">Create</Button>
-                </PopoverTrigger>
+                <PopoverTrigger>{children ? children : <Button color="primary">Create</Button>}</PopoverTrigger>
                 <PopoverContent className="p-0">
-                    <div className="w-[598px] p-4 ">
-                        <div className="flex">
-                            <section>
-                                <Avatar size="lg" src={currentUser?.photo} />
-                            </section>
-                            <section className="ms-4 flex-1 max-w-full overflow-hidden">
-                                <h4 className="text-sm font-semibold mb-1">{currentUser?.username || "Anonymous"}</h4>
-
-                                <RichTextEditor
-                                    value={post?.caption || ""}
-                                    isMention={true}
-                                    isTag={true}
-                                    ref={contentRef}
-                                    handleInputChange={(value) => {
-                                        setCaption(value);
-                                    }}
-                                    className="w-full"
-                                />
-                                <div className="mt-2">
-                                    <EmojiPicker
-                                        placement="top"
-                                        button={
-                                            <Button
-                                                disableRipple
-                                                className="bg-transparent p-0 gap-0 justify-start"
-                                                isIconOnly
-                                                size="sm"
-                                                color="default"
-                                                aria-label="Like"
-                                            >
-                                                <SmileIcon size={20} className="text-default-500" />
-                                            </Button>
-                                        }
-                                        contentRef={contentRef}
-                                        onAfterPicked={() => {
-                                            setCaption(contentRef.current?.innerHTML ?? "");
-                                        }}
-                                    />
-                                    {/* <Button
-                                            disableRipple
-                                            className="bg-transparent p-0 gap-0 justify-start"
-                                            isIconOnly
-                                            size="sm"
-                                            color="default"
-                                            aria-label="Like"
-                                        >
-                                            <ImagePlusIcon size={20} className="text-default-500" />
-                                        </Button> */}
-                                    <MediaFileUploaderButton
-                                        buttonProps={{
-                                            disableRipple: true,
-                                            className: "bg-transparent p-0 gap-0 justify-start",
-                                            isIconOnly: true,
-                                            size: "sm",
-                                            color: "default",
-                                            children: (
-                                                <>
-                                                    <label htmlFor="file-input" className="cursor-pointer w-full">
-                                                        <ImagePlusIcon size={20} className="text-default-500" />
-                                                    </label>
-                                                </>
-                                            ),
-                                        }}
-                                        ref={fileInputRef}
-                                        onUpload={uploadMediaFiles}
-                                    />
-                                </div>
-                                <div className="max-w-full overflow-hidden">
-                                    <div className="mt-2">
-                                        <MediaFileSlider
-                                            scrollHorizontally
-                                            videoPreview={true}
-                                            mediaFiles={mediaFiles}
-                                            onRemoveMediaFile={type === "create" ? removeMediaFiles : undefined}
-                                        />
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                        <div className="flex justify-end mt-4">
-                            <Button
-                                onClick={handleCreatePost}
-                                isDisabled={
-                                    caption.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0 &&
-                                    mediaFiles.length === 0
-                                }
-                                color="default"
-                                variant="bordered"
-                                isLoading={loading}
-                            >
-                                Post
-                            </Button>
-                        </div>
+                    <div ref={popoverRef} className="w-[598px] p-4 ">
+                        {renderPostForm()}
                     </div>
                 </PopoverContent>
             </Popover>

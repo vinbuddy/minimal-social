@@ -1,6 +1,6 @@
 "use client";
 import { IPost } from "@/types/post";
-import { Avatar, Button, Tooltip, user } from "@nextui-org/react";
+import { Avatar, Tooltip } from "@nextui-org/react";
 import { EllipsisIcon, WandSparklesIcon } from "lucide-react";
 import TimeAgo from "../TimeAgo";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
@@ -11,8 +11,9 @@ import useVisibility from "@/hooks/useVisibility";
 import FullScreenMediaSlider from "../Media/FullScreenMediaSlider";
 import UserProfileCard from "../User/UserProfileCard";
 import PostMenuDropdown from "./PostMenuDropdown";
-import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
 import UserName from "../User/UserName";
+import PostActions from "./PostActions";
+import PostModalButton from "./PostModalButton";
 
 interface IProps {
     post: IPost;
@@ -21,9 +22,14 @@ interface IProps {
 export default function PostItem({ post }: IProps) {
     const { isVisible: open, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
     const [activeIndex, setActiveIndex] = useState<number>(0);
+    const [openEditModal, setOpenEditModal] = useState<boolean>(false);
     const handleMediaFileClick = (index: number) => {
         setActiveIndex(index);
         showFullscreenSlider();
+    };
+
+    const handleToggleEditModal = () => {
+        setOpenEditModal(!openEditModal);
     };
 
     // Convert <a> to <Link> tag
@@ -69,24 +75,34 @@ export default function PostItem({ post }: IProps) {
                             </h4>
                         </Tooltip>
 
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-3">
                             {post?.isEdited && (
                                 <Tooltip content="This post is edited" placement="bottom" showArrow>
-                                    <WandSparklesIcon size={18} />
+                                    <WandSparklesIcon className="cursor-pointer" size={16} />
                                 </Tooltip>
                             )}
 
                             {/* Time */}
-                            <p className="text-grey text-sm me-3 cursor-pointer leading-none">
+                            <p className="text-grey text-sm cursor-pointer leading-none">
                                 <TimeAgo date={post?.createdAt} />
                             </p>
 
                             {/* Menu */}
-                            <PostMenuDropdown post={post}>
-                                <button className="outline-none rounded-full z-[1]">
-                                    <EllipsisIcon size={16} />
-                                </button>
-                            </PostMenuDropdown>
+                            <div className="flex flex-col justify-center">
+                                <PostMenuDropdown onOpenEditModal={handleToggleEditModal} post={post}>
+                                    <button className="outline-none rounded-full z-[1]">
+                                        <EllipsisIcon size={16} />
+                                    </button>
+                                </PostMenuDropdown>
+                                <PostModalButton
+                                    post={post}
+                                    open={openEditModal}
+                                    setOpen={setOpenEditModal}
+                                    type="edit"
+                                >
+                                    <div></div>
+                                </PostModalButton>
+                            </div>
                         </div>
                     </div>
 
@@ -101,27 +117,7 @@ export default function PostItem({ post }: IProps) {
                     </div>
                     {/* Like, Share, Save,... */}
                     <div className="mt-2">
-                        <Button
-                            size="sm"
-                            radius="full"
-                            color="default"
-                            variant="light"
-                            startContent={<HeartIcon isFilled={false} size={18} />}
-                        >
-                            3,4k
-                        </Button>
-                        <Button
-                            size="sm"
-                            radius="full"
-                            variant="light"
-                            startContent={<CommentIcon isFilled={false} size={18} />}
-                        >
-                            30
-                        </Button>
-
-                        <Button size="sm" radius="full" variant="light" startContent={<RepostIcon size={18} />}>
-                            30
-                        </Button>
+                        <PostActions post={post} />
                     </div>
                 </section>
             </div>

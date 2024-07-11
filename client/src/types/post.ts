@@ -20,6 +20,8 @@ export interface IPost {
     isEdited: boolean;
     createdAt: string;
     updatedAt: string;
+    likeCount?: number;
+    commentCount?: number;
 }
 
 // export type PostType = "Feed" | "Following" | "UserPosts";
