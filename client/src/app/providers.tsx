@@ -5,6 +5,7 @@ import { fetcher } from "@/utils/httpRequest";
 import { NextUIProvider } from "@nextui-org/react";
 import { useState } from "react";
 import { SWRConfig } from "swr";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 export function SWRConfigProvider({ children }: { children: React.ReactNode }) {
     return (
@@ -24,7 +25,13 @@ export function SWRConfigProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function NextProvider({ children }: { children: React.ReactNode }) {
-    return <NextUIProvider className="h-full">{children}</NextUIProvider>;
+    return (
+        <NextUIProvider className="h-full">
+            <NextThemesProvider attribute="class" defaultTheme="light">
+                {children}
+            </NextThemesProvider>
+        </NextUIProvider>
+    );
 }
 
 interface AuthClientAppProps {

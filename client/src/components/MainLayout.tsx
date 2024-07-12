@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { HeartIcon, LogOut, SearchIcon, Send, Smile, SunDim, User } from "lucide-react";
+import { HeartIcon, LogOut, MoonIcon, SearchIcon, Send, Smile, SunDim, User } from "lucide-react";
 import Link from "next/link";
 import { Avatar, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 import useAuthStore from "@/hooks/store/useAuthStore";
@@ -9,6 +9,8 @@ import useLoading from "@/hooks/useLoading";
 import { toast } from "sonner";
 import { usePathname, useRouter } from "next/navigation";
 import { HomeIcon } from "@/assets/icons";
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 
 const navLinks = [
     {
@@ -34,10 +36,14 @@ const navLinks = [
 ];
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+    const [mounted, setMounted] = useState<boolean>(false);
+    const { theme, setTheme } = useTheme();
     const { currentUser } = useAuthStore();
     const { startLoading, stopLoading, loading } = useLoading();
     const router = useRouter();
     const pathName = usePathname();
+
+    useEffect(() => setMounted(true), []);
 
     const handleLogOut = async (): Promise<void> => {
         try {
@@ -133,15 +139,25 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             <DropdownItem
                                 textValue=""
                                 isReadOnly
-                                startContent={<SunDim size={16} />}
+                                startContent={theme === "light" ? <SunDim size={16} /> : <MoonIcon size={16} />}
                                 endContent={
                                     <select
                                         className="z-10 outline-none w-16 py-0.5 rounded-md text-tiny group-data-[hover=true]:border-default-500 border-small border-default-300 dark:border-default-200 bg-transparent text-default-500"
                                         id="theme"
                                         name="theme"
+                                        value={theme}
+                                        onChange={(e) => setTheme(e.target.value)}
                                     >
-                                        <option className="text-black">Light</option>
-                                        <option className="text-black">Dark</option>
+                                        {mounted && (
+                                            <>
+                                                <option className="text-black" value="dark">
+                                                    Dark
+                                                </option>
+                                                <option className="text-black" value="light">
+                                                    Light
+                                                </option>
+                                            </>
+                                        )}
                                     </select>
                                 }
                                 key="theme"
