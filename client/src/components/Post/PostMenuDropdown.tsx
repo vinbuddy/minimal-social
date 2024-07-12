@@ -1,19 +1,14 @@
+"use client";
 import useAuthStore from "@/hooks/store/useAuthStore";
 import { IPost } from "@/types/post";
-import {
-    Dropdown,
-    DropdownTrigger,
-    DropdownMenu,
-    DropdownItem,
-    BaseColors,
-    ThemeColors,
-    SemanticBaseColors,
-    useDisclosure,
-    Tooltip,
-} from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
 import { EyeIcon, LinkIcon, TrashIcon, WandSparkles } from "lucide-react";
+import Link from "next/link";
 import { Fragment } from "react";
-import PostModalButton from "./PostModalButton";
+import { toast } from "sonner";
+import ConfirmationModal from "../ConfirmationModal";
+import axiosInstance from "@/utils/httpRequest";
+import useGlobalMutation from "@/hooks/useGlobalMutation";
 
 interface IProps {
     children: React.ReactNode | React.JSX.Element | React.ReactElement;
@@ -23,25 +18,56 @@ interface IProps {
 
 type PostMenuItem = {
     key: string;
-    content: string;
+    content: string | React.ReactNode;
     icon: React.ReactNode;
     color?: "default" | "primary" | "secondary" | "success" | "warning" | "danger";
     className?: string;
+    href?: string;
     onClick?: () => void;
 };
 
 export default function PostMenuDropdown({ children, post, onOpenEditModal }: IProps) {
     const { currentUser } = useAuthStore();
+    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const mutate = useGlobalMutation();
+
+    const handleCopyLink = async (): Promise<void> => {
+        try {
+            const pathName = `/post/${post._id}`;
+            await navigator.clipboard.writeText(window.location.origin + pathName);
+            toast.success("Copied link", { position: "bottom-center" });
+        } catch (err) {
+            toast.error("Copied error");
+        }
+    };
+
+    const handleDeletePost = async () => {
+        try {
+            if (!post) return;
+            const response = await axiosInstance.delete(`/post/${post._id}`);
+
+            mutate((key) => typeof key === "string" && key.includes("/post"));
+            toast.success("Delete post successfully", {
+                position: "bottom-center",
+            });
+        } catch (error: any) {
+            toast.error("Delete post error");
+            toast.error(error.response.data.message);
+        }
+    };
+
     const items: PostMenuItem[] = [
         {
             key: "copy",
             content: "Copy link",
             icon: <LinkIcon size={18} />,
+            onClick: handleCopyLink,
         },
         {
             key: "detail",
-            content: "View detail",
+            content: "View post",
             icon: <EyeIcon size={18} />,
+            href: `/post/${post._id}`,
         },
     ];
 
@@ -59,17 +85,20 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
             icon: <TrashIcon size={18} />,
             color: "danger",
             className: "text-danger",
+            onClick: () => onOpen(),
         },
     ];
 
     return (
         <>
+            <ConfirmationModal isOpen={isOpen} onOpenChange={onOpenChange} onOk={handleDeletePost} />
             <Dropdown placement="bottom-end">
                 <DropdownTrigger>{children}</DropdownTrigger>
                 <DropdownMenu variant="flat" aria-label="Static Actions">
                     {post?.postBy?._id === currentUser?._id // Check if the post is created by the current user or not
                         ? ownerItems.map((item) => (
                               <DropdownItem
+                                  href={item?.href}
                                   onClick={item?.onClick}
                                   className={item.className ?? ""}
                                   color={item.color}
@@ -82,6 +111,7 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
                         : items.map((item) => (
                               <Fragment key={item.key}>
                                   <DropdownItem
+                                      href={item?.href}
                                       onClick={item?.onClick}
                                       className={item.className ?? ""}
                                       color={item.color}
@@ -92,13 +122,6 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
                                   </DropdownItem>
                               </Fragment>
                           ))}
-
-                    {/* <DropdownItem key="new">New file</DropdownItem>
-                        <DropdownItem key="copy">Copy link</DropdownItem>
-                        <DropdownItem key="edit">Edit file</DropdownItem>
-                        <DropdownItem key="delete" className="text-danger" color="danger">
-                            Delete file
-                        </DropdownItem> */}
                 </DropdownMenu>
             </Dropdown>
         </>

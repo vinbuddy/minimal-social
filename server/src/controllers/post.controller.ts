@@ -5,6 +5,7 @@ import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
 import { createPostInput, createPostSchema, editPostInput, editPostSchema } from "../schemas/post.schema";
 import { uploadToCloudinary } from "../helpers/cloudinary";
+import cloudinary from "../configs/cloudinary";
 
 interface RequestWithFiles extends Request {
     files: Express.Multer.File[];
@@ -97,6 +98,33 @@ export async function editPostHandler(req: Request, res: Response, next: NextFun
     } catch (error) {
         next(error);
     }
+}
+
+export async function deletePostHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({ message: "Post ID is required" });
+        }
+
+        const post = await PostModel.findById(id);
+
+        const mediaFiles: MediaFile[] | null = post && post.mediaFiles;
+
+        if (mediaFiles && mediaFiles.length > 0) {
+            const promises = mediaFiles.map((file) => cloudinary.uploader.destroy(file.publicId));
+            await Promise.all(promises);
+        }
+
+        const deletedPost = await PostModel.findByIdAndDelete(id);
+
+        if (!deletedPost) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        return res.status(200).json({ message: "Delete post successfully" });
+    } catch (error) {}
 }
 
 export async function getAllPostsHandler(req: Request, res: Response, next: NextFunction) {

@@ -164,7 +164,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 </nav>
             </aside>
 
-            <div className="flex-1 ps-[80px]">
+            <div className="flex-1">
                 <div>{children}</div>
             </div>
         </div>

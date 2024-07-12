@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import {
     createPostHandler,
+    deletePostHandler,
     editPostHandler,
     getAllPostsHandler,
     likePostHandler,
@@ -15,6 +16,7 @@ const router: Router = express.Router();
 router.post("/", verifyToken, uploadFile.array("mediaFiles"), createPostHandler);
 router.put("/", verifyToken, editPostHandler);
 router.get("/", verifyToken, getAllPostsHandler);
+router.delete("/:id", verifyToken, deletePostHandler);
 router.put("/like", verifyToken, likePostHandler);
 router.put("/unlike", verifyToken, unlikePostHandler);
 

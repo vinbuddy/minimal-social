@@ -34,7 +34,7 @@ function ConversationPage() {
     }, [currentUser]);
     return (
         <MainLayout>
-            <div className="grid grid-cols-12 h-full">
+            <div className="grid grid-cols-12 h-full ps-[80px]">
                 <section className="col-span-12 sm:col-span-12 md:col-span-3 lg:col-span-3 xl:col-span-3 2xl:col-span-3">
                     <div className="h-screen overflow-auto border-r-1 border-divider px-4 pb-4 scrollbar">
                         <div className="sticky top-0 pt-4 bg-background z-10">

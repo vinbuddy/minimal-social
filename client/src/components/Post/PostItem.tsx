@@ -50,7 +50,7 @@ export default function PostItem({ post }: IProps) {
     };
 
     return (
-        <div className="py-5 border-b last:border-none">
+        <div className="py-5 border-b border-divider last:border-none">
             <FullScreenMediaSlider
                 onHide={hideFullscreenSlider}
                 isOpen={open}

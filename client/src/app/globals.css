@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+    padding-right: 0px !important;
+}
+
 body {
     /* height: 100vh; */
     overflow-x: hidden !important;

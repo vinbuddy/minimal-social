@@ -12,6 +12,7 @@ import "swiper/css/scrollbar";
 import NextImage from "next/image";
 import { XIcon } from "lucide-react";
 import VideoPlayer from "./VideoPlayer";
+import { Image } from "@nextui-org/react";
 
 interface IProps {
     mediaFiles: IMediaFile[];
@@ -62,16 +63,63 @@ function MediaFileSlider({
                                     onClick={() => !!onMediaFileClick && onMediaFileClick(index)}
                                 >
                                     {file.type === "image" ? (
-                                        <NextImage
-                                            className="w-full h-auto block rounded-lg"
-                                            src={file?.url}
-                                            width={file.width}
-                                            height={file.height}
-                                            placeholder="blur"
-                                            blurDataURL={file?.url}
-                                            alt="Preview Image"
-                                        />
+                                        onRemoveMediaFile ? (
+                                            <NextImage
+                                                className="w-full h-auto block rounded-lg"
+                                                src={file?.url}
+                                                width={file.width}
+                                                height={file.height}
+                                                placeholder="blur"
+                                                blurDataURL={file?.url}
+                                                alt="Preview Image"
+                                            />
+                                        ) : (
+                                            <Image
+                                                // removeWrapper
+                                                classNames={{ wrapper: "h-full" }}
+                                                as={NextImage}
+                                                className="w-full h-auto block rounded-lg"
+                                                src={file?.url}
+                                                width={file.width}
+                                                height={file.height}
+                                                placeholder="blur"
+                                                blurDataURL={file?.url}
+                                                alt="Preview Image"
+                                            />
+                                        )
                                     ) : (
+                                        // <NextImage
+                                        //     // as={NextImage}
+                                        //     className="w-full h-auto block rounded-lg"
+                                        //     src={file?.url}
+                                        //     width={file.width}
+                                        //     height={file.height}
+                                        //     placeholder="blur"
+                                        //     blurDataURL={file?.url}
+                                        //     alt="Preview Image"
+                                        // />
+                                        // onRemoveMediaFile ? (
+                                        //     <NextImage
+                                        //         className="w-full h-auto block rounded-lg"
+                                        //         src={file?.url}
+                                        //         width={file.width}
+                                        //         height={file.height}
+                                        //         placeholder="blur"
+                                        //         blurDataURL={file?.url}
+                                        //         alt="Preview Image"
+                                        //     />
+                                        // ) : (
+                                        //     <Image
+                                        //         as={NextImage}
+                                        //         className="w-full h-auto block rounded-lg"
+                                        //         src={file?.url}
+                                        //         width={file.width}
+                                        //         height={file.height}
+                                        //         placeholder="blur"
+                                        //         blurDataURL={file?.url}
+                                        //         alt="Preview Image"
+                                        //     />
+                                        // )
                                         <>
                                             <VideoPlayer
                                                 src={file.url}
