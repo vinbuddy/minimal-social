@@ -159,13 +159,6 @@ export async function getAllPostsHandler(req: Request, res: Response, next: Next
                 },
             },
             {
-                $addFields: {
-                    likeCount: {
-                        $size: "$likes",
-                    },
-                },
-            },
-            {
                 $lookup: {
                     from: "comments",
                     localField: "_id",
@@ -175,6 +168,7 @@ export async function getAllPostsHandler(req: Request, res: Response, next: Next
             },
             {
                 $addFields: {
+                    likeCount: { $size: "$likes" },
                     commentCount: { $size: "$comments" },
                 },
             },
@@ -194,6 +188,162 @@ export async function getAllPostsHandler(req: Request, res: Response, next: Next
         return res
             .status(200)
             .json({ message: "Get all posts successfully", data: posts, totalPosts, totalPages, page, limit });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getFollowingPostsHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = req.query.userId;
+        const page = Number(req.query.page) ?? 1;
+        const limit = Number(req.query.limit) ?? 15;
+
+        const skip = (Number(page) - 1) * limit;
+
+        const user = await UserModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const followingIds = user?.followings ?? [];
+
+        const totalPosts = await PostModel.countDocuments({
+            postBy: { $in: followingIds }, // Get following posts
+        });
+        const totalPages = Math.ceil(totalPosts / limit);
+
+        const posts = await PostModel.aggregate([
+            { $match: { postBy: { $in: followingIds } } },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+                // Join postBy field with users collection
+                $lookup: {
+                    from: "users",
+                    localField: "postBy",
+                    foreignField: "_id",
+                    as: "postBy",
+                },
+            },
+            { $unwind: "$postBy" }, // Deconstruct postBy array to object
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "mentions",
+                    foreignField: "_id",
+                    as: "mentions",
+                },
+            },
+            {
+                $lookup: {
+                    from: "comments",
+                    localField: "_id",
+                    foreignField: "target",
+                    as: "comments",
+                },
+            },
+            {
+                $addFields: {
+                    likeCount: { $size: "$likes" },
+                    commentCount: { $size: "$comments" },
+                },
+            },
+            {
+                $project: {
+                    "postBy.password": 0, // Exclude sensitive fields
+                    "postBy.refreshToken": 0,
+                    "postBy.__v": 0,
+                    "mentions.password": 0,
+                    "mentions.refreshToken": 0,
+                    "mentions.__v": 0,
+                    comments: 0, // Exclude comments array
+                },
+            },
+        ]);
+
+        return res
+            .status(200)
+            .json({ message: "Get following posts successfully", data: posts, totalPosts, totalPages, page, limit });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getLikedPostsHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = req.query.userId;
+        const page = Number(req.query.page) ?? 1;
+        const limit = Number(req.query.limit) ?? 15;
+
+        const skip = (Number(page) - 1) * limit;
+
+        const user = await UserModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const totalPosts = await PostModel.countDocuments({
+            likes: { $in: [userId] }, // Get following posts
+        });
+        const totalPages = Math.ceil(totalPosts / limit);
+
+        const posts = await PostModel.aggregate([
+            { $match: { likes: { $in: [userId] } } },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+                // Join postBy field with users collection
+                $lookup: {
+                    from: "users",
+                    localField: "postBy",
+                    foreignField: "_id",
+                    as: "postBy",
+                },
+            },
+            { $unwind: "$postBy" }, // Deconstruct postBy array to object
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "mentions",
+                    foreignField: "_id",
+                    as: "mentions",
+                },
+            },
+            {
+                $lookup: {
+                    from: "comments",
+                    localField: "_id",
+                    foreignField: "target",
+                    as: "comments",
+                },
+            },
+            {
+                $addFields: {
+                    likeCount: { $size: "$likes" },
+                    commentCount: { $size: "$comments" },
+                },
+            },
+            {
+                $project: {
+                    "postBy.password": 0, // Exclude sensitive fields
+                    "postBy.refreshToken": 0,
+                    "postBy.__v": 0,
+                    "mentions.password": 0,
+                    "mentions.refreshToken": 0,
+                    "mentions.__v": 0,
+                    comments: 0, // Exclude comments array
+                },
+            },
+        ]);
+
+        return res
+            .status(200)
+            .json({ message: "Get following posts successfully", data: posts, totalPosts, totalPages, page, limit });
     } catch (error) {
         next(error);
     }

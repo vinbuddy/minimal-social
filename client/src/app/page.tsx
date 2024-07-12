@@ -1,7 +1,6 @@
 "use client";
 import { Spinner, Tab, Tabs } from "@nextui-org/react";
-import { ImageIcon, PanelRight, PaperclipIcon, Phone, PlusIcon, Search, ThumbsUpIcon, Video } from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MainLayout from "@/components/MainLayout";
 import PostModalButton from "@/components/Post/PostModalButton";
@@ -11,6 +10,19 @@ import { IPost } from "@/types/post";
 import PostItem from "@/components/Post/PostItem";
 function Home() {
     const [postType, setPostType] = useState<"feed" | "following" | "liked">("feed");
+    const { currentUser } = useAuthStore();
+
+    const getURL = () => {
+        switch (postType) {
+            case "following":
+                return `/post/following?userId=${currentUser?._id}`;
+            case "liked":
+                return `/post/liked?userId=${currentUser?._id}`;
+            default:
+                return "/post";
+        }
+    };
+
     const {
         data: posts,
         loadingMore,
@@ -19,7 +31,7 @@ function Home() {
         size,
         setSize: setPage,
         mutate,
-    } = usePagination<IPost>("/post");
+    } = usePagination<IPost>(getURL());
 
     console.log(posts);
 
@@ -43,22 +55,26 @@ function Home() {
                     </header>
 
                     <main className="px-4 pb-4">
-                        <InfiniteScroll
-                            next={() => setPage(size + 1)}
-                            hasMore={!isReachedEnd}
-                            loader={
-                                <div className="flex justify-center">
-                                    <Spinner size="sm" />
-                                </div>
-                            }
-                            dataLength={posts?.length ?? 0}
-                        >
-                            {posts.map((post) => (
-                                <Fragment key={post?._id}>
-                                    <PostItem post={post} />
-                                </Fragment>
-                            ))}
-                        </InfiniteScroll>
+                        {error && <p className="text-center text-danger">{error?.message}</p>}
+                        {posts.length === 0 && !loadingMore && !error && <p className="text-center">Post not found</p>}
+                        {!error && posts.length > 0 && (
+                            <InfiniteScroll
+                                next={() => setPage(size + 1)}
+                                hasMore={!isReachedEnd}
+                                loader={
+                                    <div className="flex justify-center">
+                                        <Spinner size="sm" />
+                                    </div>
+                                }
+                                dataLength={posts?.length ?? 0}
+                            >
+                                {posts.map((post) => (
+                                    <Fragment key={post?._id}>
+                                        <PostItem post={post} />
+                                    </Fragment>
+                                ))}
+                            </InfiniteScroll>
+                        )}
                     </main>
                 </div>
             </div>
