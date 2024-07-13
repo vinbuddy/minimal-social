@@ -274,11 +274,11 @@ export async function getFollowingPostsHandler(req: Request, res: Response, next
 
 export async function getLikedPostsHandler(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = req.query.userId;
-        const page = Number(req.query.page) ?? 1;
-        const limit = Number(req.query.limit) ?? 15;
+        const userId = req.query.userId as string;
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 15;
 
-        const skip = (Number(page) - 1) * limit;
+        const skip = (page - 1) * limit;
 
         const user = await UserModel.findById(userId);
 
@@ -287,17 +287,16 @@ export async function getLikedPostsHandler(req: Request, res: Response, next: Ne
         }
 
         const totalPosts = await PostModel.countDocuments({
-            likes: { $in: [userId] }, // Get following posts
+            likes: { $in: [userId] },
         });
         const totalPages = Math.ceil(totalPosts / limit);
 
         const posts = await PostModel.aggregate([
-            { $match: { likes: { $in: [userId] } } },
+            { $match: { likes: { $in: [new mongoose.Types.ObjectId(userId)] } } },
             { $sort: { createdAt: -1 } },
             { $skip: skip },
             { $limit: limit },
             {
-                // Join postBy field with users collection
                 $lookup: {
                     from: "users",
                     localField: "postBy",
@@ -305,7 +304,7 @@ export async function getLikedPostsHandler(req: Request, res: Response, next: Ne
                     as: "postBy",
                 },
             },
-            { $unwind: "$postBy" }, // Deconstruct postBy array to object
+            { $unwind: "$postBy" },
             {
                 $lookup: {
                     from: "users",
@@ -330,13 +329,13 @@ export async function getLikedPostsHandler(req: Request, res: Response, next: Ne
             },
             {
                 $project: {
-                    "postBy.password": 0, // Exclude sensitive fields
+                    "postBy.password": 0,
                     "postBy.refreshToken": 0,
                     "postBy.__v": 0,
                     "mentions.password": 0,
                     "mentions.refreshToken": 0,
                     "mentions.__v": 0,
-                    comments: 0, // Exclude comments array
+                    comments: 0,
                 },
             },
         ]);
