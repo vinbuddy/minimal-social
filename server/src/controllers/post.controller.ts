@@ -272,6 +272,66 @@ export async function getFollowingPostsHandler(req: Request, res: Response, next
     }
 }
 
+export async function getPostDetailHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const postId = req.params.id;
+
+        if (!postId) {
+            return res.status(400).json({ message: "Post ID is required" });
+        }
+
+        const post = await PostModel.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(postId) } },
+            {
+                // Join postBy field with users collection
+                $lookup: {
+                    from: "users",
+                    localField: "postBy",
+                    foreignField: "_id",
+                    as: "postBy",
+                },
+            },
+            { $unwind: "$postBy" }, // Deconstruct postBy array to object
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "mentions",
+                    foreignField: "_id",
+                    as: "mentions",
+                },
+            },
+            {
+                $lookup: {
+                    from: "comments",
+                    localField: "_id",
+                    foreignField: "target",
+                    as: "comments",
+                },
+            },
+            {
+                $addFields: {
+                    likeCount: { $size: "$likes" },
+                    commentCount: { $size: "$comments" },
+                },
+            },
+            {
+                $project: {
+                    "postBy.password": 0, // Exclude sensitive fields
+                    "postBy.refreshToken": 0,
+                    "postBy.__v": 0,
+                    "mentions.password": 0,
+                    "mentions.refreshToken": 0,
+                    "mentions.__v": 0,
+                    comments: 0, // Exclude comments array
+                },
+            },
+        ]);
+        return res.status(200).json({ message: "Get post detail successfully", data: post[0] });
+    } catch (error) {
+        next(error);
+    }
+}
+
 export async function getLikedPostsHandler(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = req.query.userId as string;

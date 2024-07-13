@@ -14,8 +14,8 @@ interface IProps {
 
 export default function PostActions({ post }: IProps) {
     const { currentUser } = useAuthStore();
-    const [isLiked, setIsLiked] = useState<boolean>(() => post.likes.includes(currentUser?._id) || false);
-    const [likeCount, setLikeCount] = useState<number>(post.likeCount ?? 0);
+    const [isLiked, setIsLiked] = useState<boolean>(() => post?.likes.includes(currentUser?._id) || false);
+    const [likeCount, setLikeCount] = useState<number>(post?.likeCount ?? 0);
 
     const handleUnLike = async (): Promise<void> => {
         setIsLiked(false);

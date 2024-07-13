@@ -234,7 +234,7 @@ function RichTextEditor(
         <>
             {isMention ? (
                 <>
-                    <div className="relative">
+                    <div className="relative w-full">
                         <div
                             suppressContentEditableWarning={true}
                             ref={contentInnerRef}

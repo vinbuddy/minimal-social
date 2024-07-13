@@ -98,6 +98,7 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
                     {post?.postBy?._id === currentUser?._id // Check if the post is created by the current user or not
                         ? ownerItems.map((item) => (
                               <DropdownItem
+                                  as={item?.href ? Link : undefined}
                                   href={item?.href}
                                   onClick={item?.onClick}
                                   className={item.className ?? ""}
@@ -110,6 +111,7 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
                           ))
                         : items.map((item) => (
                               <DropdownItem
+                                  as={item?.href ? Link : undefined}
                                   href={item?.href}
                                   onClick={item?.onClick}
                                   className={item.className ?? ""}

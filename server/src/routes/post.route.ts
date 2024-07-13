@@ -6,6 +6,7 @@ import {
     getAllPostsHandler,
     getFollowingPostsHandler,
     getLikedPostsHandler,
+    getPostDetailHandler,
     likePostHandler,
     unlikePostHandler,
 } from "../controllers/post.controller";
@@ -18,6 +19,8 @@ const router: Router = express.Router();
 router.post("/", verifyToken, uploadFile.array("mediaFiles"), createPostHandler);
 router.put("/", verifyToken, editPostHandler);
 router.get("/", verifyToken, getAllPostsHandler);
+router.get("/:id", verifyToken, getPostDetailHandler);
+
 router.get("/following", verifyToken, getFollowingPostsHandler);
 router.get("/liked", verifyToken, getLikedPostsHandler);
 router.delete("/:id", verifyToken, deletePostHandler);
