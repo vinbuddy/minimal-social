@@ -1,15 +1,15 @@
 import React from "react";
-import { Avatar, Button, Card, CardBody, CardFooter, CardHeader } from "@nextui-org/react";
+import { Avatar, Card, CardBody, CardFooter, CardHeader } from "@nextui-org/react";
 import { IUser } from "@/types/user";
 import { VerifiedIcon } from "@/assets/icons";
+import FollowButton from "./FollowButton";
 
 interface IProps {
     user: IUser;
 }
 
 export default function UserProfileCard({ user }: IProps) {
-    const [isFollowed, setIsFollowed] = React.useState(false);
-
+    const [followerCount, setFollowerCount] = React.useState(user?.followers?.length ?? 0);
     return (
         <Card shadow="none" className="min-w-[300px] max-w-[350px] p-1 border-none bg-transparent">
             <CardHeader className="justify-between">
@@ -32,15 +32,18 @@ export default function UserProfileCard({ user }: IProps) {
                         <p className=" text-default-500 text-small">Following</p>
                     </div>
                     <div className="flex gap-1">
-                        <p className="font-semibold text-default-600 text-small">{user?.followers?.length ?? 0}</p>
+                        <p className="font-semibold text-default-600 text-small">{followerCount}</p>
                         <p className="text-default-500 text-small">Followers</p>
                     </div>
                 </div>
             </CardBody>
             <CardFooter className="gap-3">
-                <Button size="sm" radius="md" fullWidth color="primary">
-                    {isFollowed ? "Unfollow" : "Follow"}
-                </Button>
+                <FollowButton
+                    user={user}
+                    onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
+                    onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
+                    buttonProps={{ size: "sm", radius: "md", fullWidth: true }}
+                />
             </CardFooter>
         </Card>
     );

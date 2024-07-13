@@ -9,9 +9,9 @@ export interface IUser {
 
     isAdmin?: boolean;
 
-    followings: IUser[];
+    followings: string[];
 
-    followers: IUser[];
+    followers: string[];
 
     bio: string;
 
