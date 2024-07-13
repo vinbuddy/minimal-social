@@ -22,13 +22,16 @@ export class Comment {
     public commentBy: Ref<User>;
 
     @prop({ ref: () => Comment, default: null })
-    public parentCommentId?: Ref<Comment>;
+    public rootComment: Ref<Comment>;
+
+    @prop({ ref: () => User, default: null })
+    public replyTo: Ref<User>;
 
     @prop({ ref: () => User, default: [] })
-    public likes?: Ref<User>[];
+    public likes: Ref<User>[];
 
     @prop({ ref: () => User, default: [] })
-    public mentions?: Ref<User>[];
+    public mentions: Ref<User>[];
 
     @prop({ default: [] })
     public tags?: string[];
