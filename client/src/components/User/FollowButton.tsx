@@ -71,6 +71,7 @@ export default function FollowButton({ user, buttonProps, onAfterFollowed, onAft
             onPress={isFollowed ? handleUnFollow : handleFollow}
             color={isFollowed ? "default" : "primary"}
             variant={isFollowed ? "ghost" : "solid"}
+            className={`${currentUser && currentUser._id === user._id ? "hidden" : ""}`}
             {...buttonProps}
         >
             {isFollowed ? "Unfollow" : "Follow"}

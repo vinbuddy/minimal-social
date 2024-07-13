@@ -109,18 +109,16 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
                               </DropdownItem>
                           ))
                         : items.map((item) => (
-                              <Fragment key={item.key}>
-                                  <DropdownItem
-                                      href={item?.href}
-                                      onClick={item?.onClick}
-                                      className={item.className ?? ""}
-                                      color={item.color}
-                                      key={item.key}
-                                      endContent={item.icon}
-                                  >
-                                      {item.content}
-                                  </DropdownItem>
-                              </Fragment>
+                              <DropdownItem
+                                  href={item?.href}
+                                  onClick={item?.onClick}
+                                  className={item.className ?? ""}
+                                  color={item.color}
+                                  key={item.key}
+                                  endContent={item.icon}
+                              >
+                                  {item.content}
+                              </DropdownItem>
                           ))}
                 </DropdownMenu>
             </Dropdown>

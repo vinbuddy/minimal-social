@@ -55,7 +55,7 @@ function Home() {
                     </header>
 
                     <main className="px-4 pb-4">
-                        {error && <p className="text-center text-danger">{error?.message}</p>}
+                        {error && !loadingMore && <p className="text-center text-danger">{error?.message}</p>}
                         {posts.length === 0 && !loadingMore && !error && <p className="text-center">Post not found</p>}
                         {!error && posts.length > 0 && (
                             <InfiniteScroll
