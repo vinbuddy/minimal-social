@@ -13,6 +13,7 @@ import useAuthStore from "@/hooks/store/useAuthStore";
 import { toast } from "sonner";
 import usePagination from "@/hooks/usePagination";
 import useCommentStore from "@/hooks/store/useCommentStore";
+import axiosInstance from "@/utils/httpRequest";
 
 interface IProps {
     comment: IComment;
@@ -55,16 +56,15 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
     };
 
     const handleUnLike = async (): Promise<void> => {
+        if (!currentUser?._id || !comment?._id) return;
         setIsLiked(false);
         setLikeCount((prev) => prev - 1);
 
-        // if (!currentUser?._id || !post?._id) return;
-
         try {
-            // const response = await axiosInstance.put("/post/unlike", {
-            //     postId: post._id,
-            //     userId: currentUser?._id,
-            // });
+            const response = await axiosInstance.put("/comment/unlike", {
+                commentId: comment?._id,
+                userId: currentUser?._id,
+            });
 
             toast.success("Unliked post successfully", {
                 position: "bottom-center",
@@ -80,14 +80,15 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
     };
 
     const handleLike = async (): Promise<void> => {
+        if (!currentUser?._id || !comment?._id) return;
         setIsLiked(true);
         setLikeCount((prev) => prev + 1);
 
         try {
-            // const response = await axiosInstance.put("/post/like", {
-            //     postId: post._id,
-            //     userId: currentUser?._id,
-            // });
+            const response = await axiosInstance.put("/comment/like", {
+                commentId: comment._id,
+                userId: currentUser?._id,
+            });
 
             toast.success("Liked post successfully", {
                 position: "bottom-center",
@@ -96,9 +97,9 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
             setIsLiked(false);
             setLikeCount((prev) => prev - 1);
 
-            // toast.error("Failed to unlike post", {
-            //     position: "bottom-center",
-            // });
+            toast.error("Failed to like post", {
+                position: "bottom-center",
+            });
             console.log(error.response.data.message);
         }
     };

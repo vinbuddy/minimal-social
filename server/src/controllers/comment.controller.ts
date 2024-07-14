@@ -186,3 +186,61 @@ export async function getRepliesHandler(req: Request, res: Response, next: NextF
         next(error);
     }
 }
+
+export async function likeCommentHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { commentId, userId } = req.body;
+
+        if (!commentId || !userId) {
+            return res.status(400).json({
+                message: "commentId or userId is required",
+            });
+        }
+
+        const updatedComment = await CommentModel.findByIdAndUpdate(commentId, {
+            $push: { likes: userId },
+        });
+
+        if (!updatedComment) {
+            return res.status(404).json({ message: "Comment not found" });
+        }
+
+        const comment = await CommentModel.populate(updatedComment, [
+            { path: "commentBy", select: USER_MODEL_HIDDEN_FIELDS },
+            { path: "mentions", select: USER_MODEL_HIDDEN_FIELDS },
+        ]);
+
+        return res.status(200).json({ message: "Comment liked successfully", data: comment });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function unlikeCommentHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { commentId, userId } = req.body;
+
+        if (!commentId || !userId) {
+            return res.status(400).json({
+                message: "commentId or userId is required",
+            });
+        }
+
+        const updatedComment = await CommentModel.findByIdAndUpdate(commentId, {
+            $pull: { likes: userId },
+        });
+
+        if (!updatedComment) {
+            return res.status(404).json({ message: "Comment not found" });
+        }
+
+        const comment = await CommentModel.populate(updatedComment, [
+            { path: "commentBy", select: USER_MODEL_HIDDEN_FIELDS },
+            { path: "mentions", select: USER_MODEL_HIDDEN_FIELDS },
+        ]);
+
+        return res.status(200).json({ message: "Comment unliked successfully", data: comment });
+    } catch (error) {
+        next(error);
+    }
+}
