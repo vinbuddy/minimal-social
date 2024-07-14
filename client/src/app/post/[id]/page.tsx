@@ -1,6 +1,7 @@
 "use client";
 import BackButton from "@/components/BackButton";
 import CommentForm from "@/components/Comment/CommentForm";
+import CommentItem from "@/components/Comment/CommentItem";
 import MainLayout from "@/components/MainLayout";
 import PostDetail from "@/components/Post/PostDetail";
 import useAuthStore from "@/hooks/store/useAuthStore";
@@ -41,11 +42,15 @@ export default function PostPage({ params }: { params: { id: string } }) {
                         <main className="px-4 pb-4 mt-4">
                             <PostDetail post={post} />
 
-                            <div className="mt-4 sticky top-[80px] z-[1] py-3">
+                            <div className="mt-4 sticky top-[79px] z-[1] pt-3 pb-6 bg-background border-b  border-divider">
                                 <CommentForm />
                             </div>
 
-                            <div className="min-h-[800px]"></div>
+                            <div className="min-h-[800px] flex flex-col gap-5 mt-4">
+                                <CommentItem />
+                                <CommentItem />
+                                <CommentItem />
+                            </div>
                         </main>
                     </div>
                 </div>
