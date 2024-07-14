@@ -15,12 +15,12 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import useSWR from "swr";
 
 export default function PostPage({ params }: { params: { id: string } }) {
-    const { data, error, isLoading } = useSWR(`/post/${params.id}`);
+    const { data, error } = useSWR(`/post/${params.id}`);
     const post = data?.data as IPost;
 
     const {
         data: comments,
-        loadingMore,
+        isLoading,
         error: commentError,
         isReachedEnd,
         size,
@@ -60,10 +60,10 @@ export default function PostPage({ params }: { params: { id: string } }) {
                             </div>
 
                             <div className="flex flex-col mt-4">
-                                {commentError && !loadingMore && (
+                                {commentError && !isLoading && (
                                     <p className="text-center text-danger">{commentError?.message}</p>
                                 )}
-                                {comments.length === 0 && !loadingMore && !commentError && (
+                                {comments.length === 0 && !isLoading && !commentError && (
                                     <p className="text-center">Comment not found</p>
                                 )}
                                 {!commentError && comments.length > 0 && (
@@ -84,9 +84,6 @@ export default function PostPage({ params }: { params: { id: string } }) {
                                         ))}
                                     </InfiniteScroll>
                                 )}
-                                {/* <CommentItem />
-                                <CommentItem />
-                                <CommentItem /> */}
                             </div>
                         </main>
                     </div>

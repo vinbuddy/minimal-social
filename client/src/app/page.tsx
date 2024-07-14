@@ -29,11 +29,10 @@ function Home() {
         error,
         isReachedEnd,
         size,
+        isLoading,
         setSize: setPage,
         mutate,
     } = usePagination<IPost>(getURL());
-
-    console.log(posts);
 
     return (
         <MainLayout>
@@ -55,8 +54,8 @@ function Home() {
                     </header>
 
                     <main className="px-4 pb-4">
-                        {error && !loadingMore && <p className="text-center text-danger">{error?.message}</p>}
-                        {posts.length === 0 && !loadingMore && !error && <p className="text-center">Post not found</p>}
+                        {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
+                        {posts.length === 0 && !isLoading && !error && <p className="text-center">Post not found</p>}
                         {!error && posts.length > 0 && (
                             <InfiniteScroll
                                 next={() => setPage(size + 1)}
