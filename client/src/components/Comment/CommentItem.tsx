@@ -3,7 +3,7 @@ import { HeartIcon } from "@/assets/icons";
 import { IComment } from "@/types/comment";
 import { Avatar, Button, Tooltip } from "@nextui-org/react";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
-import { ChevronDownIcon, EllipsisIcon } from "lucide-react";
+import { ChevronDownIcon, EllipsisIcon, LoaderIcon } from "lucide-react";
 import Link from "next/link";
 import UserName from "../User/UserName";
 import TimeAgo from "../TimeAgo";
@@ -31,6 +31,7 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
 
     const {
         data: replies,
+        isLoading,
         loadingMore,
         error,
         isReachedEnd,
@@ -154,7 +155,13 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                                     className="px-0 bg-transparent text-default-400"
                                     size="sm"
                                     disableRipple
-                                    endContent={<ChevronDownIcon size={16} />}
+                                    endContent={
+                                        isLoading ? (
+                                            <LoaderIcon className="animate-spin" size={16} />
+                                        ) : (
+                                            <ChevronDownIcon size={16} />
+                                        )
+                                    }
                                 >
                                     See {comment?.replyCount ?? 0} replies
                                 </Button>
@@ -198,10 +205,17 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                         {!isReachedEnd && (
                             <div className="mt-1 flex">
                                 <Button
+                                    onPress={handleLoadReplies}
                                     className="px-0 bg-transparent text-default-400"
                                     size="sm"
                                     disableRipple
-                                    endContent={<ChevronDownIcon size={16} onClick={handleLoadReplies} />}
+                                    endContent={
+                                        isLoading ? (
+                                            <LoaderIcon className="animate-spin" size={16} />
+                                        ) : (
+                                            <ChevronDownIcon size={16} />
+                                        )
+                                    }
                                 >
                                     See {comment?.replyCount ?? 0} replies
                                 </Button>

@@ -16,7 +16,7 @@ export default function usePagination<T>(url: string | null) {
         return `${url}limit=${LIMIT}&page=${pageIndex + 1}`;
     };
 
-    const { data, error, size, setSize, mutate } = useSWRInfinite(getKey, fetcher);
+    const { data, error, size, setSize, mutate, isLoading } = useSWRInfinite(getKey, fetcher);
 
     // Extract the data from the response structure
     const paginatedData: T[] = data ? data.flatMap((page) => page.data) : [];
@@ -29,6 +29,7 @@ export default function usePagination<T>(url: string | null) {
         size,
         isReachedEnd,
         loadingMore,
+        isLoading,
         setSize,
         mutate,
     };
