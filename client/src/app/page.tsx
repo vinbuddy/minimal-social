@@ -8,6 +8,8 @@ import useAuthStore from "@/hooks/store/useAuthStore";
 import usePagination from "@/hooks/usePagination";
 import { IPost } from "@/types/post";
 import PostItem from "@/components/Post/PostItem";
+import PostSkeletons from "@/components/Post/PostSkeletons";
+
 function Home() {
     const [postType, setPostType] = useState<"feed" | "following" | "liked">("feed");
     const { currentUser } = useAuthStore();
@@ -61,8 +63,8 @@ function Home() {
                                 next={() => setPage(size + 1)}
                                 hasMore={!isReachedEnd}
                                 loader={
-                                    <div className="flex justify-center">
-                                        <Spinner size="sm" />
+                                    <div className="flex justify-center items-center overflow-hidden h-[70px]">
+                                        <Spinner size="md" />
                                     </div>
                                 }
                                 dataLength={posts?.length ?? 0}
@@ -74,6 +76,8 @@ function Home() {
                                 ))}
                             </InfiniteScroll>
                         )}
+
+                        {isLoading && <PostSkeletons length={2} />}
                     </main>
                 </div>
             </div>

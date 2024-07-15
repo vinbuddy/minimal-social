@@ -55,7 +55,11 @@ export default function PostPage({ params }: { params: { id: string } }) {
                         <main className="px-4 pb-4 mt-4">
                             <PostDetail post={post} />
 
-                            <div className="mt-4 sticky top-[79px] z-[1] pt-3 pb-6 bg-background border-b  border-divider">
+                            <div
+                                className={`mt-4 sticky top-[79px] z-[1] pt-3 pb-6 bg-background border-divider ${
+                                    comments.length > 0 && "border-b"
+                                }`}
+                            >
                                 <CommentForm targetType="Post" />
                             </div>
 
@@ -64,15 +68,15 @@ export default function PostPage({ params }: { params: { id: string } }) {
                                     <p className="text-center text-danger">{commentError?.message}</p>
                                 )}
                                 {comments.length === 0 && !isLoading && !commentError && (
-                                    <p className="text-center">Comment not found</p>
+                                    <p className="text-center">No comments yet.</p>
                                 )}
                                 {!commentError && comments.length > 0 && (
                                     <InfiniteScroll
                                         next={() => setPage(size + 1)}
                                         hasMore={!isReachedEnd}
                                         loader={
-                                            <div className="flex justify-center">
-                                                <Spinner size="sm" />
+                                            <div className="flex justify-center items-center overflow-hidden h-[70px]">
+                                                <Spinner size="md" />
                                             </div>
                                         }
                                         dataLength={comments?.length ?? 0}

@@ -4,16 +4,10 @@ import useSWRInfinite from "swr/infinite";
 export default function usePagination<T>(url: string | null) {
     const LIMIT = 15;
 
-    if (url && !url.includes("?")) {
-        url += "?";
-    } else if (url && !url.endsWith("&")) {
-        url += "&";
-    }
-
     const getKey = (pageIndex: number, previousPageData: any[]) => {
         if (!url) return null;
-        if (previousPageData && !previousPageData.length) return null; // reached the end
-        return `${url}limit=${LIMIT}&page=${pageIndex + 1}`;
+        if (previousPageData && previousPageData.length === 0) return null; // reached the end
+        return `${url}${url.includes("?") ? "&" : "?"}limit=${LIMIT}&page=${pageIndex + 1}`;
     };
 
     const { data, error, size, setSize, mutate, isLoading } = useSWRInfinite(getKey, fetcher);
