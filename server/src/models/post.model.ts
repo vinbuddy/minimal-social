@@ -27,7 +27,7 @@ export class Post {
     @prop({ auto: true })
     public _id?: mongoose.Types.ObjectId;
 
-    @prop({ required: true })
+    @prop({ default: null })
     public caption: string;
 
     @prop({ default: [] })
@@ -47,6 +47,12 @@ export class Post {
 
     @prop()
     public tags: string[];
+
+    @prop({ ref: () => Post, default: null })
+    public originalPost: Ref<Post>;
+
+    @prop({ ref: () => User, default: [] })
+    public reposts: Ref<User>[];
 }
 
 const PostModel = getModelForClass(Post);

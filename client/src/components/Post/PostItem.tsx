@@ -1,6 +1,6 @@
 "use client";
 import { IPost } from "@/types/post";
-import { Avatar, Tooltip } from "@nextui-org/react";
+import { Avatar, Image, Tooltip } from "@nextui-org/react";
 import { EllipsisIcon, WandSparklesIcon } from "lucide-react";
 import TimeAgo from "../TimeAgo";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
@@ -14,15 +14,21 @@ import PostMenuDropdown from "./PostMenuDropdown";
 import UserName from "../User/UserName";
 import PostActions from "./PostActions";
 import PostModalButton from "./PostModalButton";
+import { RepostIcon } from "@/assets/icons";
 
 interface IProps {
     post: IPost;
 }
 
-export default function PostItem({ post }: IProps) {
+export default function PostItem({ post: _post }: IProps) {
     const { isVisible: open, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
     const [activeIndex, setActiveIndex] = useState<number>(0);
     const [openEditModal, setOpenEditModal] = useState<boolean>(false);
+
+    const isReposted = _post?.originalPost?.caption || _post?.originalPost?.mediaFiles;
+    const post: IPost = isReposted ? _post?.originalPost : _post;
+    const repostedInfo = _post;
+
     const handleMediaFileClick = (index: number) => {
         setActiveIndex(index);
         showFullscreenSlider();
@@ -55,8 +61,41 @@ export default function PostItem({ post }: IProps) {
                 onHide={hideFullscreenSlider}
                 isOpen={open}
                 activeSlideIndex={activeIndex}
-                mediaFiles={post?.mediaFiles}
+                mediaFiles={post?.mediaFiles ?? []}
             />
+            {isReposted && (
+                <div className="flex px-1 mb-5">
+                    <section className="flex flex-col items-center">
+                        <RepostIcon size={18} />
+                        <Avatar
+                            isBordered
+                            src={post?.postBy?.photo}
+                            alt={post?.postBy?.username}
+                            size="md"
+                            className="cursor-pointer invisible h-0"
+                        />
+                    </section>
+                    <section className="ms-4 flex-1 max-w-full overflow-hidden">
+                        <Tooltip
+                            delay={500}
+                            placement="bottom-start"
+                            content={<UserProfileCard user={repostedInfo?.postBy} />}
+                        >
+                            <div className="flex items-center text-default-600 text-sm gap-2">
+                                <Image radius="full" className="size-5" src={repostedInfo?.postBy?.photo} alt="" />
+                                <div className="flex items-center">
+                                    <h4 className="leading-none cursor-pointer hover:underline">
+                                        {repostedInfo?.postBy?.username}
+                                    </h4>
+                                    <span>
+                                        &nbsp;reposted <TimeAgo className="!text-sm" date={repostedInfo?.createdAt} />
+                                    </span>
+                                </div>
+                            </div>
+                        </Tooltip>
+                    </section>
+                </div>
+            )}
             <div className="flex px-1">
                 <section className="flex">
                     <Avatar
@@ -108,16 +147,18 @@ export default function PostItem({ post }: IProps) {
 
                     <div className="mt-1">{parse(post?.caption ?? "", parserOptions)}</div>
                     <div>
-                        <MediaFileSlider
-                            onMediaFileClick={handleMediaFileClick}
-                            mediaFiles={post?.mediaFiles ?? []}
-                            videoPreview={true}
-                            scrollHorizontally={false}
-                        />
+                        {post?.mediaFiles && (
+                            <MediaFileSlider
+                                onMediaFileClick={handleMediaFileClick}
+                                mediaFiles={post?.mediaFiles ?? []}
+                                videoPreview={true}
+                                scrollHorizontally={false}
+                            />
+                        )}
                     </div>
                     {/* Like, Share, Save,... */}
                     <div className="mt-2">
-                        <PostActions post={post} />
+                        <PostActions post={_post} />
                     </div>
                 </section>
             </div>

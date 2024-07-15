@@ -13,8 +13,10 @@ export interface IPost {
     _id: string;
     postBy: IUser;
     caption: string;
+    originalPost: IPost;
     mediaFiles: IMediaFile[];
     likes: any[];
+    reposts: any[];
     tags: any[];
     mentions: IUser[];
     isEdited: boolean;
@@ -22,6 +24,7 @@ export interface IPost {
     updatedAt: string;
     likeCount?: number;
     commentCount?: number;
+    repostCount?: number;
 }
 
 // export type PostType = "Feed" | "Following" | "UserPosts";

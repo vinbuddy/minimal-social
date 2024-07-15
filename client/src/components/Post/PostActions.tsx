@@ -1,6 +1,7 @@
 "use client";
 import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
 import useAuthStore from "@/hooks/store/useAuthStore";
+import useGlobalMutation from "@/hooks/useGlobalMutation";
 import { IPost } from "@/types/post";
 import axiosInstance from "@/utils/httpRequest";
 import { Button } from "@nextui-org/react";
@@ -14,9 +15,15 @@ interface IProps {
 
 export default function PostActions({ post }: IProps) {
     const { currentUser } = useAuthStore();
-    const [isLiked, setIsLiked] = useState<boolean>(() => post?.likes.includes(currentUser?._id) || false);
+    const [isLiked, setIsLiked] = useState<boolean>(() => post?.likes?.includes(currentUser?._id) || false);
     const [likeCount, setLikeCount] = useState<number>(post?.likeCount ?? 0);
-
+    const [isReposted, setIsReposted] = useState<boolean>(
+        () => post?.originalPost?.reposts?.includes(currentUser?._id) || false
+    );
+    const [repostCount, setRepostCount] = useState<number>(
+        post?.originalPost?._id ? post?.originalPost?.repostCount ?? 0 : 0
+    );
+    const mutate = useGlobalMutation();
     const handleUnLike = async (): Promise<void> => {
         setIsLiked(false);
         setLikeCount((prev) => prev - 1);
@@ -24,7 +31,7 @@ export default function PostActions({ post }: IProps) {
         if (!currentUser?._id || !post?._id) return;
 
         try {
-            const response = await axiosInstance.put("/post/unlike", {
+            const response = await axiosInstance.post("/post/unlike", {
                 postId: post._id,
                 userId: currentUser?._id,
             });
@@ -47,7 +54,7 @@ export default function PostActions({ post }: IProps) {
         setLikeCount((prev) => prev + 1);
 
         try {
-            const response = await axiosInstance.put("/post/like", {
+            const response = await axiosInstance.post("/post/like", {
                 postId: post._id,
                 userId: currentUser?._id,
             });
@@ -60,6 +67,60 @@ export default function PostActions({ post }: IProps) {
             setLikeCount((prev) => prev - 1);
 
             toast.error("Failed to unlike post", {
+                position: "bottom-center",
+            });
+            console.log(error.response.data.message);
+        }
+    };
+
+    const handleUnRepost = async (): Promise<void> => {
+        setIsReposted(false);
+        setRepostCount((prev) => prev - 1);
+
+        if (!currentUser?._id || !post?._id) return;
+
+        try {
+            const response = await axiosInstance.post("/post/un-repost", {
+                originalPostId: post?.originalPost?._id,
+                postId: post._id,
+                userId: currentUser?._id,
+            });
+
+            mutate((key) => typeof key === "string" && key.includes("/post"));
+
+            toast.success("UnRepost successfully", {
+                position: "bottom-center",
+            });
+        } catch (error: any) {
+            setIsReposted(true);
+            setRepostCount((prev) => prev + 1);
+            toast.error("Failed to Un-Repost", {
+                position: "bottom-center",
+            });
+            console.log(error.response.data.message);
+        }
+    };
+
+    const handleRepost = async (): Promise<void> => {
+        setIsReposted(true);
+        setRepostCount((prev) => prev + 1);
+
+        try {
+            const response = await axiosInstance.post("/post/repost", {
+                postId: post._id,
+                userId: currentUser?._id,
+            });
+
+            mutate((key) => typeof key === "string" && key.includes("/post"));
+
+            toast.success("Repost successfully", {
+                position: "bottom-center",
+            });
+        } catch (error: any) {
+            setIsReposted(false);
+            setRepostCount((prev) => prev - 1);
+
+            toast.error("Failed to repost", {
                 position: "bottom-center",
             });
             console.log(error.response.data.message);
@@ -92,13 +153,16 @@ export default function PostActions({ post }: IProps) {
             </Button>
 
             <Button
+                onClick={isReposted ? handleUnRepost : handleRepost}
                 title="repost"
-                isIconOnly
                 size="sm"
                 radius="full"
                 variant="light"
+                color={isReposted ? "success" : "default"}
                 startContent={<RepostIcon size={18} />}
-            />
+            >
+                {repostCount}
+            </Button>
         </div>
     );
 }

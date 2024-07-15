@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import PostModel, { MediaFile } from "../models/post.model";
 import { extractMentionsAndTags, replaceHrefs } from "../helpers/textParser";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { createPostInput, createPostSchema, editPostInput, editPostSchema } from "../schemas/post.schema";
 import { uploadToCloudinary } from "../helpers/cloudinary";
 import cloudinary from "../configs/cloudinary";
@@ -11,6 +11,101 @@ import CommentModel from "../models/comment";
 interface RequestWithFiles extends Request {
     files: Express.Multer.File[];
 }
+
+const getPostQueryHelper = {
+    postLookups: [
+        {
+            $lookup: {
+                from: "users",
+                localField: "postBy",
+                foreignField: "_id",
+                as: "postBy",
+            },
+        },
+        { $unwind: "$postBy" },
+        {
+            $lookup: {
+                from: "users",
+                localField: "mentions",
+                foreignField: "_id",
+                as: "mentions",
+            },
+        },
+        {
+            $lookup: {
+                from: "comments",
+                localField: "_id",
+                foreignField: "target",
+                as: "comments",
+            },
+        },
+        {
+            $addFields: {
+                likeCount: { $size: { $ifNull: ["$likes", []] } },
+                commentCount: { $size: { $ifNull: ["$comments", []] } },
+                repostCount: { $size: { $ifNull: ["$reposts", []] } },
+            },
+        },
+    ],
+    originalPostLookups: [
+        {
+            $lookup: {
+                from: "posts",
+                localField: "originalPost",
+                foreignField: "_id",
+                as: "originalPost",
+            },
+        },
+        { $unwind: { path: "$originalPost", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "originalPost.postBy",
+                foreignField: "_id",
+                as: "originalPost.postBy",
+            },
+        },
+        { $unwind: { path: "$originalPost.postBy", preserveNullAndEmptyArrays: true } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "originalPost.mentions",
+                foreignField: "_id",
+                as: "originalPost.mentions",
+            },
+        },
+        {
+            $lookup: {
+                from: "comments",
+                localField: "originalPost._id",
+                foreignField: "target",
+                as: "originalPost.comments",
+            },
+        },
+        {
+            $addFields: {
+                "originalPost.likeCount": { $size: { $ifNull: ["$originalPost.likes", []] } },
+                "originalPost.commentCount": { $size: { $ifNull: ["$originalPost.comments", []] } },
+                "originalPost.repostCount": { $size: { $ifNull: ["$originalPost.reposts", []] } },
+            },
+        },
+    ],
+    projectFields: {
+        "postBy.password": 0,
+        "postBy.refreshToken": 0,
+        "postBy.__v": 0,
+        "mentions.password": 0,
+        "mentions.refreshToken": 0,
+        "mentions.__v": 0,
+        "originalPost.comments": 0,
+        "originalPost.postBy.password": 0,
+        "originalPost.postBy.refreshToken": 0,
+        "originalPost.postBy.__v": 0,
+        "originalPost.mentions.password": 0,
+        "originalPost.mentions.refreshToken": 0,
+        "originalPost.mentions.__v": 0,
+    },
+};
 
 export async function createPostHandler(_req: Request, res: Response, next: NextFunction) {
     try {
@@ -138,47 +233,12 @@ export async function getAllPostsHandler(req: Request, res: Response, next: Next
             { $sort: { createdAt: -1 } },
             { $skip: skip },
             { $limit: limit },
-            {
-                // Join postBy field with users collection
-                $lookup: {
-                    from: "users",
-                    localField: "postBy",
-                    foreignField: "_id",
-                    as: "postBy",
-                },
-            },
-            { $unwind: "$postBy" }, // Deconstruct postBy array to object
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "mentions",
-                    foreignField: "_id",
-                    as: "mentions",
-                },
-            },
-            {
-                $lookup: {
-                    from: "comments",
-                    localField: "_id",
-                    foreignField: "target",
-                    as: "comments",
-                },
-            },
-            {
-                $addFields: {
-                    likeCount: { $size: "$likes" },
-                    commentCount: { $size: "$comments" },
-                },
-            },
+            ...getPostQueryHelper.postLookups,
+            ...getPostQueryHelper.originalPostLookups,
             {
                 $project: {
-                    "postBy.password": 0, // Exclude sensitive fields
-                    "postBy.refreshToken": 0,
-                    "postBy.__v": 0,
-                    "mentions.password": 0,
-                    "mentions.refreshToken": 0,
-                    "mentions.__v": 0,
-                    comments: 0, // Exclude comments array
+                    ...getPostQueryHelper.projectFields,
+                    comment: 0,
                 },
             },
         ]);
@@ -217,47 +277,12 @@ export async function getFollowingPostsHandler(req: Request, res: Response, next
             { $sort: { createdAt: -1 } },
             { $skip: skip },
             { $limit: limit },
-            {
-                // Join postBy field with users collection
-                $lookup: {
-                    from: "users",
-                    localField: "postBy",
-                    foreignField: "_id",
-                    as: "postBy",
-                },
-            },
-            { $unwind: "$postBy" }, // Deconstruct postBy array to object
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "mentions",
-                    foreignField: "_id",
-                    as: "mentions",
-                },
-            },
-            {
-                $lookup: {
-                    from: "comments",
-                    localField: "_id",
-                    foreignField: "target",
-                    as: "comments",
-                },
-            },
-            {
-                $addFields: {
-                    likeCount: { $size: "$likes" },
-                    commentCount: { $size: "$comments" },
-                },
-            },
+            ...getPostQueryHelper.postLookups,
+            ...getPostQueryHelper.originalPostLookups,
             {
                 $project: {
-                    "postBy.password": 0, // Exclude sensitive fields
-                    "postBy.refreshToken": 0,
-                    "postBy.__v": 0,
-                    "mentions.password": 0,
-                    "mentions.refreshToken": 0,
-                    "mentions.__v": 0,
-                    comments: 0, // Exclude comments array
+                    ...getPostQueryHelper.projectFields,
+                    comment: 0,
                 },
             },
         ]);
@@ -354,46 +379,12 @@ export async function getLikedPostsHandler(req: Request, res: Response, next: Ne
             { $sort: { createdAt: -1 } },
             { $skip: skip },
             { $limit: limit },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "postBy",
-                    foreignField: "_id",
-                    as: "postBy",
-                },
-            },
-            { $unwind: "$postBy" },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "mentions",
-                    foreignField: "_id",
-                    as: "mentions",
-                },
-            },
-            {
-                $lookup: {
-                    from: "comments",
-                    localField: "_id",
-                    foreignField: "target",
-                    as: "comments",
-                },
-            },
-            {
-                $addFields: {
-                    likeCount: { $size: "$likes" },
-                    commentCount: { $size: "$comments" },
-                },
-            },
+            ...getPostQueryHelper.postLookups,
+            ...getPostQueryHelper.originalPostLookups,
             {
                 $project: {
-                    "postBy.password": 0,
-                    "postBy.refreshToken": 0,
-                    "postBy.__v": 0,
-                    "mentions.password": 0,
-                    "mentions.refreshToken": 0,
-                    "mentions.__v": 0,
-                    comments: 0,
+                    ...getPostQueryHelper.projectFields,
+                    comment: 0,
                 },
             },
         ]);
@@ -447,6 +438,58 @@ export async function unlikePostHandler(req: Request, res: Response, next: NextF
         ]);
 
         return res.status(200).json({ message: "Post unliked successfully", data: post });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function repostHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { postId, userId } = req.body;
+
+        const post = await PostModel.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        const repostedPost = await PostModel.create({
+            postBy: new mongoose.Types.ObjectId(userId),
+            originalPost: new mongoose.Types.ObjectId(postId),
+        });
+
+        await PostModel.findByIdAndUpdate(postId, {
+            $push: { reposts: userId },
+        });
+
+        await repostedPost.save();
+
+        const newPost = await PostModel.populate(repostedPost, [
+            { path: "postBy", select: USER_MODEL_HIDDEN_FIELDS },
+            { path: "mentions", select: USER_MODEL_HIDDEN_FIELDS },
+        ]);
+
+        return res.status(200).json({ message: "Repost post successfully", data: newPost });
+    } catch (error) {
+        next(error);
+    }
+}
+export async function unRepostHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { originalPostId, postId, userId } = req.body;
+
+        const post = await PostModel.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        await PostModel.findByIdAndUpdate(originalPostId, {
+            $pull: { reposts: userId },
+        });
+        await PostModel.findByIdAndDelete(postId);
+
+        return res.status(200).json({ message: "Unrepost post successfully" });
     } catch (error) {
         next(error);
     }
