@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import { createPostInput, createPostSchema, editPostInput, editPostSchema } from "../schemas/post.schema";
 import { uploadToCloudinary } from "../helpers/cloudinary";
 import cloudinary from "../configs/cloudinary";
+import CommentModel from "../models/comment";
 
 interface RequestWithFiles extends Request {
     files: Express.Multer.File[];
@@ -117,11 +118,8 @@ export async function deletePostHandler(req: Request, res: Response, next: NextF
             await Promise.all(promises);
         }
 
-        const deletedPost = await PostModel.findByIdAndDelete(id);
-
-        if (!deletedPost) {
-            return res.status(404).json({ message: "Post not found" });
-        }
+        await PostModel.findByIdAndDelete(id);
+        await CommentModel.deleteMany({ target: new mongoose.Types.ObjectId(id) });
 
         return res.status(200).json({ message: "Delete post successfully" });
     } catch (error) {}

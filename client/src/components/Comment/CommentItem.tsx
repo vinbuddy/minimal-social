@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import usePagination from "@/hooks/usePagination";
 import useCommentStore from "@/hooks/store/useCommentStore";
 import axiosInstance from "@/utils/httpRequest";
+import CommentMenuDropdown from "./CommentMenuDropdown";
 
 interface IProps {
     comment: IComment;
@@ -142,9 +143,13 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                                 Reply
                             </button>
 
-                            <button className="px-2 group-hover:block hidden">
-                                <EllipsisIcon size={18} />
-                            </button>
+                            <div>
+                                <CommentMenuDropdown comment={comment}>
+                                    <button className="px-2 outline-none group-hover:block hidden">
+                                        <EllipsisIcon size={18} />
+                                    </button>
+                                </CommentMenuDropdown>
+                            </div>
                         </div>
 
                         {/*  REPLIES DIDN'T FETCH */}

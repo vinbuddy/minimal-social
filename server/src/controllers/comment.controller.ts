@@ -244,3 +244,34 @@ export async function unlikeCommentHandler(req: Request, res: Response, next: Ne
         next(error);
     }
 }
+
+export async function deleteCommentHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const commentId = req.params.id;
+
+        if (!commentId) {
+            return res.status(400).json({
+                message: "commentId is required",
+            });
+        }
+
+        const comment = await CommentModel.findById(commentId);
+
+        if (!comment) {
+            return res.status(404).json({ message: "Comment not found" });
+        }
+
+        const isRootComment = comment.replyTo == null;
+
+        if (isRootComment) {
+            // Delete all replies of root comment
+            await CommentModel.deleteMany({ rootComment: new mongoose.Types.ObjectId(commentId) });
+        }
+
+        await CommentModel.findByIdAndDelete(commentId);
+
+        return res.status(200).json({ message: "Comment deleted successfully" });
+    } catch (error) {
+        next(error);
+    }
+}

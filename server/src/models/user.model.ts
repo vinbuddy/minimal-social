@@ -31,7 +31,8 @@ export class User {
     public password: string;
 
     @prop({
-        default: "https://github.com/vinbuddy/mimimal-social/assets/94288269/e8733bc3-ac77-42c6-b036-b9f1fb31b21c",
+        default:
+            "https://res.cloudinary.com/dtbhvc4p4/image/upload/v1720978549/profile/344060599-e8733bc3-ac77-42c6-b036-b9f1fb31b21c_hlh6by.png",
     })
     public photo: string;
 

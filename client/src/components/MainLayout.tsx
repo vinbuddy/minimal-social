@@ -75,7 +75,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     };
 
     return (
-        <div className="flex h-screen w-full bg-muted/40">
+        <div className="flex w-full bg-muted/40">
             <aside className="w-[80px] fixed top-0 left-0 bottom-0 flex flex-col justify-between h-full border-r-1 border-divider bg-background">
                 <nav className="flex flex-col items-center px-4 sm:py-4">
                     <header className="h-[40px] flex items-center mb-5">

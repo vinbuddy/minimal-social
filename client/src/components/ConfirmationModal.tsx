@@ -55,12 +55,12 @@ export default function ConfirmationModal({
                                             {icon}
                                         </span>
                                     </div>
-                                    <h4 className="my-3 text-xl font-bold">{title}</h4>
+                                    <h4 className="text-center my-3 text-xl font-bold">{title}</h4>
                                     <p className="text-center text-default-500">{description}</p>
                                 </div>
                             </ModalBody>
                             <ModalFooter className="flex justify-between">
-                                <Button fullWidth color="default" radius="full" variant="flat" onPress={onClose}>
+                                <Button fullWidth color="default" radius="full" variant="light" onPress={onClose}>
                                     Cancel
                                 </Button>
                                 <Button
