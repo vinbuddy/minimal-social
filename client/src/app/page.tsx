@@ -1,6 +1,6 @@
 "use client";
 import { Spinner, Tab, Tabs } from "@nextui-org/react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MainLayout from "@/components/MainLayout";
 import PostModalButton from "@/components/Post/PostModalButton";
@@ -15,17 +15,6 @@ function Home() {
     const [postType, setPostType] = useState<"feed" | "following" | "liked">("feed");
     const { currentUser } = useAuthStore();
     const { socket } = useSocketContext();
-
-    useEffect(() => {
-        if (!socket) return;
-
-        // Receive message from server
-        socket.on("message", (data) => {
-            console.log("message received from server:", data);
-        });
-
-        return () => {};
-    }, [socket]);
 
     const getURL = () => {
         switch (postType) {
