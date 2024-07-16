@@ -28,6 +28,7 @@
     "react-hook-form": "^7.52.1",
     "react-infinite-scroll-component": "^6.1.0",
     "react-timeago": "^7.2.0",
+    "socket.io-client": "^4.7.5",
     "sonner": "^1.5.0",
     "swiper": "^11.1.4",
     "swr": "^2.2.5",

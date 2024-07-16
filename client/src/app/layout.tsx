@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import MainLayout from "@/components/MainLayout";
 import { AuthClientApp, NextProvider as NextUIProvider, SWRConfigProvider } from "./providers";
 import { Toaster } from "sonner";
 import { AuthContextProvider } from "@/contexts/AuthContext";
 import { cookies } from "next/headers";
 import TokenRefresher from "@/components/TokenRefresher";
+import { SocketProvider } from "@/contexts/SocketContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,9 +30,11 @@ export default function RootLayout({
                     <NextUIProvider>
                         <SWRConfigProvider>
                             <AuthContextProvider>
-                                {children}
-                                <Toaster />
-                                <TokenRefresher />
+                                <SocketProvider>
+                                    {children}
+                                    <Toaster />
+                                    <TokenRefresher />
+                                </SocketProvider>
                             </AuthContextProvider>
                         </SWRConfigProvider>
                     </NextUIProvider>
