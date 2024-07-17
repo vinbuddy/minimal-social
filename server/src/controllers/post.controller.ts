@@ -6,7 +6,7 @@ import mongoose, { Model } from "mongoose";
 import { createPostInput, createPostSchema, editPostInput, editPostSchema } from "../schemas/post.schema";
 import { uploadToCloudinary } from "../helpers/cloudinary";
 import cloudinary from "../configs/cloudinary";
-import CommentModel from "../models/comment";
+import CommentModel from "../models/comment.model";
 
 interface RequestWithFiles extends Request {
     files: Express.Multer.File[];

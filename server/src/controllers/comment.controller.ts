@@ -3,7 +3,7 @@ import { CreateCommentInput, createCommentSchema } from "../schemas/comment.sche
 import { extractMentionsAndTags, replaceHrefs } from "../helpers/textParser";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
-import CommentModel from "../models/comment";
+import CommentModel from "../models/comment.model";
 
 export async function createCommentHandler(req: Request, res: Response, next: NextFunction) {
     try {
