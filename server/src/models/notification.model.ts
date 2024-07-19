@@ -1,6 +1,7 @@
 import { prop, getModelForClass, modelOptions, Ref, Severity } from "@typegoose/typegoose";
 import mongoose from "mongoose";
 import { User } from "./user.model";
+import { Post } from "./post.model";
 
 export class NotificationReceiver {
     @prop({ ref: () => User, required: true })
@@ -18,6 +19,9 @@ export class Notification {
     @prop({ auto: true })
     public _id?: mongoose.Types.ObjectId;
 
+    @prop({ refPath: "targetType", default: null })
+    public target: Ref<Post | Comment | User>;
+
     @prop({ required: true })
     public targetType: "Comment" | "Post" | "User";
 
@@ -34,10 +38,10 @@ export class Notification {
     public url: string | null;
 
     @prop({ ref: () => User, required: true })
-    public sender: Ref<User>;
+    public senders: Ref<User>[];
 
-    @prop({ ref: () => NotificationReceiver, required: true })
-    public receivers: Ref<NotificationReceiver>[];
+    @prop({ required: true })
+    public receivers: NotificationReceiver[];
 }
 
 const NotificationModel = getModelForClass(Notification);

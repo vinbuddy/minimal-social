@@ -27,6 +27,8 @@ const io = new Server(httpServer, {
 });
 
 // Use middlewares
+app.set("io", io);
+
 app.use(cookieParser());
 app.use(cors({ credentials: true, origin: process.env.CLIENT_BASE__URL as string }));
 app.options("*", cors());
@@ -44,17 +46,17 @@ const startServer = async () => {
     try {
         await mongoose.connect(uri);
         console.log(`Database connected`);
+
+        // Set up Socket.io event handlers
+        socketHandlers(io);
+
+        httpServer.listen(PORT, () => {
+            console.log(`running on https://localhost:${PORT}`);
+        });
     } catch (error: any) {
         console.log("error: ", error.message);
         process.exit(1);
     }
-
-    // Set up Socket.io event handlers
-    socketHandlers(io);
-
-    httpServer.listen(PORT, () => {
-        console.log(`running on https://localhost:${PORT}`);
-    });
 };
 
 startServer();

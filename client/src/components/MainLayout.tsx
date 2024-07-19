@@ -2,7 +2,7 @@
 import * as React from "react";
 import { HeartIcon, LogOut, MoonIcon, SearchIcon, Send, Smile, SunDim, User } from "lucide-react";
 import Link from "next/link";
-import { Avatar, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
+import { Avatar, Badge, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 import useAuthStore from "@/hooks/store/useAuthStore";
 import axiosInstance from "@/utils/httpRequest";
 import useLoading from "@/hooks/useLoading";
@@ -11,6 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { HomeIcon } from "@/assets/icons";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useSocketContext } from "@/contexts/SocketContext";
 
 const navLinks = [
     {
@@ -37,13 +38,38 @@ const navLinks = [
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState<boolean>(false);
+    const [isNotification, setIsNotification] = useState<boolean>(false);
     const { theme, setTheme } = useTheme();
     const { currentUser } = useAuthStore();
     const { startLoading, stopLoading, loading } = useLoading();
     const router = useRouter();
     const pathName = usePathname();
+    const { socket } = useSocketContext();
 
     useEffect(() => setMounted(true), []);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        socket.on("notification", (data) => {
+            console.log(data);
+            if (data) {
+                setIsNotification(true);
+                toast(data?.message ?? "You have new notification", {
+                    action: {
+                        label: "See",
+                        onClick: () => {
+                            router.push(`${data?.url}`);
+                        },
+                    },
+                });
+            }
+        });
+    }, [socket]);
+
+    useEffect(() => {
+        if (currentUser) setIsNotification(currentUser?.isNotification ?? false);
+    }, [currentUser]);
 
     const handleLogOut = async (): Promise<void> => {
         try {
@@ -92,6 +118,27 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     <div className="flex flex-col items-center gap-4">
                         {navLinks.map((navLink, index) => {
                             let isActive = pathName === navLink.href;
+
+                            if (isNotification && navLink.href === "/notification") {
+                                return (
+                                    <Button
+                                        key={index}
+                                        size="lg"
+                                        title={navLink.content}
+                                        as={Link}
+                                        href={navLink.href}
+                                        radius="sm"
+                                        isIconOnly
+                                        color={isActive ? "primary" : "default"}
+                                        variant={isActive ? undefined : "light"}
+                                    >
+                                        <Badge content="" color="danger" shape="circle" placement="top-right">
+                                            <>{navLink.icon}</>
+                                        </Badge>
+                                    </Button>
+                                );
+                            }
+
                             return (
                                 <Button
                                     key={index}

@@ -1,8 +1,10 @@
 import { Server, Socket } from "socket.io";
+import { addSocketClient, socketClients } from "../helpers/socket";
 
-export default function userSocketHandler(clients: Record<string, string>, io: Server, socket: Socket) {
+export default function userSocketHandler(socket: Socket) {
     socket.on("online", (data) => {
-        clients[socket.id] = data.userId;
+        addSocketClient(socket.id, data?.userId);
+        console.log("User online", data?.userId);
 
         socket.emit("online", { message: "User online successfully" });
     });

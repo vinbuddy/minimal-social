@@ -16,4 +16,6 @@ export interface IUser {
     bio: string;
 
     isVerified: boolean;
+
+    isNotification: boolean;
 }

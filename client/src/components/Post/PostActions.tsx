@@ -59,6 +59,19 @@ export default function PostActions({ post }: IProps) {
                 userId: currentUser?._id,
             });
 
+            const notificationResponse = await axiosInstance.post("/notification", {
+                target: post?._id,
+                targetType: "Post",
+                action: "like",
+                photo: currentUser?.photo,
+                message: `${currentUser?.username} liked your post`,
+                sender: currentUser?._id,
+                receivers: [post?.postBy?._id],
+                url: `/post/${post?._id}`,
+            });
+
+            console.log(notificationResponse.data);
+
             toast.success("Liked post successfully", {
                 position: "bottom-center",
             });
@@ -66,9 +79,10 @@ export default function PostActions({ post }: IProps) {
             setIsLiked(false);
             setLikeCount((prev) => prev - 1);
 
-            toast.error("Failed to unlike post", {
+            toast.error("Failed to like post", {
                 position: "bottom-center",
             });
+            toast.error(error.response.data.message, { position: "bottom-center" });
             console.log(error.response.data.message);
         }
     };

@@ -48,6 +48,9 @@ export class User {
     @prop({ required: true, default: "I am a new user" })
     public bio: string;
 
+    @prop({ default: false })
+    public isNotification: boolean;
+
     @prop({ required: true, default: false })
     isVerified: boolean;
 
