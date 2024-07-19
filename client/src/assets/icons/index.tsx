@@ -1,21 +1,48 @@
-export const HomeIcon = ({ className = "", width = 24, height = 24 }) => {
+export const HomeIcon = ({ className = "", size = 24, isFilled = false }) => {
     return (
-        <svg
-            aria-label="Home"
-            role="img"
-            viewBox="0 0 26 26"
-            className={className}
-            style={{ height: height, width: width, fill: "currentColor" }}
-        >
-            <title>Home</title>
-            <path
-                d="M2.25 12.8855V20.7497C2.25 21.8543 3.14543 22.7497 4.25 22.7497H9.25C9.52614 22.7497 9.75 22.5258 9.75 22.2497V17.6822V16.4997C9.75 14.7048 11.2051 13.2497 13 13.2497C14.7949 13.2497 16.25 14.7048 16.25 16.4997V17.6822V22.2497C16.25 22.5258 16.4739 22.7497 16.75 22.7497H21.75C22.8546 22.7497 23.75 21.8543 23.75 20.7497V12.8855C23.75 11.3765 23.0685 9.94814 21.8954 8.99882L16.1454 4.34539C14.3112 2.86094 11.6888 2.86094 9.85455 4.34539L4.10455 8.99882C2.93153 9.94814 2.25 11.3765 2.25 12.8855Z"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-width="2.5"
-            ></path>
-        </svg>
+        <>
+            {isFilled ? (
+                <svg
+                    aria-label="Trang chủ"
+                    role="img"
+                    viewBox="0 0 26 26"
+                    style={{
+                        height: size,
+                        width: size,
+                        fill: isFilled ? "currentColor" : "none",
+                        stroke: "currentColor",
+                    }}
+                >
+                    <title>Trang chủ</title>
+                    <path
+                        d="M2.25 12.8855V20.7497C2.25 21.8543 3.14543 22.7497 4.25 22.7497H8.25C8.52614 22.7497 8.75 22.5259 8.75 22.2497V17.6822V17.4997C8.75 15.1525 10.6528 13.2497 13 13.2497C15.3472 13.2497 17.25 15.1525 17.25 17.4997V17.6822V22.2497C17.25 22.5259 17.4739 22.7497 17.75 22.7497H21.75C22.8546 22.7497 23.75 21.8543 23.75 20.7497V12.8855C23.75 11.3765 23.0685 9.94815 21.8954 8.99883L16.1454 4.3454C14.3112 2.86095 11.6888 2.86095 9.85455 4.3454L4.10455 8.99883C2.93153 9.94815 2.25 11.3765 2.25 12.8855Z"
+                        fill="currentColor"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-width="2.5"
+                    ></path>
+                </svg>
+            ) : (
+                <svg
+                    style={{
+                        height: size,
+                        width: size,
+                    }}
+                    aria-label="Trang chủ"
+                    role="img"
+                    viewBox="0 0 26 26"
+                >
+                    <title>Trang chủ</title>
+                    <path
+                        d="M2.25 12.8855V20.7497C2.25 21.8543 3.14543 22.7497 4.25 22.7497H9.25C9.52614 22.7497 9.75 22.5258 9.75 22.2497V17.6822V16.4997C9.75 14.7048 11.2051 13.2497 13 13.2497C14.7949 13.2497 16.25 14.7048 16.25 16.4997V17.6822V22.2497C16.25 22.5258 16.4739 22.7497 16.75 22.7497H21.75C22.8546 22.7497 23.75 21.8543 23.75 20.7497V12.8855C23.75 11.3765 23.0685 9.94814 21.8954 8.99882L16.1454 4.34539C14.3112 2.86094 11.6888 2.86094 9.85455 4.34539L4.10455 8.99882C2.93153 9.94814 2.25 11.3765 2.25 12.8855Z"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-width="2.5"
+                    ></path>
+                </svg>
+            )}
+        </>
     );
 };
 
@@ -65,6 +92,61 @@ export const HeartIcon = ({ className = "", size = 24, isFilled = false }) => {
         </svg>
     );
 };
+export const ConversationIcon = ({ className = "", size = 24, isFilled = false }) => {
+    return (
+        <>
+            {isFilled ? (
+                <svg
+                    style={{
+                        height: size,
+                        width: size,
+                        fill: isFilled ? "currentColor" : "none",
+                        stroke: "currentColor",
+                    }}
+                    aria-label="Direct"
+                    fill="currentColor"
+                    height="24"
+                    role="img"
+                    viewBox="0 0 24 24"
+                    width="24"
+                >
+                    <title>Direct</title>
+                    <path
+                        d="M22.91 2.388a.69.69 0 0 0-.597-.347l-20.625.002a.687.687 0 0 0-.482 1.178L7.26 9.16a.686.686 0 0 0 .778.128l7.612-3.657a.723.723 0 0 1 .937.248.688.688 0 0 1-.225.932l-7.144 4.52a.69.69 0 0 0-.3.743l2.102 8.692a.687.687 0 0 0 .566.518.655.655 0 0 0 .103.008.686.686 0 0 0 .59-.337L22.903 3.08a.688.688 0 0 0 .007-.692"
+                        fill-rule="evenodd"
+                    ></path>
+                </svg>
+            ) : (
+                <svg
+                    style={{ height: size, width: size }}
+                    aria-label="Direct"
+                    fill="currentColor"
+                    role="img"
+                    viewBox="0 0 24 24"
+                >
+                    <title>Direct</title>
+                    <line
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        x1="22"
+                        x2="9.218"
+                        y1="3"
+                        y2="10.083"
+                    ></line>
+                    <polygon
+                        fill="none"
+                        points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334"
+                        stroke="currentColor"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                    ></polygon>
+                </svg>
+            )}
+        </>
+    );
+};
 
 export const RepostIcon = ({ className = "", size = 24 }) => {
     return (
@@ -95,6 +177,37 @@ export const CommentIcon = ({ className = "", size = 24, isFilled = false }) => 
                 stroke-linejoin="round"
                 stroke-width="1.25"
             ></path>
+        </svg>
+    );
+};
+export const SearchIcon = ({ className = "", size = 24, isFilled = false }) => {
+    return (
+        <svg
+            aria-label="Tìm kiếm"
+            role="img"
+            viewBox="0 0 24 24"
+            style={{ height: size, width: size, fill: "currentcolor" }}
+        >
+            <title>Tìm kiếm</title>
+            <path
+                d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+            ></path>
+            <line
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                x1="16.511"
+                x2="22"
+                y1="16.511"
+                y2="22"
+            ></line>
         </svg>
     );
 };

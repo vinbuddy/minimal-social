@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { HeartIcon, LogOut, MoonIcon, SearchIcon, Send, Smile, SunDim, User } from "lucide-react";
+import { LogOut, MoonIcon, SunDim, User } from "lucide-react";
 import Link from "next/link";
 import { Avatar, Badge, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
 import useAuthStore from "@/hooks/store/useAuthStore";
@@ -8,31 +8,35 @@ import axiosInstance from "@/utils/httpRequest";
 import useLoading from "@/hooks/useLoading";
 import { toast } from "sonner";
 import { usePathname, useRouter } from "next/navigation";
-import { HomeIcon } from "@/assets/icons";
+import { HomeIcon, HeartIcon, ConversationIcon, SearchIcon } from "@/assets/icons";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useSocketContext } from "@/contexts/SocketContext";
+import Image from "next/image";
+
+import logoDark from "@/assets/images/logo-dark.png";
+import logoLight from "@/assets/images/logo-light.png";
 
 const navLinks = [
     {
         content: "Home",
         href: "/",
-        icon: <HomeIcon />,
+        icon: (isFilled: boolean = false) => <HomeIcon isFilled={isFilled} />,
     },
     {
         content: "Conversation",
         href: "/conversation",
-        icon: <Send />,
+        icon: (isFilled: boolean = false) => <ConversationIcon isFilled={isFilled} />,
     },
     {
         content: "search",
         href: "/search",
-        icon: <SearchIcon />,
+        icon: (isFilled: boolean = false) => <SearchIcon isFilled={isFilled} />,
     },
     {
         content: "Notification",
         href: "/notification",
-        icon: <HeartIcon />,
+        icon: (isFilled: boolean = false) => <HeartIcon isFilled={isFilled} />,
     },
 ];
 
@@ -107,10 +111,19 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     <header className="h-[40px] flex items-center mb-5">
                         <Link
                             href="#"
-                            className=" group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full text-lg font-semibold md:h-8 md:w-8 md:text-base"
+                            className="max-w-full group flex  shrink-0 items-center justify-center gap-2 rounded-full text-lg font-semibold  md:text-base"
                         >
-                            <Smile className="h-7 w-7 transition-all group-hover:scale-110" />
-                            <span className="sr-only">Acme Inc</span>
+                            {/* <Smile className="h-7 w-7 transition-all group-hover:scale-110" />
+                            <span className="sr-only">Acme Inc</span> */}
+                            <Image
+                                className="rounded-lg max-w-full"
+                                src={theme === "light" ? logoLight : logoDark}
+                                width={0}
+                                height={0}
+                                sizes="100vw"
+                                style={{ width: "100%", height: "auto" }}
+                                alt="logo"
+                            />
                         </Link>
                     </header>
                 </nav>
@@ -118,6 +131,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     <div className="flex flex-col items-center gap-4">
                         {navLinks.map((navLink, index) => {
                             let isActive = pathName === navLink.href;
+                            const Icon = navLink.icon(isActive);
+                            console.log("Icon: ", Icon);
+                            const activeColor = theme === "light" ? "text-black" : "text-white";
 
                             if (isNotification && navLink.href === "/notification") {
                                 return (
@@ -129,11 +145,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                         href={navLink.href}
                                         radius="sm"
                                         isIconOnly
-                                        color={isActive ? "primary" : "default"}
-                                        variant={isActive ? undefined : "light"}
+                                        color="default"
+                                        className={`${isActive ? activeColor : "text-foreground"}`}
+                                        variant="light"
                                     >
                                         <Badge content="" color="danger" shape="circle" placement="top-right">
-                                            <>{navLink.icon}</>
+                                            {Icon}
                                         </Badge>
                                     </Button>
                                 );
@@ -148,10 +165,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                     href={navLink.href}
                                     radius="sm"
                                     isIconOnly
-                                    color={isActive ? "primary" : "default"}
-                                    variant={isActive ? undefined : "light"}
+                                    // color="danger"
+                                    color="default"
+                                    className={`${isActive ? activeColor : "text-foreground"}`}
+                                    variant="light"
                                 >
-                                    <>{navLink.icon}</>
+                                    {Icon}
                                 </Button>
                             );
                         })}
