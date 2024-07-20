@@ -64,7 +64,7 @@ export default function PostActions({ post }: IProps) {
                 targetType: "Post",
                 action: "like",
                 photo: currentUser?.photo,
-                message: `${currentUser?.username} liked your post`,
+                message: `liked your post`,
                 sender: currentUser?._id,
                 receivers: [post?.postBy?._id],
                 url: `/post/${post?._id}`,

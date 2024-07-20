@@ -16,6 +16,7 @@ import Image from "next/image";
 
 import logoDark from "@/assets/images/logo-dark.png";
 import logoLight from "@/assets/images/logo-light.png";
+import NotificationToast from "./NotificationToast";
 
 const navLinks = [
     {
@@ -59,14 +60,14 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             console.log(data);
             if (data) {
                 setIsNotification(true);
-                toast(data?.message ?? "You have new notification", {
-                    action: {
-                        label: "See",
-                        onClick: () => {
-                            router.push(`${data?.url}`);
-                        },
-                    },
-                });
+                toast(
+                    <div>
+                        <NotificationToast sender={data?.sender} notification={data?.notification} />
+                    </div>,
+                    {
+                        closeButton: true,
+                    }
+                );
             }
         });
     }, [socket]);
@@ -132,7 +133,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                         {navLinks.map((navLink, index) => {
                             let isActive = pathName === navLink.href;
                             const Icon = navLink.icon(isActive);
-                            console.log("Icon: ", Icon);
                             const activeColor = theme === "light" ? "text-black" : "text-white";
 
                             if (isNotification && navLink.href === "/notification") {

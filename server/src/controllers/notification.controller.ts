@@ -110,6 +110,8 @@ export async function createNotification(req: Request, res: Response, next: Next
             { path: "receivers.receiver", select: USER_MODEL_HIDDEN_FIELDS },
         ]);
 
+        const senderInfo = await UserModel.findById(sender).select(USER_MODEL_HIDDEN_FIELDS);
+
         // Send notification to receivers
         const io = req.app.get("io") as Server;
 
@@ -118,7 +120,10 @@ export async function createNotification(req: Request, res: Response, next: Next
 
             socketIds.forEach((socketId: string) => {
                 if (socketId && receiver !== sender) {
-                    io.to(socketId).emit("notification", notification);
+                    io.to(socketId).emit("notification", {
+                        notification,
+                        sender: senderInfo,
+                    });
                 }
             });
         });
