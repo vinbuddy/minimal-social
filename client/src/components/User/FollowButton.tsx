@@ -21,7 +21,7 @@ export default function FollowButton({ user, buttonProps, onAfterFollowed, onAft
     const [isFollowed, setIsFollowed] = useState<boolean>(() => {
         if (!currentUser) return false;
 
-        return user.followers.includes(currentUser._id);
+        return user?.followers?.includes(currentUser._id) ?? false;
     });
 
     const handleFollow = async () => {

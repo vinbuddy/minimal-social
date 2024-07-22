@@ -15,6 +15,7 @@ import Link from "next/link";
 import MediaFileSlider from "../Media/MediaFileSlider";
 import PostActions from "./PostActions";
 import FullScreenMediaSlider from "../Media/FullScreenMediaSlider";
+import PostActivitiesModalButton from "./PostActivitiesModalButton";
 
 interface IProps {
     post: IPost;
@@ -111,14 +112,15 @@ export default function PostDetail({ post }: IProps) {
                 <div className="mt-2 flex items-center justify-between">
                     <PostActions post={post} />
 
-                    <Button
-                        size="sm"
-                        variant="light"
-                        radius="full"
-                        className="text-default-500 text-sm px-3 cursor-pointer"
-                    >
-                        See activities
-                    </Button>
+                    <PostActivitiesModalButton
+                        buttonProps={{
+                            size: "sm",
+                            variant: "light",
+                            radius: "full",
+                            className: "text-default-500 text-sm px-3 cursor-pointer",
+                            children: "See activities",
+                        }}
+                    />
                 </div>
             </section>
         </div>

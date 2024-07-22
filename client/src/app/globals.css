@@ -14,7 +14,7 @@ body {
 /* Custom All Scrollbar Vertical into  */
 .scrollbar::-webkit-scrollbar {
     border-radius: 0;
-    width: 5px;
+    width: 8px;
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
