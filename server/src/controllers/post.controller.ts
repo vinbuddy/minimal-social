@@ -222,8 +222,8 @@ export async function deletePostHandler(req: Request, res: Response, next: NextF
 
 export async function getAllPostsHandler(req: Request, res: Response, next: NextFunction) {
     try {
-        const page = Number(req.query.page) ?? 1;
-        const limit = Number(req.query.limit) ?? 15;
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 15;
 
         const skip = (Number(page) - 1) * limit;
         const totalPosts = await PostModel.countDocuments();
@@ -254,8 +254,8 @@ export async function getAllPostsHandler(req: Request, res: Response, next: Next
 export async function getFollowingPostsHandler(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = req.query.userId;
-        const page = Number(req.query.page) ?? 1;
-        const limit = Number(req.query.limit) ?? 15;
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 15;
 
         const skip = (Number(page) - 1) * limit;
 
@@ -474,6 +474,7 @@ export async function repostHandler(req: Request, res: Response, next: NextFunct
         next(error);
     }
 }
+
 export async function unRepostHandler(req: Request, res: Response, next: NextFunction) {
     try {
         const { originalPostId, postId, userId } = req.body;
@@ -490,6 +491,87 @@ export async function unRepostHandler(req: Request, res: Response, next: NextFun
         await PostModel.findByIdAndDelete(postId);
 
         return res.status(200).json({ message: "Unrepost post successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Post Activities
+export async function getUsersLikedPostHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const postId = req.params.id;
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 5;
+
+        if (!postId) {
+            return res.status(400).json({ message: "Post ID is required" });
+        }
+
+        const post = await PostModel.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        // Pagination
+        const skip = (Number(page) - 1) * limit;
+        const totalUsers = post.likes.length;
+        const totalPages = Math.ceil(totalUsers / limit);
+
+        // Get users with pagination
+        const users = await UserModel.find({
+            _id: { $in: post.likes },
+        })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .select(USER_MODEL_HIDDEN_FIELDS);
+
+        return res
+            .status(200)
+            .json({ message: "Get users liked post successfully", data: users, totalUsers, totalPages, page, limit });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getUsersRepostedPostHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const postId = req.params.id;
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 5;
+
+        if (!postId) {
+            return res.status(400).json({ message: "Post ID is required" });
+        }
+
+        const post = await PostModel.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        // Pagination
+        const skip = (Number(page) - 1) * limit;
+        const totalUsers = post.likes.length;
+        const totalPages = Math.ceil(totalUsers / limit);
+
+        const users = await UserModel.find({
+            _id: { $in: post.reposts },
+        })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .select(USER_MODEL_HIDDEN_FIELDS);
+
+        return res.status(200).json({
+            message: "Get users reposted post successfully",
+            data: users,
+            totalUsers,
+            totalPages,
+            page,
+            limit,
+        });
     } catch (error) {
         next(error);
     }
