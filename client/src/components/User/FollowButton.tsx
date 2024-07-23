@@ -33,6 +33,17 @@ export default function FollowButton({ user, buttonProps, onAfterFollowed, onAft
                 currentUserId: currentUser._id,
             });
 
+            await axiosInstance.post("/notification", {
+                target: user?._id,
+                targetType: "User",
+                action: "follow",
+                photo: currentUser?.photo,
+                message: `followed you`,
+                sender: currentUser?._id,
+                receivers: [user?._id],
+                url: `/profile/${currentUser?._id}`,
+            });
+
             onAfterFollowed && onAfterFollowed();
 
             toast.success("Followed successfully", { position: "bottom-center" });
