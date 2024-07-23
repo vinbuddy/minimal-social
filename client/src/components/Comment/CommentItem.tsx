@@ -15,6 +15,7 @@ import usePagination from "@/hooks/usePagination";
 import useCommentStore from "@/hooks/store/useCommentStore";
 import axiosInstance from "@/utils/httpRequest";
 import CommentMenuDropdown from "./CommentMenuDropdown";
+import { useParams } from "next/navigation";
 
 interface IProps {
     comment: IComment;
@@ -24,6 +25,7 @@ interface IProps {
 export default function CommentItem({ comment, isReply = false }: IProps) {
     const { currentUser } = useAuthStore();
     const { reply } = useCommentStore();
+    const params: { id: string } = useParams();
 
     const [isLiked, setIsLiked] = useState<boolean>(() => comment?.likes.includes(currentUser?._id) || false);
     const [likeCount, setLikeCount] = useState<number>(comment?.likeCount ?? 0);
@@ -90,6 +92,17 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
             const response = await axiosInstance.put("/comment/like", {
                 commentId: comment._id,
                 userId: currentUser?._id,
+            });
+
+            await axiosInstance.post("/notification", {
+                target: comment?._id,
+                targetType: "Comment",
+                action: "like",
+                photo: currentUser?.photo,
+                message: `liked your comment`,
+                sender: currentUser?._id,
+                receivers: [comment?.commentBy?._id],
+                url: `/post/${params?.id}?commentId=${comment?._id}`,
             });
 
             toast.success("Liked post successfully", {

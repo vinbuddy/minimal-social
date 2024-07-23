@@ -60,7 +60,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
                                     comments.length > 0 && "border-b"
                                 }`}
                             >
-                                <CommentForm targetType="Post" />
+                                <CommentForm target={post} targetType="Post" />
                             </div>
 
                             <div className="flex flex-col mt-4">

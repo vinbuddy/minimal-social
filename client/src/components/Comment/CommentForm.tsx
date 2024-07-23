@@ -14,12 +14,22 @@ import { TOAST_OPTIONS } from "@/utils/toast";
 import useGlobalMutation from "@/hooks/useGlobalMutation";
 import useCommentStore from "@/hooks/store/useCommentStore";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
+import { IComment } from "@/types/comment";
+import { IPost } from "@/types/post";
+import { IUser } from "@/types/user";
 
-interface IProps {
-    targetType: "Post" | "Video";
+// type TargetType = IPost | IVideo;
+type CommentTargetType = IPost;
+
+interface IProps<T extends CommentTargetType, TT> {
+    target: T;
+    targetType: TT;
 }
 
-export default function CommentForm({ targetType }: IProps) {
+export default function CommentForm<T extends CommentTargetType, TT extends "Post" | "Video">({
+    targetType,
+    target,
+}: IProps<T, TT>) {
     const params: { id: string } = useParams();
     const { currentUser } = useAuthStore();
     const { startLoading, stopLoading, loading } = useLoading();
@@ -58,6 +68,36 @@ export default function CommentForm({ targetType }: IProps) {
                 rootComment: replyTo?.rootComment === null ? replyTo?._id : replyTo?.rootComment,
             };
             const response = await axiosInstance.post("/comment", data);
+            const commentResponse = response.data.data as IComment;
+
+            // Notification reply
+            if (!replyTo) {
+                await axiosInstance.post("/notification", {
+                    target: commentResponse?._id,
+                    targetType: "Comment",
+                    action: "comment",
+                    photo: currentUser?.photo,
+                    message: `commented on your post`,
+                    sender: currentUser?._id,
+                    receivers: [target?.postBy?._id],
+                    url: `/post/${params?.id}?commentId=${commentResponse?._id}`,
+                });
+            } else {
+                await axiosInstance.post("/notification", {
+                    target: commentResponse?._id,
+                    targetType: "Comment",
+                    action: "comment",
+                    photo: currentUser?.photo,
+                    message: `replied on your comment`,
+                    sender: currentUser?._id,
+                    receivers: [replyTo?.commentBy?._id],
+                    url: `/post/${params?.id}?commentId=${commentResponse?._id}&rootComment=${
+                        replyTo?.rootComment ?? replyTo?._id
+                    }`,
+                });
+            }
+
+            // Notification comment
 
             if (commentInputRef.current) {
                 commentInputRef.current.innerHTML = "";
