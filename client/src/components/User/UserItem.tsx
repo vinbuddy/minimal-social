@@ -1,11 +1,17 @@
-import { Avatar, Badge } from "@nextui-org/react";
+import { Avatar, Badge, Tooltip } from "@nextui-org/react";
 import UserName from "./UserName";
 import FollowButton from "./FollowButton";
 import { HeartIcon, RepostIcon } from "@/assets/icons";
+import { IUser } from "@/types/user";
+import UserProfileCard from "./UserProfileCard";
 
-export default function UserItem() {
+interface IProps {
+    user: IUser;
+}
+
+export default function UserItem({ user }: IProps) {
     return (
-        <div className="flex items-center justify-between py-5 border-b border-divider last:border-none">
+        <div className="flex items-center justify-between py-5 border-b border-divider last:border-none ps-1">
             <section className="flex items-center gap-4">
                 <Badge
                     isOneChar
@@ -14,15 +20,13 @@ export default function UserItem() {
                     color="danger"
                     placement="bottom-right"
                 >
-                    <Avatar
-                        size="sm"
-                        isBordered
-                        src="https://scontent.cdninstagram.com/v/t51.2885-19/435256018_788186039888703_2696385283718779029_n.jpg?stp=dst-jpg_s320x320&_nc_ht=scontent.cdninstagram.com&_nc_cat=103&_nc_ohc=dGRb2yhxBX0Q7kNvgHYi_vC&edm=APs17CUBAAAA&ccb=7-5&oh=00_AYBxnM1mlc1pO_kz3aqLU-zJAiQByhxM3QubYozPQraJyg&oe=66A3B48E&_nc_sid=10d13b"
-                    />
+                    <Avatar size="sm" isBordered src={user?.photo} />
                 </Badge>
-                <h4>
-                    <UserName />
-                </h4>
+                <Tooltip delay={500} placement="bottom-start" content={<UserProfileCard user={user} />}>
+                    <h4>
+                        <UserName user={user} />
+                    </h4>
+                </Tooltip>
             </section>
             <section>
                 <FollowButton

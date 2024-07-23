@@ -113,6 +113,7 @@ export default function PostDetail({ post }: IProps) {
                     <PostActions post={post} />
 
                     <PostActivitiesModalButton
+                        post={post}
                         buttonProps={{
                             size: "sm",
                             variant: "light",
