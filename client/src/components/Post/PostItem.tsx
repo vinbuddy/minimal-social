@@ -82,7 +82,12 @@ export default function PostItem({ post: _post }: IProps) {
                             content={<UserProfileCard user={repostedInfo?.postBy} />}
                         >
                             <div className="flex items-center text-default-600 text-sm gap-2">
-                                <Image radius="full" className="size-5" src={repostedInfo?.postBy?.photo} alt="" />
+                                <Image
+                                    radius="full"
+                                    className="size-5 z-[1]"
+                                    src={repostedInfo?.postBy?.photo}
+                                    alt=""
+                                />
                                 <div className="flex items-center">
                                     <h4 className="leading-none cursor-pointer hover:underline">
                                         {repostedInfo?.postBy?.username}

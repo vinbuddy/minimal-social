@@ -151,15 +151,6 @@ export default function PostModalButton({ type = "create", post, children, open,
         setOpen && setOpen(_open);
     };
 
-    // const handleRevalidatePost = () => {
-
-    //     for (const key of cache.keys() as any) {
-    //         if (key.includes("/post")) {
-    //             mutate(key);
-    //         }
-    //     }
-    // }
-
     const handleCreatePost = async () => {
         if (!currentUser) {
             alert("Unauthenticated user found.");
@@ -192,9 +183,25 @@ export default function PostModalButton({ type = "create", post, children, open,
                 withCredentials: true,
             });
 
+            console.log(response.data);
+            const postResponse = response.data.data as IPost;
+
+            // Notification
+            if (postResponse.mentions.length > 0) {
+                const notificationResponse = await axiosInstance.post("/notification", {
+                    target: postResponse?._id,
+                    targetType: "Post",
+                    action: "mention",
+                    photo: currentUser?.photo,
+                    message: `mentioned you in a post`,
+                    sender: currentUser?._id,
+                    receivers: postResponse?.mentions?.map((user) => user?._id),
+                    url: `/post/${postResponse?._id}`,
+                });
+            }
+
             mutate((key) => typeof key === "string" && key.includes("/post"));
 
-            console.log(response.data);
             reset();
             setIsOpen(false);
             setOpen && setOpen(false);

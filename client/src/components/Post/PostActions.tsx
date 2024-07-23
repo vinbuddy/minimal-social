@@ -70,8 +70,6 @@ export default function PostActions({ post }: IProps) {
                 url: `/post/${post?._id}`,
             });
 
-            console.log(notificationResponse.data);
-
             toast.success("Liked post successfully", {
                 position: "bottom-center",
             });
@@ -123,6 +121,17 @@ export default function PostActions({ post }: IProps) {
             const response = await axiosInstance.post("/post/repost", {
                 postId: post._id,
                 userId: currentUser?._id,
+            });
+
+            const notificationResponse = await axiosInstance.post("/notification", {
+                target: post?._id,
+                targetType: "Post",
+                action: "repost",
+                photo: currentUser?.photo,
+                message: `reposted your post`,
+                sender: currentUser?._id,
+                receivers: [post?.postBy?._id],
+                url: `/post/${post?._id}`,
             });
 
             mutate((key) => typeof key === "string" && key.includes("/post"));
