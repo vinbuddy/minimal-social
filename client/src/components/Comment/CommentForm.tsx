@@ -93,7 +93,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                     receivers: [replyTo?.commentBy?._id],
                     url: `/post/${params?.id}?commentId=${commentResponse?._id}&rootComment=${
                         replyTo?.rootComment ?? replyTo?._id
-                    }`,
+                    }&replyToId=${replyTo?._id}`,
                 });
             }
 
