@@ -146,7 +146,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                         radius="sm"
                                         isIconOnly
                                         color="default"
-                                        className={`${isActive ? activeColor : "text-foreground"}`}
+                                        className={`${isActive ? activeColor : "text-default-400"}`}
                                         variant="light"
                                     >
                                         <Badge content="" color="danger" shape="circle" placement="top-right">
@@ -167,7 +167,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                     isIconOnly
                                     // color="danger"
                                     color="default"
-                                    className={`${isActive ? activeColor : "text-foreground"}`}
+                                    className={`${isActive ? activeColor : "text-default-400"}`}
                                     variant="light"
                                 >
                                     {Icon}
