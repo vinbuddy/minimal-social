@@ -1,6 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import e, { NextFunction, Request, Response } from "express";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import { FollowUserInput, followUserSchema } from "../schemas/user.schema";
+import mongoose from "mongoose";
 
 export async function getUsersHandler(req: Request, res: Response, next: NextFunction) {
     try {
@@ -96,6 +97,42 @@ export async function unfollowUserHandler(req: Request, res: Response, next: Nex
         await UserModel.findByIdAndUpdate(userId, { $pull: { followers: currentUserId } });
 
         return res.status(200).json({ message: "User followed successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getFollowSuggestionsHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = req.query.userId as string;
+
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 15;
+
+        const user = await UserModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const skip = (Number(page) - 1) * limit;
+        const totalUsers = await UserModel.countDocuments({
+            _id: { $ne: userId }, // Except yourself
+            followers: { $ne: userId }, // Except users followed you
+            followings: { $ne: userId }, // Except users that you followed
+        });
+        const totalPages = Math.ceil(totalUsers / limit);
+
+        const suggestions = await UserModel.find({
+            _id: { $ne: userId }, // Except yourself
+            followers: { $ne: userId }, // Except users followed you
+            followings: { $ne: userId }, // Except users that you followed
+        })
+            .skip(skip)
+            .limit(limit)
+            .select(USER_MODEL_HIDDEN_FIELDS);
+
+        return res.status(200).json({ statusCode: 200, data: suggestions, totalPages, totalUsers, page, limit });
     } catch (error) {
         next(error);
     }

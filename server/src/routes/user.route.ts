@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import {
     followUserHandler,
+    getFollowSuggestionsHandler,
     getUserHandler,
     getUsersHandler,
     searchUserHandler,
@@ -12,6 +13,7 @@ const router: Router = express.Router();
 
 router.get("/search", verifyToken, searchUserHandler);
 router.get("/", verifyAdminToken, getUsersHandler);
+router.get("/suggestion", getFollowSuggestionsHandler);
 router.get("/:id", verifyToken, getUserHandler);
 
 router.put("/follow", verifyToken, followUserHandler);
