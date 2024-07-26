@@ -4,14 +4,19 @@ import FollowButton from "./FollowButton";
 import { HeartIcon, RepostIcon } from "@/assets/icons";
 import { IUser } from "@/types/user";
 import UserProfileCard from "./UserProfileCard";
+import Link from "next/link";
 
 interface IProps {
     user: IUser;
+    href?: string;
 }
 
-export default function UserItem({ user }: IProps) {
+export default function UserItem({ user, href }: IProps) {
     return (
-        <div className="flex items-center justify-between py-5 border-b border-divider last:border-none ps-1">
+        <Link
+            href={href ?? "#"}
+            className="flex items-center justify-between py-5 border-b border-divider last:border-none ps-1"
+        >
             <section className="flex items-center gap-4">
                 <Badge
                     isOneChar
@@ -36,6 +41,6 @@ export default function UserItem({ user }: IProps) {
                     buttonProps={{ size: "sm", radius: "md", fullWidth: false }}
                 />
             </section>
-        </div>
+        </Link>
     );
 }

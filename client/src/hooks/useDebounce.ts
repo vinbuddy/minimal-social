@@ -9,7 +9,7 @@ function useSearchDebounce(value: string, delay: number) {
         }, delay);
 
         return () => clearTimeout(hanler);
-    }, [value]);
+    }, [value, delay]);
 
     return deBouncedValue;
 }

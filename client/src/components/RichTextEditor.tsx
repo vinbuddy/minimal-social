@@ -1,5 +1,5 @@
 "use client";
-import useSearchDebounce from "@/hooks/useSearchDebounce";
+import useDebounce from "@/hooks/useDebounce";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 // import { fallbackAvatar } from "@/assets/images";
@@ -33,7 +33,7 @@ function RichTextEditor(
     const dropdownMentionRef = useRef<HTMLDivElement>(null);
     const contentInnerRef = useRef<HTMLDivElement>(null);
 
-    const debouncedSearch = useSearchDebounce(userName, 750);
+    const debouncedSearch = useDebounce(userName, 750);
 
     const isOpenMention = isTypingMention === true && debouncedSearch.length > 0 && suggestions.length > 0;
 

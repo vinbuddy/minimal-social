@@ -40,7 +40,7 @@ export default function UserSuggestionList() {
                 >
                     {users.map((user) => (
                         <Fragment key={user?._id}>
-                            <UserItem user={user} />
+                            <UserItem href={`/profile/${user?._id}`} user={user} />
                         </Fragment>
                     ))}
                 </InfiniteScroll>
