@@ -5,6 +5,7 @@ import userRoutes from "./user.route";
 import postRoutes from "./post.route";
 import commentRoutes from "./comment.route";
 import notificationRoutes from "./notification.route";
+import searchRoutes from "./search.route";
 
 const router = express.Router();
 
@@ -13,5 +14,6 @@ router.use("/user", userRoutes);
 router.use("/post", postRoutes);
 router.use("/comment", commentRoutes);
 router.use("/notification", notificationRoutes);
+router.use("/search", searchRoutes);
 
 export default router;
