@@ -65,6 +65,7 @@ export async function createNotificationHandler(req: Request, res: Response, nex
         const { targetType, target, action, photo, message, url, sender, receivers } = createNotificationSchema.parse(
             req.body
         ) as CreateNotificationInput;
+        console.log("sender: ", sender);
 
         const senderId = new mongoose.Types.ObjectId(sender);
         const receiverIds = receivers.map((receiver: string) => new mongoose.Types.ObjectId(receiver));
@@ -94,7 +95,7 @@ export async function createNotificationHandler(req: Request, res: Response, nex
                 photo,
                 message,
                 url: url ?? null,
-                sender: [new mongoose.Types.ObjectId(sender)],
+                senders: [senderId],
                 receivers: notificationReceivers,
             });
 
