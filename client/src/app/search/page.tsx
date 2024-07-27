@@ -102,7 +102,7 @@ export default function SearchPage() {
 
                                 {showError && <div className="text-center text-danger-500">{error?.message}</div>}
 
-                                {searchValue && !isLoading && (
+                                {searchValue && (
                                     <div>
                                         <div className="flex items-center justify-between py-4 border-b border-divider ps-1">
                                             <Link
@@ -122,6 +122,7 @@ export default function SearchPage() {
                                         </div>
 
                                         {hasResults &&
+                                            !isLoading &&
                                             autocompleteResults?.data.map((user) => (
                                                 <UserItem href={`/profile/${user?._id}`} key={user?._id} user={user} />
                                             ))}

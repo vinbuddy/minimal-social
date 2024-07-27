@@ -1,6 +1,7 @@
 "use client";
 import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
 import MainLayout from "@/components/MainLayout";
+import NotificationItem from "@/components/Notification/NotificationItem";
 import { Tab, Tabs } from "@nextui-org/react";
 import { AtSignIcon, UserIcon } from "lucide-react";
 
@@ -60,7 +61,15 @@ export default function NotificationPage() {
                         </Tabs>
                     </header>
 
-                    <main className="px-4 pb-4"></main>
+                    <main className="px-4 pb-4">
+                        <NotificationItem />
+                        <NotificationItem />
+                        <NotificationItem />
+                        <NotificationItem />
+                        <NotificationItem />
+                        <NotificationItem />
+                        <NotificationItem />
+                    </main>
                 </div>
             </div>
         </MainLayout>

@@ -16,7 +16,7 @@ import Image from "next/image";
 
 import logoDark from "@/assets/images/logo-dark.png";
 import logoLight from "@/assets/images/logo-light.png";
-import NotificationToast from "./NotificationToast";
+import NotificationToast from "@/components/Notification/NotificationToast";
 
 const navLinks = [
     {
