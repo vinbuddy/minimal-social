@@ -60,7 +60,7 @@ const helpers = {
     },
 };
 
-export async function createNotification(req: Request, res: Response, next: NextFunction) {
+export async function createNotificationHandler(req: Request, res: Response, next: NextFunction) {
     try {
         const { targetType, target, action, photo, message, url, sender, receivers } = createNotificationSchema.parse(
             req.body
@@ -132,6 +132,76 @@ export async function createNotification(req: Request, res: Response, next: Next
             message: "Create notification successfully",
             data: notification,
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getUserNotificationsHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = req.params.userId;
+        const page = Number(req.query.page as string) || 1;
+        const limit = Number(req.query.limit as string) || 10;
+        const action = req.query.action;
+
+        if (!userId) {
+            return res.status(400).json({
+                message: "User id is required",
+            });
+        }
+
+        const user = await UserModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        const condition: any = {
+            receivers: {
+                $in: [userId],
+            },
+            action: action,
+        };
+
+        const skip = (page - 1) * limit;
+        const totalNotifications = await NotificationModel.countDocuments(condition);
+        const totalPages = Math.ceil(totalNotifications / limit);
+
+        const notifications = await NotificationModel.find(condition);
+
+        return res.status(200).json({
+            message: "Get notifications successfully",
+            data: notifications,
+            totalPages,
+            page,
+            limit,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function deleteNotificationHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const notificationId = req.params.id;
+
+        if (!notificationId) {
+            return res.status(400).json({
+                message: "Notification id is required",
+            });
+        }
+
+        const deleted = await NotificationModel.findByIdAndDelete(notificationId);
+
+        if (!deleted) {
+            return res.status(404).json({
+                message: "Notification not found",
+            });
+        }
+
+        return res.status(200).json({ message: "Delete notification successfully" });
     } catch (error) {
         next(error);
     }
