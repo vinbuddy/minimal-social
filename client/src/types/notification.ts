@@ -24,6 +24,10 @@ export interface INotification {
     senders: IUser[];
 
     receivers: INotificationReceiver[];
+
+    createdAt: string;
+
+    updatedAt: string;
 }
 
 export interface INotificationTheme {

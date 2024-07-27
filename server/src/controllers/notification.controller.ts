@@ -160,16 +160,24 @@ export async function getUserNotificationsHandler(req: Request, res: Response, n
 
         const condition: any = {
             receivers: {
-                $in: [userId],
+                $elemMatch: { receiver: new mongoose.Types.ObjectId(userId) },
             },
-            action: action,
         };
+
+        if (action && action !== "all") {
+            condition["action"] = action;
+        }
 
         const skip = (page - 1) * limit;
         const totalNotifications = await NotificationModel.countDocuments(condition);
         const totalPages = Math.ceil(totalNotifications / limit);
 
-        const notifications = await NotificationModel.find(condition);
+        const result = await NotificationModel.find(condition).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+        const notifications = await NotificationModel.populate(result, [
+            { path: "senders", select: USER_MODEL_HIDDEN_FIELDS },
+            { path: "receivers.receiver", select: USER_MODEL_HIDDEN_FIELDS },
+        ]);
 
         return res.status(200).json({
             message: "Get notifications successfully",

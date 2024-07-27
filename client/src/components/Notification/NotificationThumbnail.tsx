@@ -18,7 +18,7 @@ export const NOTIFICATION_THEME_BY_ACTION: INotificationTheme = {
         color: "success",
     },
     follow: {
-        icon: <UserIcon stroke="none" fill="#fff" size={14} />,
+        icon: <UserIcon stroke="none" fill="currentColor" size={14} />,
         color: "primary",
     },
     repost: {

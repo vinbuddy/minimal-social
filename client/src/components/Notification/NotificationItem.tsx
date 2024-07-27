@@ -3,57 +3,57 @@ import NotificationThumbnail from "./NotificationThumbnail";
 import Link from "next/link";
 import { Avatar, AvatarGroup, Button } from "@nextui-org/react";
 import { EllipsisIcon } from "lucide-react";
+import TimeAgo from "../TimeAgo";
+import UserName from "../User/UserName";
 
 interface IProps {
-    notification?: INotification;
+    notification: INotification;
 }
 
 export default function NotificationItem({ notification }: IProps) {
+    const others = notification?.senders?.length - 1;
+    const totalNotifications = notification?.senders?.length;
     return (
         <div className="group flex items-center justify-between py-5 border-b border-divider last:border-none ps-1">
-            <Link href="" className="flex flex-1 gap-5">
-                <NotificationThumbnail photo="https://avatars.githubusercontent.com/u/94288269?v=4" action="like" />
-                <div>
+            <Link href={notification?.url ?? "#"} className="flex flex-1 gap-5">
+                <NotificationThumbnail photo={notification?.photo} action={notification?.action} />
+                <div className="w-full">
                     <h4>
-                        <Link href="/profile/vinbuddy" className="font-semibold">
-                            vinbuddy
+                        <Link href={`/profile/${notification?.senders[0]?._id}`} className="font-semibold">
+                            <UserName className="inline-flex" user={notification?.senders[0]} />
                         </Link>{" "}
-                        and 2 others liked your post
+                        {notification?.senders && totalNotifications > 1 && <span>and {others} others&nbsp;</span>}
+                        <span>{notification?.message}</span>
                     </h4>
-                    <p className="text-default-400 text-sm mt-1 mb-2">4 minutes ago</p>
+                    <div className="">
+                        <TimeAgo className="!text-default-400 !text-sm" date={notification?.createdAt} />
+                    </div>
 
-                    <AvatarGroup
-                        max={3}
-                        total={10}
-                        renderCount={(count) => (
-                            <p className="text-tiny text-default-400 font-medium ms-2">+{count} others</p>
-                        )}
-                    >
-                        <Avatar
-                            classNames={{ base: "!w-5 !h-5" }}
-                            src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
-                        />
-                        <Avatar
-                            classNames={{ base: "!w-5 !h-5" }}
-                            src="https://i.pravatar.cc/150?u=a04258a2462d826712d"
-                        />
-                        <Avatar
-                            classNames={{ base: "!w-5 !h-5" }}
-                            src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-                        />
-                        <Avatar
-                            classNames={{ base: "!w-5 !h-5" }}
-                            src="https://i.pravatar.cc/150?u=a04258114e29026302d"
-                        />
-                        <Avatar
-                            classNames={{ base: "!w-5 !h-5" }}
-                            src="https://i.pravatar.cc/150?u=a04258114e29026702d"
-                        />
-                        <Avatar
-                            classNames={{ base: "!w-5 !h-5" }}
-                            src="https://i.pravatar.cc/150?u=a04258114e29026708c"
-                        />
-                    </AvatarGroup>
+                    {notification?.senders?.length > 1 && (
+                        <AvatarGroup
+                            className="mt-2"
+                            isDisabled
+                            max={3}
+                            total={totalNotifications ?? 0}
+                            renderCount={(count) => {
+                                if (count <= 2) return null;
+                                return (
+                                    <p className="text-tiny text-default-400 font-medium ms-2">
+                                        +{count >= 3 ? count - 3 : count} others
+                                    </p>
+                                );
+                            }}
+                        >
+                            {notification?.senders?.map((sender) => (
+                                <Avatar
+                                    key={sender?._id}
+                                    src={sender?.photo}
+                                    alt={sender?.username}
+                                    classNames={{ base: "!w-5 !h-5" }}
+                                />
+                            ))}
+                        </AvatarGroup>
+                    )}
                 </div>
             </Link>
             <section>
