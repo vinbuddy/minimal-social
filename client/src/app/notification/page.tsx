@@ -40,6 +40,7 @@ export default function NotificationPage() {
                             variant="light"
                             color="default"
                             radius="full"
+                            fullWidth
                         >
                             <Tab key="all" title="All" />
                             <Tab
@@ -111,7 +112,7 @@ export default function NotificationPage() {
                                 ))}
                             </InfiniteScroll>
                         )}
-                        {isLoading && <NotificationSkeletons length={2} />}
+                        {isLoading && <NotificationSkeletons length={5} />}
                     </main>
                 </div>
             </div>
