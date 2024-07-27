@@ -6,16 +6,21 @@ import NotificationSkeletons from "@/components/Notification/NotificationSkeleto
 import useAuthStore from "@/hooks/store/useAuthStore";
 import usePagination from "@/hooks/usePagination";
 import { INotification } from "@/types/notification";
+import { IUser } from "@/types/user";
+import axiosInstance from "@/utils/httpRequest";
+import { TOAST_OPTIONS } from "@/utils/toast";
 import { Spinner, Tab, Tabs } from "@nextui-org/react";
 import { AtSignIcon, UserIcon } from "lucide-react";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { toast } from "sonner";
 
 type NotificationActionType = "all" | "like" | "follow" | "comment" | "mention" | "repost";
 
 export default function NotificationPage() {
     const [action, setAction] = useState<NotificationActionType>("all");
     const { currentUser } = useAuthStore();
+    const [isReadAll, setIsReadAll] = useState(false);
 
     const {
         data: notifications,
@@ -29,6 +34,29 @@ export default function NotificationPage() {
     } = usePagination<INotification>(currentUser ? `/notification/${currentUser?._id}?action=${action}` : null);
 
     const showNoResults = !isLoading && !error && notifications?.length === 0 && currentUser;
+
+    useEffect(() => {
+        const markAllAsRead = async () => {
+            try {
+                await axiosInstance.post(`/notification/read-all/${currentUser?._id}`);
+
+                useAuthStore.setState((state) => ({
+                    currentUser: {
+                        ...(state.currentUser as IUser),
+                        isNotification: false,
+                    },
+                }));
+
+                setIsReadAll(true);
+            } catch (error) {
+                console.error("Failed to mark notifications as read:", error);
+            }
+        };
+
+        if (notifications?.length > 0 && currentUser && !isReadAll) {
+            markAllAsRead();
+        }
+    }, [notifications, currentUser, isReadAll]);
 
     return (
         <MainLayout>

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
+import UserModel, { User, USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
 import { CreateNotificationInput, createNotificationSchema } from "../schemas/notification.schema";
 import NotificationModel, { NotificationReceiver, Notification } from "../models/notification.model";
@@ -211,6 +211,30 @@ export async function deleteNotificationHandler(req: Request, res: Response, nex
         }
 
         return res.status(200).json({ message: "Delete notification successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function readAllNotificationsHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = req.params.userId;
+
+        if (!userId) {
+            return res.status(400).json({
+                message: "User id is required",
+            });
+        }
+
+        const updated = await UserModel.findByIdAndUpdate(userId, { isNotification: false });
+
+        if (!updated) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({ message: "Read all notifications successfully" });
     } catch (error) {
         next(error);
     }
