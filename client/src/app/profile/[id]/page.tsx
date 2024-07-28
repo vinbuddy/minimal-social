@@ -1,18 +1,47 @@
 "use client";
 import MainLayout from "@/components/MainLayout";
+import PostItem from "@/components/Post/PostItem";
+import PostSkeletons from "@/components/Post/PostSkeletons";
 import FollowButton from "@/components/User/FollowButton";
 import UserName from "@/components/User/UserName";
 import useAuthStore from "@/hooks/store/useAuthStore";
+import usePagination from "@/hooks/usePagination";
+import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
-import { Avatar, Button, Card, Tab, Tabs } from "@nextui-org/react";
+import { Avatar, Button, Card, Spinner, Tab, Tabs } from "@nextui-org/react";
 import { useParams } from "next/navigation";
+import { Fragment, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 import useSWR from "swr";
 
 export default function ProfilePage() {
     const params = useParams() as { id: string };
     const { currentUser } = useAuthStore();
+    const [postType, setPostType] = useState<"post" | "repost" | "liked">("post");
 
     const { data: user, isLoading, error } = useSWR<{ data: IUser }>(`/user/${params.id}`);
+
+    const getURL = () => {
+        switch (postType) {
+            case "repost":
+                return `/post/user-post?userId=${params?.id}&type=repost`;
+            case "liked":
+                return `/post/liked?userId=${params?.id}`;
+            default:
+                return `/post/user-post?userId=${params.id}&type=post`;
+        }
+    };
+
+    const {
+        data: posts,
+        loadingMore,
+        isReachedEnd,
+        size,
+        isLoading: isPostLoading,
+        error: postError,
+        setSize: setPage,
+        mutate,
+    } = usePagination<IPost>(getURL());
 
     return (
         <MainLayout>
@@ -58,6 +87,7 @@ export default function ProfilePage() {
                         </section>
                         <section className="mt-10">
                             <Tabs
+                                onSelectionChange={(key) => setPostType(key.toString() as typeof postType)}
                                 variant="underlined"
                                 color="default"
                                 fullWidth
@@ -69,8 +99,38 @@ export default function ProfilePage() {
                                 }}
                             >
                                 <Tab key="post" title="Posts" />
+                                <Tab key="liked" title="Liked post" />
                                 <Tab key="repost" title="Reposts" />
                             </Tabs>
+
+                            <div className="mt-2">
+                                {postError && !isPostLoading && (
+                                    <p className="text-center text-danger">{postError?.message}</p>
+                                )}
+                                {posts.length === 0 && !isPostLoading && !postError && (
+                                    <p className="text-center">No post yet</p>
+                                )}
+                                {!postError && posts.length > 0 && (
+                                    <InfiniteScroll
+                                        next={() => setPage(size + 1)}
+                                        hasMore={!isReachedEnd}
+                                        loader={
+                                            <div className="flex justify-center items-center overflow-hidden h-[70px]">
+                                                <Spinner size="md" />
+                                            </div>
+                                        }
+                                        dataLength={posts?.length ?? 0}
+                                    >
+                                        {posts.map((post) => (
+                                            <Fragment key={post?._id}>
+                                                <PostItem post={post} />
+                                            </Fragment>
+                                        ))}
+                                    </InfiniteScroll>
+                                )}
+
+                                {isPostLoading && <PostSkeletons length={3} />}
+                            </div>
                         </section>
                     </main>
                 </div>

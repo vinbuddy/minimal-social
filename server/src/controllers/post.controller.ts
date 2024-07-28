@@ -303,6 +303,56 @@ export async function getLikedPostsHandler(req: Request, res: Response, next: Ne
     }
 }
 
+export async function getUserPostsHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const userId = req.query.userId as string;
+        const type = req.query.type as "repost" | "post";
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 15;
+
+        const skip = (page - 1) * limit;
+
+        const user = await UserModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        let condition: any = {
+            postBy: new mongoose.Types.ObjectId(userId),
+        };
+
+        if (type === "repost") {
+            condition = {
+                reposts: { $in: [new mongoose.Types.ObjectId(userId)] },
+            };
+        }
+        const totalPosts = await PostModel.countDocuments(condition);
+        const totalPages = Math.ceil(totalPosts / limit);
+
+        const posts = await PostModel.aggregate([
+            { $match: condition },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            ...getPostQueryHelper.postLookups,
+            ...getPostQueryHelper.originalPostLookups,
+            {
+                $project: {
+                    ...getPostQueryHelper.projectFields,
+                    comment: 0,
+                },
+            },
+        ]);
+
+        return res
+            .status(200)
+            .json({ message: "Get following posts successfully", data: posts, totalPosts, totalPages, page, limit });
+    } catch (error) {
+        next(error);
+    }
+}
+
 export async function likePostHandler(req: Request, res: Response, next: NextFunction) {
     try {
         const { postId, userId } = req.body;

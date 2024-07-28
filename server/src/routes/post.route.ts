@@ -7,6 +7,7 @@ import {
     getFollowingPostsHandler,
     getLikedPostsHandler,
     getPostDetailHandler,
+    getUserPostsHandler,
     getUsersLikedPostHandler,
     getUsersRepostedPostHandler,
     likePostHandler,
@@ -25,6 +26,7 @@ router.put("/", verifyToken, editPostHandler);
 router.get("/", verifyToken, getAllPostsHandler);
 router.get("/following", verifyToken, getFollowingPostsHandler);
 router.get("/liked", verifyToken, getLikedPostsHandler);
+router.get("/user-post", verifyToken, getUserPostsHandler);
 router.post("/repost", verifyToken, repostHandler);
 router.post("/un-repost", verifyToken, unRepostHandler);
 
