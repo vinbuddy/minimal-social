@@ -20,7 +20,7 @@ export default function UserProfileCard({ user }: IProps) {
                             {user?.username}
                             {user?.isVerified && <VerifiedIcon size={14} className="text-verify ms-1.5" />}
                         </h4>
-                        <h5 className="text-small tracking-tight text-default-500">{user?.email}</h5>
+                        {/* <h5 className="text-small tracking-tight text-default-500">{user?.email}</h5> */}
                     </div>
                 </div>
             </CardHeader>

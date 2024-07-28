@@ -197,7 +197,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 textValue=""
                                 startContent={<User size={16} />}
                                 as={Link}
-                                href="/profile"
+                                href={`/profile/${currentUser?._id}`}
                                 key="profile"
                             >
                                 Profile

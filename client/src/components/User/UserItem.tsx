@@ -35,7 +35,7 @@ export default function UserItem({ user, href }: IProps) {
             </section>
             <section>
                 <FollowButton
-                    user={{} as any}
+                    user={user}
                     onAfterFollowed={() => {}}
                     onAfterUnFollowed={() => {}}
                     buttonProps={{ size: "sm", radius: "md", fullWidth: false }}

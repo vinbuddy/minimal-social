@@ -4,7 +4,7 @@ import { IUser } from "@/types/user";
 import { VerifiedIcon } from "@/assets/icons";
 
 interface IProps {
-    user?: IUser;
+    user?: IUser | null;
     className?: string;
 }
 
