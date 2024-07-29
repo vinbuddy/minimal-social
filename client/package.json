@@ -24,6 +24,7 @@
     "next": "14.2.4",
     "next-themes": "^0.3.0",
     "react": "^18",
+    "react-avatar-editor": "^13.0.2",
     "react-dom": "^18",
     "react-hook-form": "^7.52.1",
     "react-infinite-scroll-component": "^6.1.0",
@@ -39,6 +40,7 @@
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
+    "@types/react-avatar-editor": "^13.0.2",
     "@types/react-dom": "^18",
     "@types/react-timeago": "^4.1.7",
     "eslint": "^8",

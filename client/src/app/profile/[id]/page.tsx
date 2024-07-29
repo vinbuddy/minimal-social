@@ -2,6 +2,7 @@
 import MainLayout from "@/components/MainLayout";
 import PostItem from "@/components/Post/PostItem";
 import PostSkeletons from "@/components/Post/PostSkeletons";
+import EditProfileModalButton from "@/components/User/EditProfileModalButton";
 import FollowButton from "@/components/User/FollowButton";
 import UserName from "@/components/User/UserName";
 import useAuthStore from "@/hooks/store/useAuthStore";
@@ -76,7 +77,13 @@ export default function ProfilePage() {
                                             onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
                                         />
                                     ) : (
-                                        <Button variant="flat">Edit profile</Button>
+                                        // <Button variant="flat">Edit profile</Button>
+                                        <EditProfileModalButton
+                                            buttonProps={{
+                                                variant: "flat",
+                                                children: "Edit profile",
+                                            }}
+                                        />
                                     )}
                                 </div>
 
