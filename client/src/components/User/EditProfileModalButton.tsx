@@ -1,38 +1,45 @@
 import useAuthStore from "@/hooks/store/useAuthStore";
-import useLoading from "@/hooks/useLoading";
 import { getFileDimension } from "@/utils/mediaFile";
-import {
-    Avatar,
-    Button,
-    ButtonProps,
-    Input,
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalHeader,
-    Slider,
-    SliderValue,
-    useDisclosure,
-} from "@nextui-org/react";
+import { Avatar, Button, ButtonProps, Input, Modal, ModalBody, ModalContent, useDisclosure } from "@nextui-org/react";
 import { CropIcon } from "lucide-react";
-import { useRef, useState } from "react";
-import AvatarEditor from "react-avatar-editor";
+import { useState } from "react";
 import AvatarCropper from "./AvatarCropper";
+import { useForm } from "react-hook-form";
+import axiosInstance from "@/utils/httpRequest";
+import axios from "axios";
+import { toast } from "sonner";
+import { TOAST_OPTIONS } from "@/utils/toast";
+import useLoading from "@/hooks/useLoading";
+import { IUser } from "@/types/user";
+import useGlobalMutation from "@/hooks/useGlobalMutation";
 
 interface IProps {
     buttonProps: ButtonProps;
 }
 
+interface IUserEditProfile {
+    username: string;
+    bio: string;
+}
+
 export default function EditProfileModalButton({ buttonProps }: IProps) {
-    const { isOpen, onOpenChange, onOpen } = useDisclosure();
+    const { isOpen, onOpenChange, onOpen, onClose } = useDisclosure();
+    const { startLoading, stopLoading, loading } = useLoading();
 
     const { currentUser } = useAuthStore();
+    const mutate = useGlobalMutation();
 
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imageURL, setImageURL] = useState<string | null>(null);
     const [isCropped, setIsCropped] = useState<boolean>(false);
-    const cropRef = useRef<AvatarEditor | null>(null);
-    const [slideValue, setSlideValue] = useState<SliderValue>(10);
+
+    const {
+        register,
+        handleSubmit,
+        watch,
+        setError,
+        formState: { errors },
+    } = useForm<IUserEditProfile>();
 
     const handlePreviewAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target?.files) return;
@@ -55,14 +62,82 @@ export default function EditProfileModalButton({ buttonProps }: IProps) {
         }
     };
 
-    //handle save
-    const handleSaveCroppedImage = async () => {
-        if (cropRef.current) {
-            const dataUrl = cropRef.current.getImage().toDataURL();
-            const result = await fetch(dataUrl);
-            const blob = await result.blob();
-            setImageURL(URL.createObjectURL(blob));
-            setIsCropped(false);
+    const handleOpenChange = (_open: boolean) => {
+        // true if is loading
+        if (loading) {
+            return;
+        }
+
+        if (imageFile && imageURL) {
+            removeImage();
+        }
+
+        onOpenChange();
+    };
+
+    const handleEditProfile = async (data: IUserEditProfile, e?: React.BaseSyntheticEvent) => {
+        e?.preventDefault();
+        if (!currentUser) return;
+
+        startLoading();
+        const formData = new FormData();
+
+        let isValid = false;
+
+        if (imageURL) {
+            const response = await fetch(imageURL);
+            const blob = await response.blob();
+
+            formData.append("file", blob);
+            isValid = true;
+        }
+
+        // Check if the user has changed the username or bio
+        if (data.username.trim() !== currentUser?.username.trim()) {
+            formData.append("username", data.username);
+            isValid = true;
+        }
+
+        if (data.bio.trim() !== currentUser?.bio.trim()) {
+            formData.append("bio", data.bio);
+            isValid = true;
+        }
+
+        if (!isValid) {
+            return setError("root.manual", {
+                type: "manual",
+                message: "You must change something to edit your profile",
+            });
+        }
+
+        try {
+            const res = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/${currentUser?._id}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            });
+
+            if (res.status === 200) {
+                onClose();
+
+                mutate((key) => typeof key === "string" && key.includes("/user"));
+
+                useAuthStore.setState((state) => ({
+                    currentUser: {
+                        ...(state.currentUser as IUser),
+                        username: res.data.data.username,
+                        bio: res.data.data.bio,
+                        photo: res.data.data.photo,
+                    },
+                }));
+
+                toast.success("Profile edited successfully", TOAST_OPTIONS);
+            }
+        } catch (error) {
+            toast.error("An error occurred while editing your profile", TOAST_OPTIONS);
+        } finally {
+            stopLoading();
         }
     };
 
@@ -70,7 +145,7 @@ export default function EditProfileModalButton({ buttonProps }: IProps) {
         <>
             <Button {...buttonProps} onClick={onOpen} />
 
-            <Modal hideCloseButton size={isCropped ? "sm" : "lg"} isOpen={isOpen} onOpenChange={onOpenChange}>
+            <Modal hideCloseButton size={isCropped ? "sm" : "lg"} isOpen={isOpen} onOpenChange={handleOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -78,9 +153,11 @@ export default function EditProfileModalButton({ buttonProps }: IProps) {
                                 {isCropped && (
                                     <AvatarCropper
                                         imageURL={imageURL}
-                                        cropRef={cropRef}
-                                        setImageURL={setImageURL}
-                                        setIsCropped={setIsCropped}
+                                        onSave={(url) => {
+                                            setImageURL(url);
+                                            setIsCropped(false);
+                                        }}
+                                        onCancel={() => setIsCropped(false)}
                                     />
                                 )}
 
@@ -132,22 +209,52 @@ export default function EditProfileModalButton({ buttonProps }: IProps) {
                                             />
                                         </div>
 
-                                        <div className="mt-6 flex flex-col gap-6">
+                                        <form
+                                            onSubmit={handleSubmit(handleEditProfile)}
+                                            className="mt-6 flex flex-col gap-6"
+                                        >
                                             <div>
                                                 <Input
                                                     type="text"
                                                     label="User name"
-                                                    value={currentUser?.username}
+                                                    defaultValue={currentUser?.username}
                                                     fullWidth
+                                                    {...register("username", {
+                                                        required: true,
+                                                        maxLength: 50,
+                                                    })}
                                                 />
                                             </div>
                                             <div>
-                                                <Input type="text" label="Bio" value={currentUser?.bio} fullWidth />
+                                                <Input
+                                                    type="text"
+                                                    label="Bio"
+                                                    defaultValue={currentUser?.bio}
+                                                    fullWidth
+                                                    {...register("bio", {
+                                                        required: false,
+                                                        maxLength: 150,
+                                                    })}
+                                                />
                                             </div>
-                                            <Button fullWidth color="primary" radius="md" size="lg">
+
+                                            {errors.root?.manual && (
+                                                <p className="text-red-500 text-tiny my-2 text-center">
+                                                    {errors.root?.manual?.message}
+                                                </p>
+                                            )}
+
+                                            <Button
+                                                isLoading={loading}
+                                                type="submit"
+                                                fullWidth
+                                                color="primary"
+                                                radius="md"
+                                                size="lg"
+                                            >
                                                 Edit profile
                                             </Button>
-                                        </div>
+                                        </form>
                                     </div>
                                 )}
                             </ModalBody>

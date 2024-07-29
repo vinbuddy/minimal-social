@@ -2,6 +2,12 @@ import e, { NextFunction, Request, Response } from "express";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import { FollowUserInput, followUserSchema } from "../schemas/user.schema";
 import mongoose from "mongoose";
+import { uploadToCloudinary } from "../helpers/cloudinary";
+import { MediaFile } from "../models/post.model";
+
+interface RequestWithFile extends Request {
+    file: Express.Multer.File;
+}
 
 export async function getUsersHandler(req: Request, res: Response, next: NextFunction) {
     try {
@@ -133,6 +139,55 @@ export async function getFollowSuggestionsHandler(req: Request, res: Response, n
             .select(USER_MODEL_HIDDEN_FIELDS);
 
         return res.status(200).json({ statusCode: 200, data: suggestions, totalPages, totalUsers, page, limit });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function editProfileHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithFile;
+        const userId = req.params.id;
+        const { bio, username } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({ statusCode: 400, message: "Id is required" });
+        }
+
+        let mediaFile: MediaFile | null = null;
+
+        if (req.file) {
+            mediaFile = await uploadToCloudinary(req.file, "avatar");
+        }
+
+        const updateValue: any = {};
+
+        if (mediaFile) {
+            updateValue["photo"] = mediaFile.url;
+            updateValue["photoPublicId"] = mediaFile.publicId;
+        }
+
+        if (username) {
+            updateValue["username"] = req.body.username;
+        }
+
+        if (bio) {
+            updateValue["bio"] = bio;
+        }
+
+        if (Object.keys(updateValue).length === 0) {
+            return res.status(400).json({ message: "You must change something to edit your profile" });
+        }
+
+        const updated = await UserModel.findByIdAndUpdate(userId, updateValue);
+
+        if (!updated) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const updatedUser = await UserModel.findById(userId).select(USER_MODEL_HIDDEN_FIELDS);
+
+        return res.status(200).json({ message: "Profile updated successfully", data: updatedUser });
     } catch (error) {
         next(error);
     }

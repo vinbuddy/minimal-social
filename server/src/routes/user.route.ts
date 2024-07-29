@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import {
+    editProfileHandler,
     followUserHandler,
     getFollowSuggestionsHandler,
     getUserHandler,
@@ -8,9 +9,13 @@ import {
     unfollowUserHandler,
 } from "../controllers/user.controller";
 import { verifyAdminToken, verifyToken } from "../middlewares/verifyToken";
+import multer from "multer";
+
+const uploadFile = multer();
 
 const router: Router = express.Router();
 
+router.put("/:id", uploadFile.single("file"), verifyToken, editProfileHandler);
 router.get("/search", verifyToken, searchUserHandler);
 router.get("/", verifyAdminToken, getUsersHandler);
 router.get("/suggestion", getFollowSuggestionsHandler);

@@ -1,24 +1,23 @@
 import { Button, Slider, SliderValue } from "@nextui-org/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 interface IProps {
     imageURL: string | null;
-    cropRef: React.RefObject<AvatarEditor>;
-    setImageURL: React.Dispatch<React.SetStateAction<string | null>>;
-    setIsCropped: React.Dispatch<React.SetStateAction<boolean>>;
+    onSave: (url: string) => void;
+    onCancel: () => void;
 }
 
-export default function AvatarCropper({ imageURL, cropRef, setImageURL, setIsCropped }: IProps) {
+export default function AvatarCropper({ imageURL, onSave, onCancel }: IProps) {
     const [slideValue, setSlideValue] = useState<SliderValue>(10);
+    const cropRef = useRef<AvatarEditor | null>(null);
 
-    //handle save
     const handleSaveCroppedImage = async () => {
         if (cropRef.current) {
             const dataUrl = cropRef.current.getImage().toDataURL();
             const result = await fetch(dataUrl);
             const blob = await result.blob();
-            setImageURL(URL.createObjectURL(blob));
-            setIsCropped(false);
+
+            onSave(URL.createObjectURL(blob));
         }
     };
 
@@ -51,7 +50,7 @@ export default function AvatarCropper({ imageURL, cropRef, setImageURL, setIsCro
             </div>
 
             <div className="flex w-full mt-5 gap-4">
-                <Button onPress={() => setIsCropped(false)} fullWidth color="default" variant="light">
+                <Button onPress={onCancel} fullWidth color="default" variant="light">
                     Cancel
                 </Button>
                 <Button onPress={handleSaveCroppedImage} fullWidth color="primary">
