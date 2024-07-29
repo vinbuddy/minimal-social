@@ -10,7 +10,7 @@ import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
 import { Avatar, Button, Card, Spinner, Tab, Tabs } from "@nextui-org/react";
 import { useParams } from "next/navigation";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import useSWR from "swr";
 
@@ -20,6 +20,13 @@ export default function ProfilePage() {
     const [postType, setPostType] = useState<"post" | "repost" | "liked">("post");
 
     const { data: user, isLoading, error } = useSWR<{ data: IUser }>(`/user/${params.id}`);
+    const [followerCount, setFollowerCount] = useState(user?.data?.followers?.length ?? 0);
+
+    useEffect(() => {
+        if (user) {
+            setFollowerCount(user.data.followers.length);
+        }
+    }, [user]);
 
     const getURL = () => {
         switch (postType) {
@@ -65,6 +72,8 @@ export default function ProfilePage() {
                                         <FollowButton
                                             buttonProps={{ size: "md", radius: "md", fullWidth: false }}
                                             user={user?.data}
+                                            onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
+                                            onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
                                         />
                                     ) : (
                                         <Button variant="flat">Edit profile</Button>
@@ -73,8 +82,7 @@ export default function ProfilePage() {
 
                                 <div className="flex gap-4 my-2">
                                     <p>
-                                        {user?.data?.followers.length}{" "}
-                                        <span className="text-default-500">followers</span>
+                                        {followerCount} <span className="text-default-500">followers</span>
                                     </p>
                                     <p>
                                         {user?.data?.followings.length}{" "}
@@ -103,7 +111,7 @@ export default function ProfilePage() {
                                 <Tab key="repost" title="Reposts" />
                             </Tabs>
 
-                            <div className="mt-2">
+                            <div className="mt-5">
                                 {postError && !isPostLoading && (
                                     <p className="text-center text-danger">{postError?.message}</p>
                                 )}

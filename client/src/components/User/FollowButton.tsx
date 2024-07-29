@@ -27,6 +27,7 @@ export default function FollowButton({ user, buttonProps, onAfterFollowed, onAft
     const handleFollow = async () => {
         try {
             if (!currentUser) return;
+            setIsFollowed(true);
 
             const response = await axiosInstance.put("/user/follow", {
                 userId: user._id,
@@ -47,7 +48,6 @@ export default function FollowButton({ user, buttonProps, onAfterFollowed, onAft
             onAfterFollowed && onAfterFollowed();
 
             toast.success("Followed successfully", { position: "bottom-center" });
-            setIsFollowed(true);
         } catch (error: any) {
             setIsFollowed(false);
             toast.error("Failed to follow user", { position: "bottom-center" });
@@ -58,6 +58,7 @@ export default function FollowButton({ user, buttonProps, onAfterFollowed, onAft
     const handleUnFollow = async () => {
         try {
             if (!currentUser) return;
+            setIsFollowed(false);
 
             const response = await axiosInstance.put("/user/unfollow", {
                 userId: user._id,
@@ -67,8 +68,6 @@ export default function FollowButton({ user, buttonProps, onAfterFollowed, onAft
             onAfterUnFollowed && onAfterUnFollowed();
 
             toast.success("Unfollowed successfully", { position: "bottom-center" });
-
-            setIsFollowed(false);
         } catch (error: any) {
             setIsFollowed(true);
 
