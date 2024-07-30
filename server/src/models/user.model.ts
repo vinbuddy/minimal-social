@@ -36,7 +36,8 @@ export class User {
     })
     public photo: string;
 
-    public photoPublicId?: string;
+    @prop({ default: null })
+    public photoPublicId: string;
 
     @prop({ required: true, default: false })
     public isAdmin?: boolean;
