@@ -1,7 +1,8 @@
-import e, { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import { FollowUserInput, followUserSchema } from "../schemas/user.schema";
-import mongoose from "mongoose";
+import cloudinary from "../configs/cloudinary";
+
 import { uploadToCloudinary } from "../helpers/cloudinary";
 import { MediaFile } from "../models/post.model";
 
@@ -177,6 +178,13 @@ export async function editProfileHandler(_req: Request, res: Response, next: Nex
 
         if (Object.keys(updateValue).length === 0) {
             return res.status(400).json({ message: "You must change something to edit your profile" });
+        }
+
+        const user = await UserModel.findById(userId);
+
+        // Delete old photo from cloudinary
+        if (mediaFile && user && user.photoPublicId) {
+            await cloudinary.uploader.destroy(user.photoPublicId);
         }
 
         const updated = await UserModel.findByIdAndUpdate(userId, updateValue);

@@ -5,7 +5,6 @@ import { CropIcon } from "lucide-react";
 import { useState } from "react";
 import AvatarCropper from "./AvatarCropper";
 import { useForm } from "react-hook-form";
-import axiosInstance from "@/utils/httpRequest";
 import axios from "axios";
 import { toast } from "sonner";
 import { TOAST_OPTIONS } from "@/utils/toast";
@@ -169,7 +168,7 @@ export default function EditProfileModalButton({ buttonProps }: IProps) {
                                                     isBordered
                                                     size="lg"
                                                     classNames={{
-                                                        base: "!size-32 !ring-offset-4 cursor-pointer",
+                                                        base: "!size-32 !ring-offset-4 cursor-pointer hover:opacity-85 transition",
                                                     }}
                                                     src={imageURL || currentUser?.photo}
                                                 />
