@@ -1,10 +1,10 @@
 import { prop, getModelForClass, Ref, modelOptions, Severity } from "@typegoose/typegoose";
 import { User } from "./user.model";
 import mongoose from "mongoose";
-import { Conversation } from "./coversation.model";
+import { Conversation } from "./conversation.model";
 import { MediaFile } from "./post.model";
 
-class MessageReaction {
+export class MessageReaction {
     @prop({ required: true, ref: () => User })
     public user: Ref<User>;
 

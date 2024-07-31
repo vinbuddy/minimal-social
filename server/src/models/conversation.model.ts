@@ -1,5 +1,6 @@
 import { prop, getModelForClass, Ref, modelOptions, Severity } from "@typegoose/typegoose";
 import { User } from "./user.model";
+import mongoose from "mongoose";
 
 class ConversationParticipant {
     @prop({ required: true, ref: () => User })
@@ -33,6 +34,9 @@ class LastMessage {
     options: { allowMixed: Severity.ALLOW },
 })
 export class Conversation {
+    @prop({ auto: true })
+    public _id?: mongoose.Types.ObjectId;
+
     @prop({ required: true })
     public participants: ConversationParticipant[];
 
