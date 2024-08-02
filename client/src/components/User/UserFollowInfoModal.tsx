@@ -68,7 +68,7 @@ export default function UserFollowInfoModal({ children, type = "follower", user 
                                     isClearable
                                     classNames={{
                                         base: "w-full",
-                                        inputWrapper: "h-[2.8rem] px-4",
+                                        inputWrapper: "h-[2.8rem] px-4 shadow",
                                     }}
                                     defaultValue={""}
                                     value={searchValue}

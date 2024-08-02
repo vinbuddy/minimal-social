@@ -45,7 +45,7 @@ export async function createPrivateConversationHandler(req: Request, res: Respon
 
 export async function getConversationsHandler(req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = req.params.userId;
+        const userId = req.query.userId;
 
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 15;

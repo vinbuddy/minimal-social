@@ -1,27 +1,45 @@
+import useAuthStore from "@/hooks/store/useAuthStore";
+import { IConversation } from "@/types/conversation";
 import { Avatar, AvatarGroup, Badge, Button } from "@nextui-org/react";
-import { DotIcon, EllipsisIcon } from "lucide-react";
+import { EllipsisIcon } from "lucide-react";
 import { ReactNode } from "react";
+import TimeAgo from "../TimeAgo";
+import UserName from "../User/UserName";
 
 interface IProps {
     isActive?: boolean;
+    conversation: IConversation;
 }
 
-export default function ConversationItem({ isActive = false }: IProps): ReactNode {
+export default function ConversationItem({ isActive = false, conversation }: IProps): ReactNode {
+    // remove me from participants
+
+    const { currentUser } = useAuthStore();
+
+    const otherUser =
+        currentUser && conversation.participants.find((participant) => participant._id !== currentUser._id);
+
     return (
         <div
-            className={`group relative flex items-center justify-between p-3 rounded-xl hover:bg-default transition cursor-pointer ${
-                isActive && "bg-default"
+            className={`group relative flex items-center justify-between p-3 rounded-xl hover:bg-content2 transition cursor-pointer ${
+                isActive && "bg-content2"
             }`}
         >
             <div className="flex items-center w-full">
-                <Avatar size="lg" radius="full" src="https://i.pravatar.cc/150?u=a04258a2462d826712d" />
+                <Avatar size="lg" radius="full" src={otherUser?.photo} />
                 <div className="ms-3 flex-1 overflow-hidden">
-                    <h3 className="font-semibold">Min</h3>
+                    <h3>
+                        <UserName isLink={false} className="font-semibold hover:no-underline" user={otherUser} />
+                    </h3>
                     <div className="text-default-600 flex items-center justify-between">
-                        <p className="flex-1 text-sm max-w-full truncate">Hey, whats up bro </p>
-                        <p className="me-2 text-tiny text-default-400">10 weeks</p>
+                        <p className="flex-1 text-sm max-w-full truncate">{conversation.lastMessage?.content ?? ""}</p>
+                        <p className="me-2 text-tiny text-default-400">
+                            {conversation?.lastMessage?.createdAt && (
+                                <TimeAgo className="!text-sm" date={conversation?.lastMessage?.createdAt} />
+                            )}
+                        </p>
                     </div>
-                    <div className="flex items-center  mt-1">
+                    {/* <div className="flex items-center  mt-1">
                         <AvatarGroup
                             max={3}
                             total={4}
@@ -39,12 +57,12 @@ export default function ConversationItem({ isActive = false }: IProps): ReactNod
                                 classNames={{ base: "!w-4 !h-4" }}
                             />
                         </AvatarGroup>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
             <Button
-                className="absolute top-0 right-2 group-hover:flex hidden bg-transparent"
+                className="absolute top-1 right-2 group-hover:flex hidden bg-transparent"
                 isIconOnly
                 radius="full"
                 variant="light"
