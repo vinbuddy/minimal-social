@@ -4,6 +4,7 @@ import PostItem from "@/components/Post/PostItem";
 import PostSkeletons from "@/components/Post/PostSkeletons";
 import EditProfileModalButton from "@/components/User/EditProfileModalButton";
 import FollowButton from "@/components/User/FollowButton";
+import UserFollowInfoModal from "@/components/User/UserFollowInfoModal";
 import UserName from "@/components/User/UserName";
 import useAuthStore from "@/hooks/store/useAuthStore";
 import usePagination from "@/hooks/usePagination";
@@ -88,13 +89,17 @@ export default function ProfilePage() {
                                 </div>
 
                                 <div className="flex gap-4 my-2">
-                                    <p>
-                                        {followerCount} <span className="text-default-500">followers</span>
-                                    </p>
-                                    <p>
-                                        {user?.data?.followings.length}{" "}
-                                        <span className="text-default-500">following</span>
-                                    </p>
+                                    <UserFollowInfoModal type="follower" user={user?.data}>
+                                        <p>
+                                            {followerCount} <span className="text-default-500">followers</span>
+                                        </p>
+                                    </UserFollowInfoModal>
+                                    <UserFollowInfoModal type="following" user={user?.data}>
+                                        <p>
+                                            {user?.data?.followings.length}{" "}
+                                            <span className="text-default-500">following</span>
+                                        </p>
+                                    </UserFollowInfoModal>
                                 </div>
 
                                 <p className="text-default-500">{user?.data?.bio}</p>

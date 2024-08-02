@@ -2,6 +2,8 @@ import express, { Router } from "express";
 import {
     editProfileHandler,
     followUserHandler,
+    getFollowersHandler,
+    getFollowingsHandler,
     getFollowSuggestionsHandler,
     getUserHandler,
     getUsersHandler,
@@ -17,6 +19,8 @@ const router: Router = express.Router();
 
 router.put("/:id", uploadFile.single("file"), verifyToken, editProfileHandler);
 router.get("/search", verifyToken, searchUserHandler);
+router.get("/following", verifyToken, getFollowingsHandler);
+router.get("/follower", verifyToken, getFollowersHandler);
 router.get("/", verifyAdminToken, getUsersHandler);
 router.get("/suggestion", getFollowSuggestionsHandler);
 router.get("/:id", verifyToken, getUserHandler);

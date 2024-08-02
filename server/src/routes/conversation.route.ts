@@ -9,8 +9,8 @@ import {
 const router: Router = express.Router();
 
 router.get("/", verifyToken, getConversationsHandler);
-router.get("/search", searchConversationsByNameHandler);
+router.get("/search", verifyToken, searchConversationsByNameHandler);
 
-router.post("/", createPrivateConversationHandler);
+router.post("/", verifyToken, createPrivateConversationHandler);
 
 export default router;
