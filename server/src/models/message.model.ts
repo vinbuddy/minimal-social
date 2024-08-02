@@ -23,7 +23,7 @@ export class Message {
     @prop({ required: true, ref: () => Conversation })
     conversation: Ref<Conversation>;
 
-    @prop({ required: true })
+    @prop({ default: null })
     content: string;
 
     @prop({ default: [] })

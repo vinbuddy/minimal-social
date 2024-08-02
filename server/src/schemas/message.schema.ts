@@ -6,7 +6,7 @@ export const createMessageSchema = z.object({
     sender: z.string(),
     receiver: z.string(),
     conversationId: z.string().optional(),
-    content: z.string(),
+    content: z.string().optional(),
     replyTo: z.string().optional(),
 });
 

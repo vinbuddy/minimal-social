@@ -24,11 +24,8 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
             },
         });
 
-        // Create a new conversation if it doesn't exist
         if (!conversation) {
-            conversation = await ConversationModel.create({
-                participants: [new mongoose.Types.ObjectId(sender), new mongoose.Types.ObjectId(receiver)],
-            });
+            return res.status(404).json({ message: "Conversation not found" });
         }
 
         // Create the message
@@ -44,12 +41,21 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
         const newMessage = await MessageModel.create({
             sender: new mongoose.Types.ObjectId(sender),
             conversation: conversation._id,
-            content,
+            content: content ?? null,
             replyTo: replyTo ? new mongoose.Types.ObjectId(replyTo) : null,
             mediaFiles: uploadedFiles || [],
         });
 
-        const message = await MessageModel.populate(newMessage, [{ path: "sender", select: USER_MODEL_HIDDEN_FIELDS }]);
+        const message = await MessageModel.populate(newMessage, [
+            { path: "sender", select: USER_MODEL_HIDDEN_FIELDS },
+            {
+                path: "conversation",
+                populate: {
+                    path: "participants",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                },
+            },
+        ]);
 
         return res.status(200).json({ message: "Create message successfully", data: message });
     } catch (error) {

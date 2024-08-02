@@ -2,13 +2,13 @@ import { prop, getModelForClass, Ref, modelOptions, Severity } from "@typegoose/
 import { User } from "./user.model";
 import mongoose from "mongoose";
 
-class ConversationParticipant {
-    @prop({ required: true, ref: () => User })
-    public user: Ref<User>;
+// class ConversationParticipant {
+//     @prop({ required: true, ref: () => User })
+//     public user: Ref<User>;
 
-    @prop({ default: null })
-    public nickname: string;
-}
+//     @prop({ default: null })
+//     public nickname: string;
+// }
 
 class GroupInfo {
     @prop({ required: true })
@@ -37,8 +37,8 @@ export class Conversation {
     @prop({ auto: true })
     public _id?: mongoose.Types.ObjectId;
 
-    @prop({ required: true })
-    public participants: ConversationParticipant[];
+    @prop({ required: true, ref: () => User })
+    public participants: Ref<User>[];
 
     @prop({ default: false })
     public isGroup: boolean;
