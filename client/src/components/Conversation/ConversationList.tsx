@@ -9,7 +9,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { Fragment } from "react";
 import ConversationSkeletons from "./ConversationSkeletons";
 
-export default function ConversationSidebar() {
+export default function ConversationList() {
     const { currentUser } = useAuthStore();
 
     const getURL = () => {

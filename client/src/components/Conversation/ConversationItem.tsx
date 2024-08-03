@@ -5,22 +5,31 @@ import { EllipsisIcon } from "lucide-react";
 import { ReactNode } from "react";
 import TimeAgo from "../TimeAgo";
 import UserName from "../User/UserName";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 interface IProps {
-    isActive?: boolean;
     conversation: IConversation;
 }
 
-export default function ConversationItem({ isActive = false, conversation }: IProps): ReactNode {
-    // remove me from participants
-
+export default function ConversationItem({ conversation }: IProps): ReactNode {
     const { currentUser } = useAuthStore();
+    const pathname = usePathname();
+
+    const isActive = pathname.includes(conversation._id);
 
     const otherUser =
         currentUser && conversation.participants.find((participant) => participant._id !== currentUser._id);
 
+    const handleMenuButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Handle your button click logic here
+    };
+
     return (
-        <div
+        <Link
+            href={`/conversation/${conversation._id}`}
             className={`group relative flex items-center justify-between p-3 rounded-xl hover:bg-content2 transition cursor-pointer ${
                 isActive && "bg-content2"
             }`}
@@ -66,9 +75,10 @@ export default function ConversationItem({ isActive = false, conversation }: IPr
                 isIconOnly
                 radius="full"
                 variant="light"
+                onClick={handleMenuButtonClick}
             >
                 <EllipsisIcon className="!text-default-500" size={18} />
             </Button>
-        </div>
+        </Link>
     );
 }
