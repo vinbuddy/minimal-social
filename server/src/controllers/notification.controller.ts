@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import { CreateNotificationInput, createNotificationSchema } from "../schemas/notification.schema";
 import NotificationModel, { NotificationReceiver, Notification } from "../models/notification.model";
 import { Server } from "socket.io";
-import { getSocketClientsByUserId } from "../helpers/socket";
+import { getSocketClientsByUserId } from "../services/socket.service";
 
 const helpers = {
     createNotificationReceiver(receiverId: mongoose.Types.ObjectId): NotificationReceiver {
