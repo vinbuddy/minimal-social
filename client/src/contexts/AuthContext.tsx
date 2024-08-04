@@ -13,7 +13,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        (async () => {
+        const initializeAuth = async () => {
             try {
                 if (!isLoaded) return;
 
@@ -40,10 +40,10 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
             } catch (error: any) {
                 console.error(error?.message);
             }
-        })();
-    }, [isLoaded, isAuthenticated, accessToken]);
+        };
 
-    if (!isLoaded || loading) return <PageLoading />;
+        initializeAuth();
+    }, [isLoaded, isAuthenticated, accessToken]);
 
     return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
 };

@@ -142,3 +142,27 @@ export async function searchConversationsByNameHandler(req: Request, res: Respon
         next(error);
     }
 }
+
+export async function getConversationDetailHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const conversationId = req.params.id;
+
+        const conversation = await ConversationModel.findById(conversationId).populate({
+            path: "participants",
+            select: USER_MODEL_HIDDEN_FIELDS,
+        });
+
+        if (!conversation) {
+            return res.status(404).json({
+                message: "Conversation not found",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Get conversation detail successfully",
+            data: conversation,
+        });
+    } catch (error) {
+        next(error);
+    }
+}

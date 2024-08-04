@@ -149,7 +149,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
             <form onSubmit={handleSubmit} className="flex items-end">
                 <Avatar size="sm" src={currentUser?.photo} className="!size-[40px]" />
 
-                <div className="min-h-[40px] p-2 px-3 flex-1 flex items-end ms-3 bg-content2 border border-divider rounded-xl">
+                <div className="min-h-[40px] relative p-2 px-3 flex-1 flex items-end ms-3 bg-content2 border border-divider rounded-3xl">
                     {/* Content input */}
                     <RichTextEditor
                         isMention={true}
@@ -169,7 +169,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                             if (commentInputRef.current) setComment(commentInputRef.current?.innerHTML);
                         }}
                         button={
-                            <button className="outline-none">
+                            <button className="outline-none mb-[1px] ms-2">
                                 <SmileIcon className="text-muted-foreground" size={18} />
                             </button>
                         }

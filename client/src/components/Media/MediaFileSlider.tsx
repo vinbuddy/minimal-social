@@ -30,7 +30,7 @@ function MediaFileSlider({
     onRemoveMediaFile,
 }: IProps) {
     return (
-        <div className={`media-file-slider ${mediaFiles?.length! > 0 && "mt-3.5"}`}>
+        <div className={`media-file-slider`}>
             {mediaFiles?.length! > 0 && (
                 <Swiper
                     modules={[Navigation, Mousewheel, A11y]}
@@ -135,7 +135,7 @@ function MediaFileSlider({
                                             onClick={() => onRemoveMediaFile(index)}
                                             className="group-hover:visible invisible transition ease-linear absolute top-2 right-2 text-lg p-1 text-white bg-[#00000080] rounded-full"
                                         >
-                                            <XIcon size={20} />
+                                            <XIcon size={18} />
                                         </button>
                                     )}
                                 </div>

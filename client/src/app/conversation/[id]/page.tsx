@@ -1,7 +1,12 @@
 "use client";
+import { ImageIcon } from "@/assets/icons";
 import ConversationInfo from "@/components/Conversation/ConversationInfo";
 import EmojiPicker from "@/components/EmojiPicker";
+import MessageForm from "@/components/Message/MessageForm";
+import RichTextEditor from "@/components/RichTextEditor";
+import UserName from "@/components/User/UserName";
 import useAuthStore from "@/hooks/store/useAuthStore";
+import { IConversation } from "@/types/conversation";
 import axiosInstance from "@/utils/httpRequest";
 import {
     Avatar,
@@ -13,11 +18,23 @@ import {
     DropdownTrigger,
     Tooltip,
 } from "@nextui-org/react";
-import { ImageIcon, InfoIcon, PaperclipIcon, Phone, PlusIcon, ThumbsUpIcon, Video } from "lucide-react";
-import { useEffect, useState } from "react";
+import { InfoIcon, StickerIcon, PaperclipIcon, Phone, PlusIcon, SmileIcon, ThumbsUpIcon, Video } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import useSWR from "swr";
+
 function ConversationDetailPage() {
-    const currentUser = useAuthStore((state) => state.currentUser);
     const [isOpenConversationInfo, setIsOpenConversationInfo] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>("");
+
+    const params = useParams<{ id: string }>();
+    const currentUser = useAuthStore((state) => state.currentUser);
+
+    const messageInputRef = useRef<HTMLDivElement>(null);
+
+    const { data, error, isLoading } = useSWR<{ data: IConversation }>(`conversation/${params.id}`);
+    const otherUser =
+        data && currentUser && data?.data?.participants?.find((participant) => participant._id !== currentUser._id);
 
     useEffect(() => {
         (async () => {
@@ -44,13 +61,15 @@ function ConversationDetailPage() {
                     <div className="h-screen flex flex-col justify-between overflow-auto py-4">
                         {/* User - Actions */}
                         <header className="min-h-[40px] flex items-center justify-between pb-5 px-4  border-b-1 border-divider">
-                            <div className="flex items-center">
-                                <Badge content="" color="default" shape="circle" placement="bottom-right">
+                            <div className="flex items-center cursor-pointer">
+                                {/* <Badge content="" color="default" shape="circle" placement="bottom-right">
                                     <Avatar radius="full" src="https://i.pravatar.cc/150?u=a04258a2462d826712d" />
-                                </Badge>
+                                </Badge> */}
+                                <Avatar radius="full" src={otherUser?.photo} />
+
                                 <div className="ms-3">
-                                    <h3 className="font-semibold">Min</h3>
-                                    <p className="text-sm text-default-500">Online 4 minutes ago</p>
+                                    <UserName user={otherUser} className="font-semibold hover:no-underline" />
+                                    {/* <p className="text-sm text-default-500">Online 4 minutes ago</p> */}
                                 </div>
                             </div>
 
@@ -82,45 +101,7 @@ function ConversationDetailPage() {
                         {/* Message */}
                         <div className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col p-4 scrollbar"></div>
 
-                        {/* Chat bar */}
-                        <div className="flex items-center gap-x-2 px-4">
-                            <Dropdown placement="bottom">
-                                <DropdownTrigger>
-                                    <Button isIconOnly color="primary" size="sm" radius="full">
-                                        <PlusIcon size={18} />
-                                    </Button>
-                                </DropdownTrigger>
-                                <DropdownMenu variant="flat">
-                                    <DropdownItem startContent={<ImageIcon size={16} />} key="image">
-                                        Send image
-                                    </DropdownItem>
-                                    <DropdownItem startContent={<PaperclipIcon size={16} />} key="file">
-                                        Send files
-                                    </DropdownItem>
-                                </DropdownMenu>
-                            </Dropdown>
-
-                            <div className="flex-1 flex items-center justify-between rounded-full  border-default border bg-background px-1">
-                                <textarea
-                                    className="flex-1 outline-none px-4 py-3 h-11 transition-all text-sm placeholder:text-muted-foreground bg-background disabled:cursor-not-allowed disabled:opacity-50 w-full rounded-full resize-none overflow-y-auto"
-                                    autoComplete="off"
-                                    name="message"
-                                    placeholder="Aa"
-                                ></textarea>
-
-                                <EmojiPicker
-                                    onChange={(value: string) => {
-                                        console.log(value);
-                                    }}
-                                />
-                            </div>
-                            <Button isIconOnly variant="light" radius="full">
-                                <ThumbsUpIcon size={18} />
-                            </Button>
-                            {/* <Button isIconOnly variant="light" radius="full">
-                                    <SendHorizonalIcon size={18} />
-                                </Button> */}
-                        </div>
+                        <MessageForm conversation={data?.data} />
                     </div>
                 </section>
                 {isOpenConversationInfo && (
