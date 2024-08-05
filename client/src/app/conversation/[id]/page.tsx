@@ -3,6 +3,8 @@ import { ImageIcon } from "@/assets/icons";
 import ConversationInfo from "@/components/Conversation/ConversationInfo";
 import EmojiPicker from "@/components/EmojiPicker";
 import MessageForm from "@/components/Message/MessageForm";
+import MessageItem from "@/components/Message/MessageItem";
+import MessageList from "@/components/Message/MessageList";
 import RichTextEditor from "@/components/RichTextEditor";
 import UserName from "@/components/User/UserName";
 import useAuthStore from "@/hooks/store/useAuthStore";
@@ -99,7 +101,13 @@ function ConversationDetailPage() {
                         </header>
 
                         {/* Message */}
-                        <div className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col p-4 scrollbar"></div>
+                        <div
+                            id="message-list"
+                            className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col p-4 scrollbar"
+                        >
+                            {/* <MessageItem /> */}
+                            {data?.data && <MessageList conversation={data?.data} />}
+                        </div>
 
                         <MessageForm conversation={data?.data} />
                     </div>

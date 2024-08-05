@@ -3,8 +3,7 @@ import { mediaFileSchema } from "./mediaFile.schema";
 import { MessageReaction } from "../models/message.model";
 
 export const createMessageSchema = z.object({
-    sender: z.string(),
-    receiver: z.string(),
+    senderId: z.string(),
     conversationId: z.string().optional(),
     content: z.string().optional(),
     replyTo: z.string().optional(),

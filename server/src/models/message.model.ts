@@ -29,8 +29,8 @@ export class Message {
     @prop({ default: [] })
     public mediaFiles: MediaFile[];
 
-    @prop({ ref: () => User, default: null })
-    public replyTo: Ref<User>;
+    @prop({ ref: () => Message, default: null })
+    public replyTo: Ref<Message>;
 
     @prop({ default: [] })
     public reaction: MessageReaction[];

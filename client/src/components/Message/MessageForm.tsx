@@ -10,6 +10,12 @@ import MediaFileUploaderButton from "../Media/MediaFileUploaderButton";
 import { IMediaFile } from "@/types/post";
 import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
 import MediaFileSlider from "../Media/MediaFileSlider";
+import useAuthStore from "@/hooks/store/useAuthStore";
+import useLoading from "@/hooks/useLoading";
+import axios from "axios";
+import { toast } from "sonner";
+import { TOAST_OPTIONS } from "@/utils/toast";
+import useGlobalMutation from "@/hooks/useGlobalMutation";
 
 interface IProps {
     conversation?: IConversation;
@@ -21,6 +27,10 @@ export default function MessageForm({ conversation }: IProps) {
 
     const messageInputRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const { currentUser } = useAuthStore();
+    const { startLoading, stopLoading, loading } = useLoading();
+    const mutate = useGlobalMutation();
 
     const uploadMediaFiles = async (e: ChangeEvent<HTMLInputElement>) => {
         const files: any = e.target.files;
@@ -77,8 +87,75 @@ export default function MessageForm({ conversation }: IProps) {
         if (removedFile?.url) URL.revokeObjectURL(removedFile.url);
     };
 
+    const reset = () => {
+        if (!messageInputRef.current) return;
+
+        messageInputRef.current.innerHTML = "";
+
+        setMediaFiles([]);
+        setMessage("");
+
+        if (fileInputRef.current) {
+            const emptyFileList = new DataTransfer();
+            fileInputRef.current.files = emptyFileList.files;
+        }
+    };
+
+    const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (!currentUser || !conversation) {
+            alert("User or conversation not found.");
+            return;
+        }
+
+        if (message.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0 && mediaFiles.length === 0) {
+            alert("Message and media files cannot be both empty.");
+            return;
+        }
+
+        startLoading();
+
+        const formData = new FormData();
+
+        formData.append("content", message);
+        formData.append("senderId", currentUser._id);
+        formData.append("conversationId", conversation._id);
+
+        //formData.append("replyTo", );
+
+        if (mediaFiles.length > 0) {
+            mediaFiles.forEach((mediaFile) => {
+                formData.append("mediaFiles", mediaFile.file!);
+            });
+        }
+        try {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            });
+            const messageResData = response?.data?.data;
+
+            mutate((key) => typeof key === "string" && key.includes("/message"));
+
+            reset();
+        } catch (error: any) {
+            toast.error("Failed to send message.", TOAST_OPTIONS);
+            toast.error(error?.response?.data?.message, TOAST_OPTIONS);
+
+            console.log(error);
+        } finally {
+            stopLoading();
+        }
+    };
+
     return (
-        <div className={`flex  gap-x-2 px-4 ${mediaFiles.length > 0 ? "items-end" : "items-center"}`}>
+        <form
+            onSubmit={handleSendMessage}
+            className={`flex  gap-x-2 px-4 ${mediaFiles.length > 0 ? "items-end" : "items-center"}`}
+        >
             <div>
                 <MediaFileUploaderButton
                     buttonProps={{
@@ -147,7 +224,7 @@ export default function MessageForm({ conversation }: IProps) {
                 </div>
             </div>
             {message.trim().length > 0 ? (
-                <Button isIconOnly variant="light" radius="full">
+                <Button isLoading={loading} type="submit" isIconOnly variant="light" radius="full">
                     <SendHorizonalIcon size={20} />
                 </Button>
             ) : (
@@ -156,6 +233,6 @@ export default function MessageForm({ conversation }: IProps) {
                     <span className="text-[20px]">👍</span>
                 </Button>
             )}
-        </div>
+        </form>
     );
 }

@@ -15,7 +15,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     useEffect(() => {
         const initializeAuth = async () => {
             try {
-                if (!isLoaded) return;
+                if (!isLoaded || typeof window === "undefined") return;
 
                 if (!accessToken && refreshToken) {
                     setLoading(true);
