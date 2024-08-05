@@ -2,8 +2,9 @@ import useAuthStore from "@/hooks/store/useAuthStore";
 import { IMessage } from "@/types/message";
 import { Avatar, Button } from "@nextui-org/react";
 import { EllipsisVerticalIcon, ReplyIcon, SmileIcon } from "lucide-react";
-import TimeAgo from "../TimeAgo";
 import { formatTimeStamp } from "@/utils/datetime";
+import Image from "next/image";
+import MediaFileSlider from "../Media/MediaFileSlider";
 
 interface IProps {
     className?: string;
@@ -13,6 +14,39 @@ interface IProps {
 export default function MessageItem({ className = "", messages }: IProps) {
     const { currentUser } = useAuthStore();
     const isOwnMessage = messages[0]?.sender?._id === currentUser?._id;
+
+    const renderImageMessage = (message: IMessage) => {
+        return (
+            <section
+                className={`[&_.swiper-slide]:first:!me-0 max-w-full overflow-hidden ${
+                    isOwnMessage && message?.mediaFiles.length > 0 ? "order-2 " : "order-1"
+                }`}
+            >
+                <MediaFileSlider
+                    // onMediaFileClick={handleMediaFileClick}
+                    mediaFiles={message?.mediaFiles ?? []}
+                    videoPreview={true}
+                    scrollHorizontally={false}
+                />
+            </section>
+        );
+    };
+
+    const renderTextMessage = (message: IMessage) => {
+        return (
+            <section
+                className={`text-[15px] rounded-[18px] px-3 py-2 
+                                    ${
+                                        isOwnMessage && message?.content
+                                            ? "order-2 bg-primary text-primary-foreground"
+                                            : "order-1 bg-content2"
+                                    }`}
+            >
+                {/* Message */}
+                <span>{message?.content}</span>
+            </section>
+        );
+    };
 
     return (
         <div
@@ -26,15 +60,25 @@ export default function MessageItem({ className = "", messages }: IProps) {
                 {/* Messages groups */}
                 {messages.length > 0 &&
                     messages?.map((message) => (
-                        <div key={message?._id} className="group flex items-center gap-2">
-                            <section
-                                className={`bg-content2 text-[15px] rounded-[18px] px-3 py-2 ${
-                                    isOwnMessage ? "order-2" : "order-1"
-                                }`}
+                        <div
+                            key={message?._id}
+                            className={`group flex items-center gap-2 ${
+                                isOwnMessage ? "justify-end" : "justify-start"
+                            }`}
+                        >
+                            {/* <section
+                                className={`text-[15px] rounded-[18px] px-3 py-2 
+                                    ${
+                                        isOwnMessage && message?.content
+                                            ? "order-2 bg-primary text-primary-foreground"
+                                            : "order-1 bg-content2"
+                                    }`}
                             >
-                                {/* Message */}
-                                {message?.content}
-                            </section>
+                                <span>{message?.content}</span>
+                            </section> */}
+                            {message?.content && renderTextMessage(message)}
+                            {message?.mediaFiles && renderImageMessage(message)}
+
                             <section
                                 className={`flex items-center flex-nowrap invisible group-hover:visible ${
                                     isOwnMessage ? "order-1" : "order-2"

@@ -117,16 +117,20 @@ export default function MessageForm({ conversation }: IProps) {
         startLoading();
 
         const formData = new FormData();
+        const formMediaFilesData = new FormData();
 
         formData.append("content", message);
         formData.append("senderId", currentUser._id);
         formData.append("conversationId", conversation._id);
 
+        formMediaFilesData.append("senderId", currentUser._id);
+        formMediaFilesData.append("conversationId", conversation._id);
+
         //formData.append("replyTo", );
 
         if (mediaFiles.length > 0) {
             mediaFiles.forEach((mediaFile) => {
-                formData.append("mediaFiles", mediaFile.file!);
+                formMediaFilesData.append("mediaFiles", mediaFile.file!);
             });
         }
         try {
@@ -137,6 +141,15 @@ export default function MessageForm({ conversation }: IProps) {
                 withCredentials: true,
             });
             const messageResData = response?.data?.data;
+
+            if ((mediaFiles.length > 0 && response.status === 200) || response.status === 201) {
+                const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formMediaFilesData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                    withCredentials: true,
+                });
+            }
 
             mutate((key) => typeof key === "string" && key.includes("/message"));
 

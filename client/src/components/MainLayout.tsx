@@ -131,7 +131,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 <nav className="">
                     <div className="flex flex-col items-center gap-4">
                         {navLinks.map((navLink, index) => {
-                            let isActive = pathName === navLink.href;
+                            let isActive = false;
+                            if (navLink.href === "/") {
+                                isActive = pathName === "/";
+                            } else {
+                                isActive = pathName.startsWith(navLink.href);
+                            }
                             const Icon = navLink.icon(isActive);
                             const activeColor = theme === "light" ? "text-black" : "text-white";
 

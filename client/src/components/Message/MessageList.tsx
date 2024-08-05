@@ -3,7 +3,7 @@ import usePagination from "@/hooks/usePagination";
 import { IConversation } from "@/types/conversation";
 import { IMessage } from "@/types/message";
 import { Spinner } from "@nextui-org/react";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MessageItem from "./MessageItem";
 
@@ -13,7 +13,7 @@ interface IProps {
 
 interface GroupedMessage {
     messages: IMessage[];
-    marginBottom: string; // Đơn vị có thể là 'px' hoặc 'rem'
+    marginBottom: string;
 }
 
 export default function MessageList({ conversation }: IProps) {
@@ -78,7 +78,6 @@ export default function MessageList({ conversation }: IProps) {
     };
 
     const groupedMessages = groupMessages(messages);
-    console.log("groupedMessages: ", groupedMessages);
 
     return (
         <div className="h-full">
@@ -101,15 +100,14 @@ export default function MessageList({ conversation }: IProps) {
                             <MessageItem messages={group.messages} className={`${group.marginBottom}`} />
                         </Fragment>
                     ))}
-                    {/* {messages.map((message) => (
-                        <Fragment key={message?._id}>
-                            <MessageItem messages={messages} />
-                        </Fragment>
-                    ))} */}
                 </InfiniteScroll>
             )}
 
-            {isLoading && <Spinner size="md" />}
+            {isLoading && (
+                <div className="flex justify-center">
+                    <Spinner size="md" />
+                </div>
+            )}
         </div>
     );
 }
