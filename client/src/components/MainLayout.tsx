@@ -14,8 +14,8 @@ import { useTheme } from "next-themes";
 import { useSocketContext } from "@/contexts/SocketContext";
 import Image from "next/image";
 
-import logoDark from "@/assets/images/logo-dark.png";
-import logoLight from "@/assets/images/logo-light.png";
+// import logoDark from "@/assets/images/logo-dark.png";
+// import logoLight from "@/assets/images/logo-light.png";
 import NotificationToast from "@/components/Notification/NotificationToast";
 
 const navLinks = [
@@ -116,41 +116,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             href="#"
                             className="max-w-full group flex  shrink-0 items-center justify-center gap-2 rounded-full text-lg font-semibold  md:text-base"
                         >
-                            {theme === "light" ? (
-                                <Image
-                                    className="rounded-lg max-w-full"
-                                    src={logoLight}
-                                    width={0}
-                                    height={0}
-                                    sizes="100vw"
-                                    style={{ width: "100%", height: "auto" }}
-                                    alt="logo"
-                                />
-                            ) : (
-                                <Image
-                                    className="rounded-lg max-w-full"
-                                    src={logoDark}
-                                    width={0}
-                                    height={0}
-                                    sizes="100vw"
-                                    style={{ width: "100%", height: "auto" }}
-                                    alt="logo"
-                                />
-                            )}
-                            {/* <Image
+                            <Image
                                 className="rounded-lg max-w-full"
-                                src={theme && theme === "light" ? logoLight : logoDark}
+                                src={theme === "light" ? "/images/logo-light.png" : "/images/logo-dark.png"}
                                 width={0}
                                 height={0}
                                 sizes="100vw"
                                 style={{ width: "100%", height: "auto" }}
                                 alt="logo"
-                            /> */}
-                            {/* <img
-                                className="rounded-lg max-w-full"
-                                src={theme && theme === "light" ? logoLight.src : logoDark.src}
-                                alt="logo"
-                            /> */}
+                            />
                         </Link>
                     </header>
                 </nav>

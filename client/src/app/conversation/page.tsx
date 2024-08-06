@@ -1,6 +1,6 @@
 "use client";
 
-import conversationBg from "@/assets/images/conversation-bg.jpg";
+// import conversationBg from "@/assets/images/conversation-bg.jpg";
 import Image from "next/image";
 
 function ConversationPage() {
@@ -11,7 +11,7 @@ function ConversationPage() {
                     className="rounded-2xl grayscale"
                     width={300}
                     height={300}
-                    src={conversationBg}
+                    src="/images/conversation-bg.jpg"
                     alt="background"
                 />
                 <h1 className="text-xl mt-3 font-semibold">Select a conversation to start messaging</h1>

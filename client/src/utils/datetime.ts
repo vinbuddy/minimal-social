@@ -7,8 +7,8 @@ export const formatTimeStamp = (ISO8601String: string): string => {
     const day = String(dateTime.getDate()).padStart(2, "0");
 
     // Get time components
-    const hours = dateTime.getHours();
-    const minutes = dateTime.getMinutes();
+    const hours = String(dateTime.getHours()).padStart(2, "0");
+    const minutes = String(dateTime.getMinutes()).padStart(2, "0");
 
     const formattedDate = `${year}-${month}-${day}`;
     const formattedTime = `${hours}:${minutes}`;

@@ -133,16 +133,37 @@ export default function MessageForm({ conversation }: IProps) {
                 formMediaFilesData.append("mediaFiles", mediaFile.file!);
             });
         }
-        try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-                withCredentials: true,
-            });
-            const messageResData = response?.data?.data;
 
-            if ((mediaFiles.length > 0 && response.status === 200) || response.status === 201) {
+        try {
+            // Send message
+            if (message.trim().length > 0) {
+                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                    withCredentials: true,
+                });
+            }
+
+            // Send media files
+            if (!message.trim().length && mediaFiles.length > 0) {
+                const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formMediaFilesData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                    withCredentials: true,
+                });
+            }
+
+            // Send both message and media files
+            if (mediaFiles.length > 0 && message.trim().length > 0) {
+                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                    withCredentials: true,
+                });
+
                 const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formMediaFilesData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
