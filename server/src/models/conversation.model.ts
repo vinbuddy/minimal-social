@@ -18,7 +18,7 @@ class GroupInfo {
     public photo: string;
 }
 
-class LastMessage {
+export class LastMessage {
     @prop({ required: true, ref: () => User })
     public sender: Ref<User>;
 

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
 import { createMessageSchema } from "../schemas/message.schema";
-import ConversationModel from "../models/conversation.model";
+import ConversationModel, { LastMessage } from "../models/conversation.model";
 import { MediaFile } from "../models/post.model";
 import { uploadToCloudinary } from "../helpers/cloudinary";
 import MessageModel from "../models/message.model";
@@ -53,6 +53,16 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
                 },
             },
         ]);
+
+        // Update last message of the conversation
+        const lastMessage: LastMessage = {
+            sender: message.sender._id,
+            content: message.content,
+            createdAt: message._id.getTimestamp(),
+        };
+
+        conversation.lastMessage = lastMessage;
+        await conversation.save();
 
         return res.status(200).json({ message: "Create message successfully", data: message });
     } catch (error) {

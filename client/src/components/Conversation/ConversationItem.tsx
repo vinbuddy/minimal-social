@@ -44,7 +44,7 @@ export default function ConversationItem({ conversation }: IProps): ReactNode {
                         <p className="flex-1 text-sm max-w-full truncate">{conversation.lastMessage?.content ?? ""}</p>
                         <p className="me-2 text-tiny text-default-400">
                             {conversation?.lastMessage?.createdAt && (
-                                <TimeAgo className="!text-sm" date={conversation?.lastMessage?.createdAt} />
+                                <TimeAgo className="!text-tiny" date={conversation?.lastMessage?.createdAt} />
                             )}
                         </p>
                     </div>

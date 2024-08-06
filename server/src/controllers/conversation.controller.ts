@@ -64,7 +64,7 @@ export async function getConversationsHandler(req: Request, res: Response, next:
         const conversations = await ConversationModel.find(condition)
             .skip(skip)
             .limit(limit)
-            .sort({ createdAt: -1 })
+            .sort({ updatedAt: -1 })
             .populate({
                 path: "participants",
                 select: USER_MODEL_HIDDEN_FIELDS,

@@ -173,6 +173,7 @@ export default function MessageForm({ conversation }: IProps) {
             }
 
             mutate((key) => typeof key === "string" && key.includes("/message"));
+            mutate((key) => typeof key === "string" && key.includes("/conversation"));
 
             reset();
         } catch (error: any) {
