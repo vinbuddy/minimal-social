@@ -120,3 +120,14 @@ body {
     opacity: 1;
     visibility: visible;
 }
+.gallery li {
+    /* height: 40vh; */
+    flex-grow: 1;
+}
+.gallery li img,
+.gallery li video {
+    max-height: 100%;
+    min-width: 100%;
+    object-fit: cover;
+    vertical-align: bottom;
+}

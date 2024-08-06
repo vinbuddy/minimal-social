@@ -2,7 +2,7 @@ import { fetcher } from "@/utils/httpRequest";
 import useSWRInfinite from "swr/infinite";
 
 export default function usePagination<T>(url: string | null) {
-    const LIMIT = 15;
+    const LIMIT = 10;
 
     const getKey = (pageIndex: number, previousPageData: any[]) => {
         if (!url) return null;

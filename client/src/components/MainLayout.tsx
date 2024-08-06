@@ -105,6 +105,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         }
     };
 
+    if (!mounted) return null;
+
     return (
         <div className="flex w-full bg-muted/40">
             <aside className="w-[80px] fixed top-0 left-0 bottom-0 flex flex-col justify-between h-full border-r-1 border-divider bg-background">
@@ -114,17 +116,41 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             href="#"
                             className="max-w-full group flex  shrink-0 items-center justify-center gap-2 rounded-full text-lg font-semibold  md:text-base"
                         >
-                            {/* <Smile className="h-7 w-7 transition-all group-hover:scale-110" />
-                            <span className="sr-only">Acme Inc</span> */}
-                            <Image
+                            {theme === "light" ? (
+                                <Image
+                                    className="rounded-lg max-w-full"
+                                    src={logoLight}
+                                    width={0}
+                                    height={0}
+                                    sizes="100vw"
+                                    style={{ width: "100%", height: "auto" }}
+                                    alt="logo"
+                                />
+                            ) : (
+                                <Image
+                                    className="rounded-lg max-w-full"
+                                    src={logoDark}
+                                    width={0}
+                                    height={0}
+                                    sizes="100vw"
+                                    style={{ width: "100%", height: "auto" }}
+                                    alt="logo"
+                                />
+                            )}
+                            {/* <Image
                                 className="rounded-lg max-w-full"
-                                src={theme === "light" ? logoLight : logoDark}
+                                src={theme && theme === "light" ? logoLight : logoDark}
                                 width={0}
                                 height={0}
                                 sizes="100vw"
                                 style={{ width: "100%", height: "auto" }}
                                 alt="logo"
-                            />
+                            /> */}
+                            {/* <img
+                                className="rounded-lg max-w-full"
+                                src={theme && theme === "light" ? logoLight.src : logoDark.src}
+                                alt="logo"
+                            /> */}
                         </Link>
                     </header>
                 </nav>
@@ -138,7 +164,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 isActive = pathName.startsWith(navLink.href);
                             }
                             const Icon = navLink.icon(isActive);
-                            const activeColor = theme === "light" ? "text-black" : "text-white";
+                            const activeColor = theme === "light" ? "!text-black" : "text-white";
 
                             if (isNotification && navLink.href === "/notification") {
                                 return (

@@ -3,7 +3,7 @@ import usePagination from "@/hooks/usePagination";
 import { IConversation } from "@/types/conversation";
 import { IMessage } from "@/types/message";
 import { Spinner } from "@nextui-org/react";
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MessageItem from "./MessageItem";
 
@@ -27,6 +27,7 @@ export default function MessageList({ conversation }: IProps) {
         setSize: setPage,
         mutate,
     } = usePagination<IMessage>(`/message?conversationId=${conversation._id}`);
+    console.log("isReachedEnd: ", isReachedEnd);
 
     const sortMessagesByTime = (messages: IMessage[]): IMessage[] => {
         return messages.slice().sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -80,34 +81,49 @@ export default function MessageList({ conversation }: IProps) {
     const groupedMessages = groupMessages(messages);
 
     return (
-        <div className="h-full">
-            {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
-            {messages.length === 0 && !isLoading && !error && <p className="text-center">Post not found</p>}
-            {!error && messages.length > 0 && (
-                <InfiniteScroll
-                    inverse={true}
-                    next={() => setPage(size + 1)}
-                    hasMore={!isReachedEnd}
-                    loader={
-                        <div className="flex justify-center items-center overflow-hidden h-[70px]">
-                            <Spinner size="md" />
+        <>
+            <div
+                id="messageList"
+                style={{
+                    height: "100%",
+                    overflowY: "auto",
+                    display: "flex",
+                    flexDirection: "column-reverse",
+                }}
+                className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col p-4 scrollbar"
+            >
+                {/* <MessageItem /> */}
+                {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
+                {messages.length === 0 && !isLoading && !error && <p className="text-center">Post not found</p>}
+                {isLoading && (
+                    <div className="h-full flex justify-center items-center">
+                        <Spinner size="md" />
+                    </div>
+                )}
+                {!error && messages.length > 0 && (
+                    <InfiniteScroll
+                        scrollableTarget="messageList"
+                        inverse={true}
+                        style={{ display: "flex", flexDirection: "column-reverse" }}
+                        next={() => setPage(size + 1)}
+                        hasMore={!isReachedEnd}
+                        loader={
+                            <div className="flex justify-center items-start overflow-hidden h-[70px]">
+                                <Spinner size="md" />
+                            </div>
+                        }
+                        dataLength={messages?.length ?? 0}
+                    >
+                        <div>
+                            {groupedMessages.map((group, index) => (
+                                <Fragment key={index}>
+                                    <MessageItem messages={group.messages} className={`${group.marginBottom}`} />
+                                </Fragment>
+                            ))}
                         </div>
-                    }
-                    dataLength={messages?.length ?? 0}
-                >
-                    {groupedMessages.map((group, index) => (
-                        <Fragment key={index}>
-                            <MessageItem messages={group.messages} className={`${group.marginBottom}`} />
-                        </Fragment>
-                    ))}
-                </InfiniteScroll>
-            )}
-
-            {isLoading && (
-                <div className="flex justify-center">
-                    <Spinner size="md" />
-                </div>
-            )}
-        </div>
+                    </InfiniteScroll>
+                )}
+            </div>
+        </>
     );
 }

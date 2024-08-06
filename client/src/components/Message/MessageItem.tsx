@@ -1,10 +1,11 @@
 import useAuthStore from "@/hooks/store/useAuthStore";
 import { IMessage } from "@/types/message";
-import { Avatar, Button } from "@nextui-org/react";
+import { Avatar, Button, Chip } from "@nextui-org/react";
 import { EllipsisVerticalIcon, ReplyIcon, SmileIcon } from "lucide-react";
 import { formatTimeStamp } from "@/utils/datetime";
 import Image from "next/image";
 import MediaFileSlider from "../Media/MediaFileSlider";
+import GalleryImages from "../GalleryImages";
 
 interface IProps {
     className?: string;
@@ -12,22 +13,30 @@ interface IProps {
 }
 
 export default function MessageItem({ className = "", messages }: IProps) {
+    console.log("messages: ", messages);
     const { currentUser } = useAuthStore();
     const isOwnMessage = messages[0]?.sender?._id === currentUser?._id;
 
     const renderImageMessage = (message: IMessage) => {
         return (
             <section
-                className={`[&_.swiper-slide]:first:!me-0 max-w-full overflow-hidden ${
-                    isOwnMessage && message?.mediaFiles.length > 0 ? "order-2 " : "order-1"
+                className={` max-w-full overflow-hidden ${
+                    isOwnMessage && message?.mediaFiles.length > 0 ? "order-2 [&_.swiper-slide]:first:!me-0" : "order-1"
                 }`}
             >
-                <MediaFileSlider
+                {/* <MediaFileSlider
                     // onMediaFileClick={handleMediaFileClick}
                     mediaFiles={message?.mediaFiles ?? []}
                     videoPreview={true}
                     scrollHorizontally={false}
-                />
+                /> */}
+
+                <GalleryImages images={message?.mediaFiles} />
+                <div className={`flex mt-1  ${isOwnMessage ? "justify-end" : "justify-start"}`}>
+                    <Chip size="sm" variant="flat" className={`px-1 text-default-500 text-tiny`}>
+                        {formatTimeStamp(message?.createdAt)}
+                    </Chip>
+                </div>
             </section>
         );
     };
@@ -50,7 +59,7 @@ export default function MessageItem({ className = "", messages }: IProps) {
 
     return (
         <div
-            className={`flex items-end gap-3 w-fit max-w-[70%] ${
+            className={`flex items-end gap-3 w-fit max-w-[75%] ${
                 isOwnMessage ? "ml-auto flex-row-reverse" : "justify-start"
             } ${className}`}
         >
@@ -66,18 +75,8 @@ export default function MessageItem({ className = "", messages }: IProps) {
                                 isOwnMessage ? "justify-end" : "justify-start"
                             }`}
                         >
-                            {/* <section
-                                className={`text-[15px] rounded-[18px] px-3 py-2 
-                                    ${
-                                        isOwnMessage && message?.content
-                                            ? "order-2 bg-primary text-primary-foreground"
-                                            : "order-1 bg-content2"
-                                    }`}
-                            >
-                                <span>{message?.content}</span>
-                            </section> */}
                             {message?.content && renderTextMessage(message)}
-                            {message?.mediaFiles && renderImageMessage(message)}
+                            {message?.mediaFiles?.length > 0 && renderImageMessage(message)}
 
                             <section
                                 className={`flex items-center flex-nowrap invisible group-hover:visible ${
@@ -93,7 +92,11 @@ export default function MessageItem({ className = "", messages }: IProps) {
                                 <Button isIconOnly size="sm" radius="full" color="default" variant="light">
                                     <EllipsisVerticalIcon size={16} className="text-default-400" />
                                 </Button>
-                                <p className={`text-default-500 text-tiny`}>{formatTimeStamp(message?.createdAt)}</p>
+                                {!message?.mediaFiles?.length && (
+                                    <Chip size="sm" variant="flat" className={`px-1 text-default-500 text-tiny`}>
+                                        {formatTimeStamp(message?.createdAt)}
+                                    </Chip>
+                                )}
                             </section>
                         </div>
                     ))}

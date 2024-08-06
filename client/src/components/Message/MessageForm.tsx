@@ -236,7 +236,7 @@ export default function MessageForm({ conversation }: IProps) {
                     />
                 </div>
             </div>
-            {message.trim().length > 0 ? (
+            {message.trim().length > 0 || mediaFiles?.length > 0 ? (
                 <Button isLoading={loading} type="submit" isIconOnly variant="light" radius="full">
                     <SendHorizonalIcon size={20} />
                 </Button>

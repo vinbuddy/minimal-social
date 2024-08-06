@@ -35,6 +35,7 @@ function ConversationDetailPage() {
     const messageInputRef = useRef<HTMLDivElement>(null);
 
     const { data, error, isLoading } = useSWR<{ data: IConversation }>(`conversation/${params.id}`);
+
     const otherUser =
         data && currentUser && data?.data?.participants?.find((participant) => participant._id !== currentUser._id);
 
@@ -101,13 +102,7 @@ function ConversationDetailPage() {
                         </header>
 
                         {/* Message */}
-                        <div
-                            id="message-list"
-                            className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col p-4 scrollbar"
-                        >
-                            {/* <MessageItem /> */}
-                            {data?.data && <MessageList conversation={data?.data} />}
-                        </div>
+                        {data?.data && <MessageList conversation={data?.data} />}
 
                         <MessageForm conversation={data?.data} />
                     </div>
