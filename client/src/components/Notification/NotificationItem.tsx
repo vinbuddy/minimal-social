@@ -1,5 +1,4 @@
 import { INotification } from "@/types/notification";
-import NotificationThumbnail from "./NotificationThumbnail";
 import Link from "next/link";
 import { Avatar, AvatarGroup, Button, useDisclosure } from "@nextui-org/react";
 import { EllipsisIcon, LoaderIcon, TrashIcon } from "lucide-react";
@@ -12,6 +11,7 @@ import { toast } from "sonner";
 import { TOAST_OPTIONS } from "@/utils/toast";
 import useLoading from "@/hooks/useLoading";
 import useGlobalMutation from "@/hooks/useGlobalMutation";
+import UserBadgeAvatar from "../User/UserBadgeAvatar";
 
 interface IProps {
     notification: INotification;
@@ -53,7 +53,8 @@ export default function NotificationItem({ notification }: IProps) {
             />
             <div className="group flex items-center justify-between py-5 border-b border-divider last:border-none ps-1">
                 <Link href={notification?.url ?? "#"} className="flex flex-1 gap-5">
-                    <NotificationThumbnail photo={notification?.photo} action={notification?.action} />
+                    <UserBadgeAvatar action={notification?.action} photo={notification?.photo} />
+                    {/* <NotificationThumbnail photo={notification?.photo} action={notification?.action} /> */}
                     <div className="w-full">
                         <h4>
                             <Link href={`/profile/${notification?.senders[0]?._id}`} className="font-semibold">

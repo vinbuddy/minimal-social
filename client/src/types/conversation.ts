@@ -22,3 +22,8 @@ export interface IConversation {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface IPrivateConversationResult {
+    conversation: IConversation;
+    user: IUser;
+}

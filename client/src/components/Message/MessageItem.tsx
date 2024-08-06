@@ -3,8 +3,6 @@ import { IMessage } from "@/types/message";
 import { Avatar, Button, Chip } from "@nextui-org/react";
 import { EllipsisVerticalIcon, ReplyIcon, SmileIcon } from "lucide-react";
 import { formatTimeStamp } from "@/utils/datetime";
-import Image from "next/image";
-import MediaFileSlider from "../Media/MediaFileSlider";
 import GalleryImages from "../GalleryImages";
 
 interface IProps {
@@ -13,7 +11,6 @@ interface IProps {
 }
 
 export default function MessageItem({ className = "", messages }: IProps) {
-    console.log("messages: ", messages);
     const { currentUser } = useAuthStore();
     const isOwnMessage = messages[0]?.sender?._id === currentUser?._id;
 

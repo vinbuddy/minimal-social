@@ -29,10 +29,3 @@ export interface INotification {
 
     updatedAt: string;
 }
-
-export interface INotificationTheme {
-    [key: string]: {
-        icon: JSX.Element;
-        color: "danger" | "success" | "primary" | "default" | "secondary" | "warning" | undefined;
-    };
-}

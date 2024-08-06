@@ -1,14 +1,14 @@
 import { Avatar, Badge } from "@nextui-org/react";
-import { INotificationTheme } from "@/types/notification";
 import { AtSignIcon, MessageCircleIcon, UserIcon } from "lucide-react";
 import { HeartIcon, RepostIcon } from "@/assets/icons";
+import { IUserBadgeTheme } from "@/types/user";
 
 interface IProps {
     action: string;
     photo: string;
 }
 
-export const NOTIFICATION_THEME_BY_ACTION: INotificationTheme = {
+export const NOTIFICATION_THEME_BY_ACTION: IUserBadgeTheme = {
     like: {
         icon: <HeartIcon isFilled size={14} />,
         color: "danger",
@@ -31,7 +31,7 @@ export const NOTIFICATION_THEME_BY_ACTION: INotificationTheme = {
     },
 };
 
-export default function NotificationThumbnail({ action, photo }: IProps) {
+export default function UserBadgeAvatar({ action, photo }: IProps) {
     return (
         <div>
             <Badge

@@ -3,7 +3,7 @@ import usePagination from "@/hooks/usePagination";
 import { IConversation } from "@/types/conversation";
 import { IMessage } from "@/types/message";
 import { Spinner } from "@nextui-org/react";
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MessageItem from "./MessageItem";
 
@@ -27,7 +27,6 @@ export default function MessageList({ conversation }: IProps) {
         setSize: setPage,
         mutate,
     } = usePagination<IMessage>(`/message?conversationId=${conversation._id}`);
-    console.log("isReachedEnd: ", isReachedEnd);
 
     const sortMessagesByTime = (messages: IMessage[]): IMessage[] => {
         return messages.slice().sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -94,7 +93,7 @@ export default function MessageList({ conversation }: IProps) {
             >
                 {/* <MessageItem /> */}
                 {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
-                {messages.length === 0 && !isLoading && !error && <p className="text-center">Post not found</p>}
+                {/* {messages.length === 0 && !isLoading && !error && <p className="text-center">Start a conversation </p>} */}
                 {isLoading && (
                     <div className="h-full flex justify-center items-center">
                         <Spinner size="md" />

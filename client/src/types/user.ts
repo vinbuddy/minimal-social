@@ -19,3 +19,10 @@ export interface IUser {
 
     isNotification: boolean;
 }
+
+export interface IUserBadgeTheme {
+    [key: string]: {
+        icon: JSX.Element;
+        color: "danger" | "success" | "primary" | "default" | "secondary" | "warning" | undefined;
+    };
+}
