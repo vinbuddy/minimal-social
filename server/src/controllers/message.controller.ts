@@ -55,9 +55,15 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
         ]);
 
         // Update last message of the conversation
+        let lastMessageContent = message.content ?? "Sent message";
+
+        if (!content && uploadedFiles.length > 0) {
+            lastMessageContent = "Sent photo";
+        }
+
         const lastMessage: LastMessage = {
             sender: message.sender._id,
-            content: message.content,
+            content: lastMessageContent,
             createdAt: message._id.getTimestamp(),
         };
 
