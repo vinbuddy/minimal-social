@@ -5,6 +5,8 @@ import { EllipsisVerticalIcon, ReplyIcon, SmileIcon } from "lucide-react";
 import { formatTimeStamp } from "@/utils/datetime";
 import GalleryImages from "../GalleryImages";
 
+import emojiRegex from "emoji-regex";
+
 interface IProps {
     className?: string;
     messages: IMessage[];
@@ -13,6 +15,17 @@ interface IProps {
 export default function MessageItem({ className = "", messages }: IProps) {
     const { currentUser } = useAuthStore();
     const isOwnMessage = messages[0]?.sender?._id === currentUser?._id;
+
+    const isImojiMessageOnly = (content: string): boolean => {
+        console.log(content, content.length);
+        const regex = emojiRegex();
+        const match = content.match(regex);
+
+        if (!match) return false;
+
+        // Check the message contains only emoji
+        return match && match.length === 1 && match[0] === content;
+    };
 
     const renderImageMessage = (message: IMessage) => {
         return (
@@ -39,15 +52,18 @@ export default function MessageItem({ className = "", messages }: IProps) {
     };
 
     const renderTextMessage = (message: IMessage) => {
-        return (
-            <section
-                className={`text-[15px] rounded-[18px] px-3 py-2 
+        const messageClassName = `text-[15px] rounded-[18px] px-3 py-2 
                                     ${
                                         isOwnMessage && message?.content
                                             ? "order-2 bg-primary text-primary-foreground"
                                             : "order-1 bg-content2"
-                                    }`}
-            >
+                                    }`;
+        const emojiMessageClassName = `text-xl rounded-[18px] py-2 ${
+            isOwnMessage && message?.content ? "order-2 " : "order-1"
+        }`;
+
+        return (
+            <section className={isImojiMessageOnly(message?.content) ? emojiMessageClassName : messageClassName}>
                 {/* Message */}
                 <span>{message?.content}</span>
             </section>

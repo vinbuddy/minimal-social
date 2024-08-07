@@ -17,12 +17,19 @@ import { toast } from "sonner";
 import { TOAST_OPTIONS } from "@/utils/toast";
 import useGlobalMutation from "@/hooks/useGlobalMutation";
 
+import data from "@emoji-mart/data";
+
+import { init } from "emoji-mart";
+
+init({ data });
+
 interface IProps {
     conversation?: IConversation;
 }
 
 export default function MessageForm({ conversation }: IProps) {
     const [message, setMessage] = useState<string>("");
+    const [emoji, setEmoji] = useState<string>(conversation?.emoji ?? "👍");
     const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>([]);
 
     const messageInputRef = useRef<HTMLDivElement>(null);
@@ -186,6 +193,33 @@ export default function MessageForm({ conversation }: IProps) {
         }
     };
 
+    const handleSendEmojiMessage = async () => {
+        try {
+            if (!currentUser || !conversation) return;
+            startLoading();
+            const formData = new FormData();
+
+            formData.append("content", emoji);
+            formData.append("senderId", currentUser._id);
+            formData.append("conversationId", conversation._id);
+
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            });
+
+            mutate((key) => typeof key === "string" && key.includes("/message"));
+            mutate((key) => typeof key === "string" && key.includes("/conversation"));
+        } catch (error) {
+            toast.error("Failed to send message.", TOAST_OPTIONS);
+            console.log(error);
+        } finally {
+            stopLoading();
+        }
+    };
+
     return (
         <form
             onSubmit={handleSendMessage}
@@ -263,9 +297,15 @@ export default function MessageForm({ conversation }: IProps) {
                     <SendHorizonalIcon size={20} />
                 </Button>
             ) : (
-                <Button isIconOnly variant="light" radius="full">
-                    {/* <ThumbsUpIcon size={20} /> */}
-                    <span className="text-[20px]">👍</span>
+                <Button
+                    onPress={handleSendEmojiMessage}
+                    isLoading={loading}
+                    type="button"
+                    isIconOnly
+                    variant="light"
+                    radius="full"
+                >
+                    <span className="text-[20px]">{emoji}</span>
                 </Button>
             )}
         </form>
