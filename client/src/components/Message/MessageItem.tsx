@@ -17,7 +17,6 @@ export default function MessageItem({ className = "", messages }: IProps) {
     const isOwnMessage = messages[0]?.sender?._id === currentUser?._id;
 
     const isImojiMessageOnly = (content: string): boolean => {
-        console.log(content, content.length);
         const regex = emojiRegex();
         const match = content.match(regex);
 

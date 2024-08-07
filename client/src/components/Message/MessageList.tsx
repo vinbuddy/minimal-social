@@ -3,9 +3,11 @@ import usePagination from "@/hooks/usePagination";
 import { IConversation } from "@/types/conversation";
 import { IMessage } from "@/types/message";
 import { Spinner } from "@nextui-org/react";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MessageItem from "./MessageItem";
+import { useSocketContext } from "@/contexts/SocketContext";
+import useGlobalMutation from "@/hooks/useGlobalMutation";
 
 interface IProps {
     conversation: IConversation;
@@ -17,6 +19,8 @@ interface GroupedMessage {
 }
 
 export default function MessageList({ conversation }: IProps) {
+    const { socket } = useSocketContext();
+    const swrMutate = useGlobalMutation();
     const {
         data: messages,
         loadingMore,
@@ -27,6 +31,33 @@ export default function MessageList({ conversation }: IProps) {
         setSize: setPage,
         mutate,
     } = usePagination<IMessage>(`/message?conversationId=${conversation._id}`);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        socket.off("newMessage");
+
+        const handleNewMessage = (newMessage: IMessage) => {
+            mutate((currentData) => {
+                if (!currentData) return [{ data: [newMessage] }];
+
+                const updatedData = currentData.map((page) => ({
+                    ...page,
+                    data: [newMessage, ...page.data],
+                }));
+
+                return updatedData;
+            }, false);
+
+            swrMutate((key) => typeof key === "string" && key.includes("/conversation"));
+        };
+
+        socket.on("newMessage", handleNewMessage);
+
+        return () => {
+            socket.off("newMessage");
+        };
+    }, [socket]);
 
     const sortMessagesByTime = (messages: IMessage[]): IMessage[] => {
         return messages.slice().sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());

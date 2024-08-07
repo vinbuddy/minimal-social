@@ -6,6 +6,7 @@ import ConversationModel, { LastMessage } from "../models/conversation.model";
 import { MediaFile } from "../models/post.model";
 import { uploadToCloudinary } from "../helpers/cloudinary";
 import MessageModel from "../models/message.model";
+import { Server } from "socket.io";
 
 interface RequestWithFiles extends Request {
     files: Express.Multer.File[];
@@ -21,7 +22,7 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
             _id: new mongoose.Types.ObjectId(conversationId),
         });
 
-        if (!conversation) {
+        if (!conversation || !conversationId) {
             return res.status(404).json({ message: "Conversation not found" });
         }
 
@@ -69,6 +70,11 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
 
         conversation.lastMessage = lastMessage;
         await conversation.save();
+
+        // Send real time message in room
+        const io = req.app.get("io") as Server;
+
+        io.to(conversationId).emit("newMessage", message);
 
         return res.status(200).json({ message: "Create message successfully", data: message });
     } catch (error) {

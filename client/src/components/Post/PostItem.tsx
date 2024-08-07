@@ -153,12 +153,14 @@ export default function PostItem({ post: _post }: IProps) {
                     <div className="mt-1">{parse(post?.caption ?? "", parserOptions)}</div>
                     <div>
                         {post?.mediaFiles && (
-                            <MediaFileSlider
-                                onMediaFileClick={handleMediaFileClick}
-                                mediaFiles={post?.mediaFiles ?? []}
-                                videoPreview={true}
-                                scrollHorizontally={false}
-                            />
+                            <div className="mt-2">
+                                <MediaFileSlider
+                                    onMediaFileClick={handleMediaFileClick}
+                                    mediaFiles={post?.mediaFiles ?? []}
+                                    videoPreview={true}
+                                    scrollHorizontally={false}
+                                />
+                            </div>
                         )}
                     </div>
                     {/* Like, Share, Save,... */}

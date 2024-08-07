@@ -179,7 +179,7 @@ export default function MessageForm({ conversation }: IProps) {
                 });
             }
 
-            mutate((key) => typeof key === "string" && key.includes("/message"));
+            // mutate((key) => typeof key === "string" && key.includes("/message"));
             mutate((key) => typeof key === "string" && key.includes("/conversation"));
 
             reset();
@@ -210,7 +210,7 @@ export default function MessageForm({ conversation }: IProps) {
                 withCredentials: true,
             });
 
-            mutate((key) => typeof key === "string" && key.includes("/message"));
+            // mutate((key) => typeof key === "string" && key.includes("/message"));
             mutate((key) => typeof key === "string" && key.includes("/conversation"));
         } catch (error) {
             toast.error("Failed to send message.", TOAST_OPTIONS);
