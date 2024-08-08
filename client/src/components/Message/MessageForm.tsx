@@ -139,11 +139,14 @@ export default function MessageForm({ conversation }: IProps) {
         formData.append("content", message);
         formData.append("senderId", currentUser._id);
         formData.append("conversationId", conversation._id);
-        formData.append("replyTo", replyTo?._id ?? null);
 
         formMediaFilesData.append("senderId", currentUser._id);
         formMediaFilesData.append("conversationId", conversation._id);
-        formMediaFilesData.append("replyTo", replyTo?._id ?? null);
+
+        if (replyTo) {
+            formData.append("replyTo", replyTo?._id ?? null);
+            formMediaFilesData.append("replyTo", replyTo?._id ?? null);
+        }
 
         if (mediaFiles.length > 0) {
             mediaFiles.forEach((mediaFile) => {
