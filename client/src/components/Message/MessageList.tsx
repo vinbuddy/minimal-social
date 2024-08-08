@@ -41,6 +41,13 @@ export default function MessageList({ conversation }: IProps) {
             mutate((currentData) => {
                 if (!currentData) return [{ data: [newMessage] }];
 
+                // remove duplicate message
+                const isDuplicate = currentData.some((page) =>
+                    page.data.some((message: any) => message._id === newMessage._id)
+                );
+
+                if (isDuplicate) return currentData;
+
                 const updatedData = currentData.map((page) => ({
                     ...page,
                     data: [newMessage, ...page.data],
@@ -132,18 +139,22 @@ export default function MessageList({ conversation }: IProps) {
                 )}
                 {!error && messages.length > 0 && (
                     <InfiniteScroll
+                        scrollThreshold={0.7}
                         scrollableTarget="messageList"
                         inverse={true}
                         style={{ display: "flex", flexDirection: "column-reverse" }}
                         next={() => setPage(size + 1)}
                         hasMore={!isReachedEnd}
                         loader={
-                            <div className="flex justify-center items-start overflow-hidden h-[70px]">
+                            <div className="flex justify-center items-start overflow-hidden">
                                 <Spinner size="md" />
                             </div>
                         }
+                        endMessage={<p className="text-center text-default-500">You have seen it all</p>}
                         dataLength={messages?.length ?? 0}
                     >
+                        {/*  Add h-[100px] to avoid being hidden scrollbar */}
+
                         <div>
                             {groupedMessages.map((group, index) => (
                                 <Fragment key={index}>
@@ -151,6 +162,7 @@ export default function MessageList({ conversation }: IProps) {
                                 </Fragment>
                             ))}
                         </div>
+                        <div className="h-[100px]"></div>
                     </InfiniteScroll>
                 )}
             </div>

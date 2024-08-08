@@ -1,11 +1,12 @@
 import useAuthStore from "@/hooks/store/useAuthStore";
 import { IMessage } from "@/types/message";
 import { Avatar, Button, Chip } from "@nextui-org/react";
-import { EllipsisVerticalIcon, ReplyIcon, SmileIcon } from "lucide-react";
+import { CornerUpLeftIcon, EllipsisVerticalIcon, ReplyIcon, SmileIcon } from "lucide-react";
 import { formatTimeStamp } from "@/utils/datetime";
 import GalleryImages from "../GalleryImages";
 
 import emojiRegex from "emoji-regex";
+import useReplyStore from "@/hooks/store/useReplyStore";
 
 interface IProps {
     className?: string;
@@ -14,6 +15,7 @@ interface IProps {
 
 export default function MessageItem({ className = "", messages }: IProps) {
     const { currentUser } = useAuthStore();
+    const { reply } = useReplyStore();
     const isOwnMessage = messages[0]?.sender?._id === currentUser?._id;
 
     const isImojiMessageOnly = (content: string): boolean => {
@@ -51,18 +53,20 @@ export default function MessageItem({ className = "", messages }: IProps) {
     };
 
     const renderTextMessage = (message: IMessage) => {
-        const messageClassName = `text-[15px] rounded-[18px] px-3 py-2 
+        const messageClassName = `text-[15px] rounded-[18px]  px-3 py-2 
                                     ${
                                         isOwnMessage && message?.content
                                             ? "order-2 bg-primary text-primary-foreground"
                                             : "order-1 bg-content2"
                                     }`;
-        const emojiMessageClassName = `text-xl rounded-[18px] py-2 ${
+        const emojiMessageClassName = `text-2xl rounded-[18px] ${
             isOwnMessage && message?.content ? "order-2 " : "order-1"
         }`;
 
+        const className = isImojiMessageOnly(message?.content) ? emojiMessageClassName : messageClassName;
+
         return (
-            <section className={isImojiMessageOnly(message?.content) ? emojiMessageClassName : messageClassName}>
+            <section className={className}>
                 {/* Message */}
                 <span>{message?.content}</span>
             </section>
@@ -80,38 +84,165 @@ export default function MessageItem({ className = "", messages }: IProps) {
             <div className="flex-1 flex flex-col gap-1">
                 {/* Messages groups */}
                 {messages.length > 0 &&
-                    messages?.map((message) => (
-                        <div
-                            key={message?._id}
-                            className={`group flex items-center gap-2 ${
-                                isOwnMessage ? "justify-end" : "justify-start"
-                            }`}
-                        >
-                            {message?.content && renderTextMessage(message)}
-                            {message?.mediaFiles?.length > 0 && renderImageMessage(message)}
+                    messages?.map((message) => {
+                        if (message?.replyTo) {
+                            return (
+                                <div
+                                    key={message?._id}
+                                    className={`relative flex flex-col  !text-sm rounded-[18px] ${
+                                        isOwnMessage ? "items-end" : "items-start"
+                                    }`}
+                                >
+                                    <div
+                                        className={`text-sm text-default-500 rounded-[18px] px-3 pt-2 pb-5 ${
+                                            isOwnMessage ? "rounded-br-none bg-content2" : "rounded-bl-none bg-content3"
+                                        }`}
+                                    >
+                                        {message?.replyTo?.mediaFiles?.length > 0 && !message?.replyTo?.content
+                                            ? "Reply to some photo"
+                                            : message?.replyTo?.content}
+                                    </div>
 
-                            <section
-                                className={`flex items-center flex-nowrap invisible group-hover:visible ${
-                                    isOwnMessage ? "order-1" : "order-2"
+                                    <div className="group gap-2 flex items-center relative top-[-12px] right-0">
+                                        {message?.content && renderTextMessage(message)}
+                                        {message?.mediaFiles?.length > 0 && renderImageMessage(message)}
+
+                                        <section
+                                            className={`flex items-center flex-nowrap invisible group-hover:visible ${
+                                                isOwnMessage ? "order-1" : "order-2"
+                                            }`}
+                                        >
+                                            <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                                                <SmileIcon size={16} className="text-default-400" />
+                                            </Button>
+                                            <Button
+                                                onPress={() => reply(message)}
+                                                isIconOnly
+                                                size="sm"
+                                                radius="full"
+                                                color="default"
+                                                variant="light"
+                                            >
+                                                <ReplyIcon size={16} className="text-default-400" />
+                                            </Button>
+                                            <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                                                <EllipsisVerticalIcon size={16} className="text-default-400" />
+                                            </Button>
+                                            {!message?.mediaFiles?.length && (
+                                                <Chip
+                                                    size="sm"
+                                                    variant="flat"
+                                                    className={`px-1 text-default-500 text-tiny`}
+                                                >
+                                                    {formatTimeStamp(message?.createdAt)}
+                                                </Chip>
+                                            )}
+                                        </section>
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        if (message?.replyTo !== null) {
+                            <div
+                                key={message?._id}
+                                className={`flex items-center gap-2 ${isOwnMessage ? "justify-end" : "justify-start"}`}
+                            >
+                                <div
+                                    className={`group relative flex flex-col  !text-sm rounded-[18px] ${
+                                        isOwnMessage ? "items-end" : "items-start"
+                                    }`}
+                                >
+                                    <div
+                                        className={`text-sm text-default-500 rounded-[18px] px-3 pt-2 pb-5 ${
+                                            isOwnMessage ? "rounded-br-none bg-content2" : "rounded-bl-none bg-content3"
+                                        }`}
+                                    >
+                                        {message?.replyTo?.mediaFiles?.length > 0 && !message?.replyTo?.content
+                                            ? "Reply to some photo"
+                                            : message?.replyTo?.content}
+                                    </div>
+
+                                    <div className="group gap-2 flex items-center relative top-[-12px] right-0">
+                                        {message?.content && renderTextMessage(message)}
+                                        {message?.mediaFiles?.length > 0 && renderImageMessage(message)}
+
+                                        <section
+                                            className={`flex items-center flex-nowrap invisible group-hover:visible ${
+                                                isOwnMessage ? "order-1" : "order-2"
+                                            }`}
+                                        >
+                                            <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                                                <SmileIcon size={16} className="text-default-400" />
+                                            </Button>
+                                            <Button
+                                                onPress={() => reply(message)}
+                                                isIconOnly
+                                                size="sm"
+                                                radius="full"
+                                                color="default"
+                                                variant="light"
+                                            >
+                                                <ReplyIcon size={16} className="text-default-400" />
+                                            </Button>
+                                            <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                                                <EllipsisVerticalIcon size={16} className="text-default-400" />
+                                            </Button>
+                                            {!message?.mediaFiles?.length && (
+                                                <Chip
+                                                    size="sm"
+                                                    variant="flat"
+                                                    className={`px-1 text-default-500 text-tiny`}
+                                                >
+                                                    {formatTimeStamp(message?.createdAt)}
+                                                </Chip>
+                                            )}
+                                        </section>
+                                    </div>
+                                </div>
+                            </div>;
+                        }
+
+                        return (
+                            <div
+                                key={message?._id}
+                                className={`group flex items-center gap-2 ${
+                                    isOwnMessage ? "justify-end" : "justify-start"
                                 }`}
                             >
-                                <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                                    <SmileIcon size={16} className="text-default-400" />
-                                </Button>
-                                <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                                    <ReplyIcon size={16} className="text-default-400" />
-                                </Button>
-                                <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                                    <EllipsisVerticalIcon size={16} className="text-default-400" />
-                                </Button>
-                                {!message?.mediaFiles?.length && (
-                                    <Chip size="sm" variant="flat" className={`px-1 text-default-500 text-tiny`}>
-                                        {formatTimeStamp(message?.createdAt)}
-                                    </Chip>
-                                )}
-                            </section>
-                        </div>
-                    ))}
+                                {message?.content && renderTextMessage(message)}
+                                {message?.mediaFiles?.length > 0 && renderImageMessage(message)}
+
+                                <section
+                                    className={`flex items-center flex-nowrap invisible group-hover:visible ${
+                                        isOwnMessage ? "order-1" : "order-2"
+                                    }`}
+                                >
+                                    <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                                        <SmileIcon size={16} className="text-default-400" />
+                                    </Button>
+                                    <Button
+                                        onPress={() => reply(message)}
+                                        isIconOnly
+                                        size="sm"
+                                        radius="full"
+                                        color="default"
+                                        variant="light"
+                                    >
+                                        <ReplyIcon size={16} className="text-default-400" />
+                                    </Button>
+                                    <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                                        <EllipsisVerticalIcon size={16} className="text-default-400" />
+                                    </Button>
+                                    {!message?.mediaFiles?.length && (
+                                        <Chip size="sm" variant="flat" className={`px-1 text-default-500 text-tiny`}>
+                                            {formatTimeStamp(message?.createdAt)}
+                                        </Chip>
+                                    )}
+                                </section>
+                            </div>
+                        );
+                    })}
             </div>
         </div>
     );

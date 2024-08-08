@@ -27,30 +27,14 @@ import useSWR from "swr";
 
 function ConversationDetailPage() {
     const [isOpenConversationInfo, setIsOpenConversationInfo] = useState<boolean>(false);
-    const [message, setMessage] = useState<string>("");
-
     const params = useParams<{ id: string }>();
     const currentUser = useAuthStore((state) => state.currentUser);
-
-    const messageInputRef = useRef<HTMLDivElement>(null);
 
     const { data, error, isLoading } = useSWR<{ data: IConversation }>(`conversation/${params.id}`);
 
     const otherUser =
         data && currentUser && data?.data?.participants?.find((participant) => participant._id !== currentUser._id);
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const res = await axiosInstance.get("/user");
-                // console.log(getCookie("accessToken"));
-                console.log("res: ", res.data);
-                console.log("currentUser: ", currentUser);
-            } catch (error) {
-                console.log("error: ", error);
-            }
-        })();
-    }, [currentUser]);
     return (
         <>
             <div className="grid grid-cols-12 h-full">

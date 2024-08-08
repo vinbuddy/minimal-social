@@ -53,6 +53,9 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
                     select: USER_MODEL_HIDDEN_FIELDS,
                 },
             },
+            {
+                path: "replyTo",
+            },
         ]);
 
         // Update last message of the conversation

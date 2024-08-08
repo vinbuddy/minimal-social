@@ -12,11 +12,10 @@ import axiosInstance from "@/utils/httpRequest";
 import { toast } from "sonner";
 import { TOAST_OPTIONS } from "@/utils/toast";
 import useGlobalMutation from "@/hooks/useGlobalMutation";
-import useCommentStore from "@/hooks/store/useCommentStore";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { IComment } from "@/types/comment";
 import { IPost } from "@/types/post";
-import { IUser } from "@/types/user";
+import useReplyStore from "@/hooks/store/useReplyStore";
 
 // type TargetType = IPost | IVideo;
 type CommentTargetType = IPost;
@@ -34,7 +33,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
     const { currentUser } = useAuthStore();
     const { startLoading, stopLoading, loading } = useLoading();
     const mutate = useGlobalMutation();
-    const { replyTo, unReply } = useCommentStore();
+    const { replyTo, unReply } = useReplyStore();
 
     const [comment, setComment] = useState<string>("");
     const commentInputRef = useRef<HTMLDivElement>(null);

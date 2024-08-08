@@ -12,10 +12,10 @@ import { useState } from "react";
 import useAuthStore from "@/hooks/store/useAuthStore";
 import { toast } from "sonner";
 import usePagination from "@/hooks/usePagination";
-import useCommentStore from "@/hooks/store/useCommentStore";
 import axiosInstance from "@/utils/httpRequest";
 import CommentMenuDropdown from "./CommentMenuDropdown";
 import { useParams } from "next/navigation";
+import useReplyStore from "@/hooks/store/useReplyStore";
 
 interface IProps {
     comment: IComment;
@@ -24,7 +24,7 @@ interface IProps {
 
 export default function CommentItem({ comment, isReply = false }: IProps) {
     const { currentUser } = useAuthStore();
-    const { reply } = useCommentStore();
+    const { replyTo, reply, unReply } = useReplyStore();
     const params: { id: string } = useParams();
 
     const [isLiked, setIsLiked] = useState<boolean>(() => comment?.likes.includes(currentUser?._id) || false);
@@ -57,6 +57,10 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                 );
             }
         },
+    };
+
+    const handleReply = (comment: IComment) => {
+        reply(comment);
     };
 
     const handleUnLike = async (): Promise<void> => {
@@ -152,7 +156,7 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                                 <TimeAgo date={comment?.createdAt} />
                             </button>
 
-                            <button onClick={() => reply(comment)} className="px-2 ">
+                            <button onClick={() => handleReply(comment)} className="px-2 ">
                                 Reply
                             </button>
 
