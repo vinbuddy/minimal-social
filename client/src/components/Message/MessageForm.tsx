@@ -136,7 +136,9 @@ export default function MessageForm({ conversation }: IProps) {
         const formData = new FormData();
         const formMediaFilesData = new FormData();
 
-        formData.append("content", message);
+        let formatMessage = message.replace(/<br>\s*$/, "");
+
+        formData.append("content", formatMessage);
         formData.append("senderId", currentUser._id);
         formData.append("conversationId", conversation._id);
 

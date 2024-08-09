@@ -35,9 +35,13 @@ export default function MessageList({ conversation }: IProps) {
     useEffect(() => {
         if (!socket) return;
 
-        socket.off("newMessage");
+        const processedMessages = new Set();
 
         const handleNewMessage = (newMessage: IMessage) => {
+            if (processedMessages.has(newMessage._id)) return;
+
+            processedMessages.add(newMessage._id);
+
             mutate((currentData) => {
                 if (!currentData) return [{ data: [newMessage] }];
 
@@ -62,7 +66,7 @@ export default function MessageList({ conversation }: IProps) {
         socket.on("newMessage", handleNewMessage);
 
         return () => {
-            socket.off("newMessage");
+            socket.off("newMessage", handleNewMessage);
         };
     }, [socket]);
 
