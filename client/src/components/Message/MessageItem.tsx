@@ -7,6 +7,7 @@ import GalleryImages from "../GalleryImages";
 
 import emojiRegex from "emoji-regex";
 import useReplyStore from "@/hooks/store/useReplyStore";
+import MessageEmojiReaction from "./MessageEmojiReaction";
 
 interface IProps {
     className?: string;
@@ -69,6 +70,40 @@ export default function MessageItem({ className = "", messages }: IProps) {
             <section className={className}>
                 {/* Message */}
                 <span>{message?.content}</span>
+            </section>
+        );
+    };
+
+    const renderMessageActions = (message: IMessage) => {
+        return (
+            <section
+                className={`flex items-center flex-nowrap invisible group-hover:visible ${
+                    isOwnMessage ? "order-1" : "order-2"
+                }`}
+            >
+                <MessageEmojiReaction onAfterPicked={(emoji: string) => {}}>
+                    <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                        <SmileIcon size={16} className="text-default-400" />
+                    </Button>
+                </MessageEmojiReaction>
+                <Button
+                    onPress={() => reply(message)}
+                    isIconOnly
+                    size="sm"
+                    radius="full"
+                    color="default"
+                    variant="light"
+                >
+                    <ReplyIcon size={16} className="text-default-400" />
+                </Button>
+                <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                    <EllipsisVerticalIcon size={16} className="text-default-400" />
+                </Button>
+                {!message?.mediaFiles?.length && (
+                    <Chip size="sm" variant="flat" className={`px-1 text-default-500 text-tiny`}>
+                        {formatTimeStamp(message?.createdAt)}
+                    </Chip>
+                )}
             </section>
         );
     };
@@ -167,37 +202,7 @@ export default function MessageItem({ className = "", messages }: IProps) {
                                         {message?.content && renderTextMessage(message)}
                                         {message?.mediaFiles?.length > 0 && renderImageMessage(message)}
 
-                                        <section
-                                            className={`flex items-center flex-nowrap invisible group-hover:visible ${
-                                                isOwnMessage ? "order-1" : "order-2"
-                                            }`}
-                                        >
-                                            <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                                                <SmileIcon size={16} className="text-default-400" />
-                                            </Button>
-                                            <Button
-                                                onPress={() => reply(message)}
-                                                isIconOnly
-                                                size="sm"
-                                                radius="full"
-                                                color="default"
-                                                variant="light"
-                                            >
-                                                <ReplyIcon size={16} className="text-default-400" />
-                                            </Button>
-                                            <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                                                <EllipsisVerticalIcon size={16} className="text-default-400" />
-                                            </Button>
-                                            {!message?.mediaFiles?.length && (
-                                                <Chip
-                                                    size="sm"
-                                                    variant="flat"
-                                                    className={`px-1 text-default-500 text-tiny`}
-                                                >
-                                                    {formatTimeStamp(message?.createdAt)}
-                                                </Chip>
-                                            )}
-                                        </section>
+                                        {renderMessageActions(message)}
                                     </div>
                                 </div>
                             </div>;
@@ -213,33 +218,7 @@ export default function MessageItem({ className = "", messages }: IProps) {
                                 {message?.content && renderTextMessage(message)}
                                 {message?.mediaFiles?.length > 0 && renderImageMessage(message)}
 
-                                <section
-                                    className={`flex items-center flex-nowrap invisible group-hover:visible ${
-                                        isOwnMessage ? "order-1" : "order-2"
-                                    }`}
-                                >
-                                    <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                                        <SmileIcon size={16} className="text-default-400" />
-                                    </Button>
-                                    <Button
-                                        onPress={() => reply(message)}
-                                        isIconOnly
-                                        size="sm"
-                                        radius="full"
-                                        color="default"
-                                        variant="light"
-                                    >
-                                        <ReplyIcon size={16} className="text-default-400" />
-                                    </Button>
-                                    <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                                        <EllipsisVerticalIcon size={16} className="text-default-400" />
-                                    </Button>
-                                    {!message?.mediaFiles?.length && (
-                                        <Chip size="sm" variant="flat" className={`px-1 text-default-500 text-tiny`}>
-                                            {formatTimeStamp(message?.createdAt)}
-                                        </Chip>
-                                    )}
-                                </section>
+                                {renderMessageActions(message)}
                             </div>
                         );
                     })}
