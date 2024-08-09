@@ -8,6 +8,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import MessageItem from "./MessageItem";
 import { useSocketContext } from "@/contexts/SocketContext";
 import useGlobalMutation from "@/hooks/useGlobalMutation";
+import useAuthStore from "@/hooks/store/useAuthStore";
 
 interface IProps {
     conversation: IConversation;
@@ -21,6 +22,7 @@ interface GroupedMessage {
 export default function MessageList({ conversation }: IProps) {
     const { socket } = useSocketContext();
     const swrMutate = useGlobalMutation();
+    const { currentUser } = useAuthStore();
     const {
         data: messages,
         loadingMore,
@@ -35,13 +37,7 @@ export default function MessageList({ conversation }: IProps) {
     useEffect(() => {
         if (!socket) return;
 
-        const processedMessages = new Set();
-
         const handleNewMessage = (newMessage: IMessage) => {
-            if (processedMessages.has(newMessage._id)) return;
-
-            processedMessages.add(newMessage._id);
-
             mutate((currentData) => {
                 if (!currentData) return [{ data: [newMessage] }];
 
@@ -60,7 +56,19 @@ export default function MessageList({ conversation }: IProps) {
                 return updatedData;
             }, false);
 
+            const sound = new Audio(
+                "https://res.cloudinary.com/dtbhvc4p4/video/upload/v1723186867/audios/message-sound_eoo8ei.mp3"
+            );
             swrMutate((key) => typeof key === "string" && key.includes("/conversation"));
+
+            if (!currentUser) return;
+
+            if (newMessage?.sender?._id !== currentUser._id) {
+                const sound = new Audio(
+                    "https://res.cloudinary.com/dtbhvc4p4/video/upload/v1723186867/audios/message-sound_eoo8ei.mp3"
+                );
+                sound.play().catch((error) => console.log("Error playing sound:", error));
+            }
         };
 
         socket.on("newMessage", handleNewMessage);
@@ -68,7 +76,7 @@ export default function MessageList({ conversation }: IProps) {
         return () => {
             socket.off("newMessage", handleNewMessage);
         };
-    }, [socket]);
+    }, []);
 
     const sortMessagesByTime = (messages: IMessage[]): IMessage[] => {
         return messages.slice().sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
