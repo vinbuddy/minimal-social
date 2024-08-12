@@ -56,9 +56,6 @@ export default function MessageList({ conversation }: IProps) {
                 return updatedData;
             }, false);
 
-            const sound = new Audio(
-                "https://res.cloudinary.com/dtbhvc4p4/video/upload/v1723186867/audios/message-sound_eoo8ei.mp3"
-            );
             swrMutate((key) => typeof key === "string" && key.includes("/conversation"));
 
             if (!currentUser) return;
@@ -70,11 +67,28 @@ export default function MessageList({ conversation }: IProps) {
                 sound.play().catch((error) => console.log("Error playing sound:", error));
             }
         };
+        const handleReactMessage = (updatedMessage: IMessage) => {
+            mutate((currentData) => {
+                console.log("currentData: ", currentData);
+                if (!currentData) return;
+
+                const updatedData = currentData.map((page) => ({
+                    ...page,
+                    data: page.data.map((message: IMessage) =>
+                        message._id === updatedMessage._id ? updatedMessage : message
+                    ),
+                }));
+
+                return updatedData;
+            }, false);
+        };
+        socket.on("reactMessage", handleReactMessage);
 
         socket.on("newMessage", handleNewMessage);
 
         return () => {
             socket.off("newMessage", handleNewMessage);
+            socket.off("reactMessage", handleReactMessage);
         };
     }, []);
 

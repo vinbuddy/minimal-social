@@ -4,7 +4,7 @@ import { IUser } from "./user";
 
 export interface IMessageReaction {
     user: IUser;
-    reaction: string;
+    emoji: string;
 }
 
 export interface IMessage {
@@ -14,7 +14,7 @@ export interface IMessage {
     content: string;
     mediaFiles: IMediaFile[];
     replyTo: IMessage;
-    reaction: IMessageReaction[];
+    reactions: IMessageReaction[];
     isEdited: boolean;
     isRetracted: boolean;
     seenBy: IUser[];

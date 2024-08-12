@@ -9,7 +9,7 @@ export class MessageReaction {
     public user: Ref<User>;
 
     @prop({ required: true })
-    public reaction: string;
+    public emoji: string;
 }
 
 @modelOptions({ schemaOptions: { collection: "messages", timestamps: true }, options: { allowMixed: Severity.ALLOW } })
@@ -33,7 +33,7 @@ export class Message {
     public replyTo: Ref<Message>;
 
     @prop({ default: [] })
-    public reaction: MessageReaction[];
+    public reactions: MessageReaction[];
 
     @prop({ default: false })
     public isEdited?: boolean;

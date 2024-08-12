@@ -111,11 +111,72 @@ export async function getConversationMessagesHandler(req: Request, res: Response
             })
             .populate({
                 path: "replyTo",
+            })
+            .populate({
+                path: "conversation",
+            })
+            .populate({
+                path: "reactions.user",
             });
 
         return res
             .status(200)
             .json({ message: "Get messages successfully", data: messages, totalMessages, totalPages, page, limit });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function reactMessageHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { userId, emoji, conversationId } = req.body;
+        const messageId = req.params.id;
+
+        const message = await MessageModel.findById(messageId);
+
+        if (!message) {
+            return res.status(404).json({ message: "Message not found" });
+        }
+
+        const reactionIndex = message.reactions.findIndex((reaction) => reaction.user.toString() === userId);
+
+        if (reactionIndex === -1) {
+            message.reactions.push({ user: new mongoose.Types.ObjectId(userId), emoji });
+            await message.save();
+        } else {
+            await MessageModel.updateOne(
+                {
+                    _id: message._id,
+                    "reactions.user": new mongoose.Types.ObjectId(userId),
+                },
+                {
+                    $set: {
+                        "reactions.$.emoji": emoji,
+                    },
+                }
+            );
+        }
+
+        const updatedMessage = await MessageModel.findById(message._id)
+            .populate({
+                path: "sender",
+                select: USER_MODEL_HIDDEN_FIELDS,
+            })
+            .populate({
+                path: "replyTo",
+            })
+            .populate({
+                path: "conversation",
+            })
+            .populate({
+                path: "reactions.user",
+            });
+
+        const io = req.app.get("io") as Server;
+
+        io.to(conversationId).emit("reactMessage", updatedMessage);
+
+        return res.status(200).json({ message: "React message successfully", data: updatedMessage });
     } catch (error) {
         next(error);
     }
