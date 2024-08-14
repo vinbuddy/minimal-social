@@ -31,9 +31,11 @@ export default function RootLayout({
                         <SWRConfigProvider>
                             <AuthContextProvider>
                                 <SocketProvider>
-                                    {children}
-                                    <Toaster />
-                                    <TokenRefresher />
+                                    <TokenRefresher>
+                                        {children}
+                                        <Toaster />
+                                    </TokenRefresher>
+                                    {/* <TokenRefresher /> */}
                                 </SocketProvider>
                             </AuthContextProvider>
                         </SWRConfigProvider>

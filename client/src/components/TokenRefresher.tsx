@@ -4,14 +4,17 @@ import axiosInstance from "@/utils/httpRequest";
 import { getTokenExpire, refreshAccessToken } from "@/utils/jwt";
 import { deleteCookie, setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { toast } from "sonner";
+import PageLoading from "./PageLoading";
 
 const TEN_MINUTES = 10 * 60 * 1000;
 const REFRESH_INTERVAL = TEN_MINUTES;
 
-export default function TokenRefresher() {
+export default function TokenRefresher({ children }: { children: ReactNode }) {
     const { isLoaded, accessToken, refreshToken } = useAuthStore();
+    const [hasRefreshedInitially, setHasRefreshedInitially] = useState<boolean>(false);
+    const [isRefreshingToken, setIsRefreshingToken] = useState<boolean>(false);
     const router = useRouter();
 
     const logout = async () => {
@@ -35,6 +38,8 @@ export default function TokenRefresher() {
 
     useEffect(() => {
         if (!isLoaded || !refreshToken) return;
+
+        setIsRefreshingToken(true);
 
         const refreshExpireAt = getTokenExpire(refreshToken);
         if (refreshExpireAt && Date.now() >= refreshExpireAt) {
@@ -66,8 +71,9 @@ export default function TokenRefresher() {
                     refreshToken: newRefreshToken,
                     isAuthenticated: true,
                 });
-                return;
             }
+            setHasRefreshedInitially(true);
+            setIsRefreshingToken(false);
         })();
 
         const interval = setInterval(async () => {
@@ -90,5 +96,9 @@ export default function TokenRefresher() {
         };
     }, [isLoaded, accessToken, refreshToken, router]);
 
-    return null;
+    if (isRefreshingToken && !hasRefreshedInitially) {
+        return <PageLoading />;
+    }
+
+    return children;
 }
