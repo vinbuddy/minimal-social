@@ -21,6 +21,7 @@ import data from "@emoji-mart/data";
 
 import { init } from "emoji-mart";
 import useReplyStore from "@/hooks/store/useReplyStore";
+import StickerGifDropdown from "../StickerGifDropdown";
 
 init({ data });
 
@@ -278,9 +279,11 @@ export default function MessageForm({ conversation }: IProps) {
                         onUpload={uploadMediaFiles}
                     />
                     <input type="file" name="media-file" id="media-file" hidden />
-                    <Button isIconOnly variant="light" radius="full">
-                        <StickerIcon size={20} className="text-default-600" strokeWidth={1.5} />
-                    </Button>
+                    <StickerGifDropdown popoverProps={{ placement: "top-start" }}>
+                        <Button isIconOnly variant="light" radius="full">
+                            <StickerIcon size={20} className="text-default-600" strokeWidth={1.5} />
+                        </Button>
+                    </StickerGifDropdown>
                 </div>
 
                 <div className="flex-1 relative py-3 px-4 flex flex-col items-start bg-background border border-divider rounded-3xl overflow-x-hidden">
