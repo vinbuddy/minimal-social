@@ -3,10 +3,10 @@ import mongoose from "mongoose";
 
 export class StickerItem {
     @prop({ auto: true })
-    public _id?: mongoose.Types.ObjectId;
+    public publicId?: mongoose.Types.ObjectId;
 
-    @prop({ required: true })
-    public name: string;
+    @prop({ default: [] })
+    public tags: string[];
 
     @prop({ required: true })
     public url: string;
