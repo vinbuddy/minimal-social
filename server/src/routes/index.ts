@@ -8,6 +8,7 @@ import notificationRoutes from "./notification.route";
 import searchRoutes from "./search.route";
 import messageRoutes from "./message.route";
 import conversationRoutes from "./conversation.route";
+import stickerRoutes from "./sticker.route";
 
 const router = express.Router();
 
@@ -19,5 +20,6 @@ router.use("/notification", notificationRoutes);
 router.use("/search", searchRoutes);
 router.use("/message", messageRoutes);
 router.use("/conversation", conversationRoutes);
+router.use("/sticker", stickerRoutes);
 
 export default router;
