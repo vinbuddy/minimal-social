@@ -15,7 +15,7 @@ interface RequestWithFiles extends Request {
 export async function createMessageHandler(_req: Request, res: Response, next: NextFunction) {
     try {
         const req = _req as RequestWithFiles;
-        const { senderId, conversationId, content, replyTo } = createMessageSchema.parse(req.body);
+        const { senderId, conversationId, content, replyTo, stickerUrl, gifUrl } = createMessageSchema.parse(req.body);
         const files = req.files as Express.Multer.File[];
 
         let conversation = await ConversationModel.findOne({
@@ -42,6 +42,8 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
             content: content ?? null,
             replyTo: replyTo ? new mongoose.Types.ObjectId(replyTo) : null,
             mediaFiles: uploadedFiles || [],
+            stickerUrl: stickerUrl ?? null,
+            gifUrl: gifUrl ?? null,
         });
 
         const message = await MessageModel.populate(newMessage, [
@@ -58,10 +60,15 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
             },
         ]);
 
-        // Update last message of the conversation
-        let lastMessageContent = message.content ?? "Sent message";
+        let lastMessageContent = "Sent message";
 
-        if (!content && uploadedFiles.length > 0) {
+        if (message.content) {
+            lastMessageContent = message.content;
+        } else if (stickerUrl) {
+            lastMessageContent = "Sent sticker";
+        } else if (gifUrl) {
+            lastMessageContent = "Sent gif";
+        } else if (uploadedFiles.length > 0) {
             lastMessageContent = "Sent photo";
         }
 

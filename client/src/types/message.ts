@@ -13,6 +13,8 @@ export interface IMessage {
     conversation: IConversation;
     content: string;
     mediaFiles: IMediaFile[];
+    stickerUrl: string | null;
+    gifUrl: string | null;
     replyTo: IMessage;
     reactions: IMessageReaction[];
     isEdited: boolean;

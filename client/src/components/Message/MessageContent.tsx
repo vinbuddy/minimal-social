@@ -4,6 +4,7 @@ import GalleryImages from "../GalleryImages";
 import emojiRegex from "emoji-regex";
 import { formatTimeStamp } from "@/utils/datetime";
 import { Chip } from "@nextui-org/react";
+import Image from "next/image";
 
 interface IProps {
     message: IMessage;
@@ -28,16 +29,49 @@ export default function MessageContent({ message, isOwnMessage }: IProps) {
         isOwnMessage && message?.content ? "order-2 " : "order-1"
     }`;
 
+    const stickerOrGifClassName = `text-2xl rounded-[18px] ${
+        (isOwnMessage && message?.stickerUrl) || message?.gifUrl ? "order-2 " : "order-1"
+    }`;
+
     const className = isImojiMessageOnly(message?.content) ? emojiMessageClassName : messageClassName;
+
+    if (message?.content) {
+        return (
+            <section className={className}>
+                <span>{message?.content}</span>
+            </section>
+        );
+    }
+
+    if (!message?.content && message?.stickerUrl) {
+        return (
+            <section className={stickerOrGifClassName}>
+                <Image
+                    className="size-[100px] rounded-xl object-cover"
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    src={message?.stickerUrl || ""}
+                    alt=""
+                />
+            </section>
+        );
+    } else if (!message?.content && message?.gifUrl) {
+        return (
+            <section className={stickerOrGifClassName}>
+                <iframe
+                    className="size-[200px] shadow-none rounded-xl"
+                    src={`https://giphy.com/embed/${message?.gifUrl}`}
+                    allowFullScreen
+                    scrolling="no"
+                    allow="encrypted-media"
+                ></iframe>
+            </section>
+        );
+    }
 
     return (
         <>
-            {message?.content && (
-                <section className={className}>
-                    <span>{message?.content}</span>
-                </section>
-            )}
-
             {message?.mediaFiles?.length > 0 && (
                 <section
                     className={`max-w-full overflow-hidden ${

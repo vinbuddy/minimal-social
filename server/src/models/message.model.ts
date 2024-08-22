@@ -29,6 +29,12 @@ export class Message {
     @prop({ default: [] })
     public mediaFiles: MediaFile[];
 
+    @prop({ default: null })
+    public stickerUrl: string | null;
+
+    @prop({ default: null })
+    public gifUrl: string | null;
+
     @prop({ ref: () => Message, default: null })
     public replyTo: Ref<Message>;
 

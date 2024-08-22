@@ -15,10 +15,12 @@ const gf = new GiphyFetch(process.env.NEXT_PUBLIC_GIPHY_API_KEY as string);
 interface IProps {
     popoverProps?: Omit<PopoverProps, "children">;
     children?: React.ReactNode;
+    onAfterPicked?: (type: "sticker" | "gif", url: string) => void;
 }
 
-export default function StickerGifDropdown({ popoverProps, children }: IProps) {
+export default function StickerGifDropdown({ popoverProps, children, onAfterPicked }: IProps) {
     const [type, setType] = useState<"sticker" | "gif">("sticker");
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const [currentStickerIndex, setCurrentStickerIndex] = useState<number | null>(null);
 
     const { data: stickerData, isLoading } = useSWR<{ data: ISticker[] }>(type === "sticker" ? "/sticker" : null);
@@ -29,8 +31,17 @@ export default function StickerGifDropdown({ popoverProps, children }: IProps) {
         }
     }, [stickerData]);
 
+    const handlePick = (url: string) => {
+        setIsOpen(false);
+        onAfterPicked && onAfterPicked(type, url);
+    };
+
+    const handleOpenChange = (open: boolean) => {
+        setIsOpen(open);
+    };
+
     return (
-        <Popover {...popoverProps} offset={10}>
+        <Popover {...popoverProps} onOpenChange={handleOpenChange} isOpen={isOpen} offset={10}>
             <PopoverTrigger>{children}</PopoverTrigger>
             <PopoverContent className="p-4">
                 <div className="max-w-[320px] overflow-hidden">
@@ -93,7 +104,11 @@ export default function StickerGifDropdown({ popoverProps, children }: IProps) {
                                         {stickerData &&
                                             stickerData?.data[currentStickerIndex as number]?.stickers?.map(
                                                 (sticker) => (
-                                                    <div key={sticker.publicId} className="col-span-4">
+                                                    <div
+                                                        className="col-span-4"
+                                                        key={sticker.publicId}
+                                                        onClick={() => handlePick(sticker.url)}
+                                                    >
                                                         <Image
                                                             src={sticker.url}
                                                             alt=""
@@ -112,6 +127,7 @@ export default function StickerGifDropdown({ popoverProps, children }: IProps) {
                             <div className="rounded-xl pe-2">
                                 <Grid
                                     key="gif"
+                                    onGifClick={(gif) => handlePick(gif.embed_url)}
                                     width={300}
                                     columns={3}
                                     fetchGifs={(offset: number) => gf.trending({ offset, limit: 15 })}

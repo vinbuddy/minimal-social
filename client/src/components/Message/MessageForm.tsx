@@ -38,7 +38,7 @@ export default function MessageForm({ conversation }: IProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const { currentUser } = useAuthStore();
-    const { reply, replyTo, unReply } = useReplyStore();
+    const { replyTo, unReply } = useReplyStore();
     const { startLoading, stopLoading, loading } = useLoading();
     const mutate = useGlobalMutation();
 
@@ -237,6 +237,38 @@ export default function MessageForm({ conversation }: IProps) {
         }
     };
 
+    const handleSendStickOrGifMessage = async (type: "sticker" | "gif", url: string) => {
+        try {
+            startLoading();
+
+            if (!currentUser || !conversation || !url) return;
+
+            const formData = new FormData();
+            formData.append("conversationId", conversation._id);
+            formData.append("senderId", currentUser._id);
+            if (type === "gif") {
+                formData.append("gifUrl", url);
+            } else {
+                formData.append("stickerUrl", url);
+            }
+
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            });
+
+            mutate((key) => typeof key === "string" && key.includes("/conversation"));
+            reset();
+        } catch (error) {
+            toast.error("Failed to send message.", TOAST_OPTIONS);
+            console.log(error);
+        } finally {
+            stopLoading();
+        }
+    };
+
     return (
         <div>
             {replyTo && (
@@ -279,7 +311,10 @@ export default function MessageForm({ conversation }: IProps) {
                         onUpload={uploadMediaFiles}
                     />
                     <input type="file" name="media-file" id="media-file" hidden />
-                    <StickerGifDropdown popoverProps={{ placement: "top-start" }}>
+                    <StickerGifDropdown
+                        popoverProps={{ placement: "top-start" }}
+                        onAfterPicked={handleSendStickOrGifMessage}
+                    >
                         <Button isIconOnly variant="light" radius="full">
                             <StickerIcon size={20} className="text-default-600" strokeWidth={1.5} />
                         </Button>
