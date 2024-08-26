@@ -5,6 +5,7 @@ import axiosInstance from "@/utils/httpRequest";
 import { IUser } from "../types/user";
 import PageLoading from "@/components/PageLoading";
 import { refreshAccessToken } from "@/utils/jwt";
+
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
 
@@ -39,11 +40,15 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
                 }
             } catch (error: any) {
                 console.error(error?.message);
+            } finally {
+                setLoading(false);
             }
         };
 
         initializeAuth();
     }, [isLoaded, isAuthenticated, accessToken]);
+
+    if (!isLoaded || loading) return <PageLoading />;
 
     return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
 };

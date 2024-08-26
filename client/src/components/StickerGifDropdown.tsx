@@ -127,7 +127,10 @@ export default function StickerGifDropdown({ popoverProps, children, onAfterPick
                             <div className="rounded-xl pe-2">
                                 <Grid
                                     key="gif"
-                                    onGifClick={(gif) => handlePick(gif.embed_url)}
+                                    onGifClick={(gif, e) => {
+                                        e.preventDefault();
+                                        handlePick(gif.embed_url);
+                                    }}
                                     width={300}
                                     columns={3}
                                     fetchGifs={(offset: number) => gf.trending({ offset, limit: 15 })}

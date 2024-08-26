@@ -61,7 +61,7 @@ export default function MessageContent({ message, isOwnMessage }: IProps) {
             <section className={stickerOrGifClassName}>
                 <iframe
                     className="size-[200px] shadow-none rounded-xl"
-                    src={`https://giphy.com/embed/${message?.gifUrl}`}
+                    src={message?.gifUrl || ""}
                     allowFullScreen
                     scrolling="no"
                     allow="encrypted-media"
