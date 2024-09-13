@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
+import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
 import { createMessageSchema } from "../schemas/message.schema";
 import ConversationModel, { LastMessage } from "../models/conversation.model";
@@ -10,6 +10,14 @@ import { Server } from "socket.io";
 
 interface RequestWithFiles extends Request {
     files: Express.Multer.File[];
+}
+
+enum E_EMOJI {
+    HEART = "❤️",
+    HAHA = "😆",
+    WOW = "😮",
+    SAD = "😢",
+    ANGRY = "😡",
 }
 
 export async function createMessageHandler(_req: Request, res: Response, next: NextFunction) {
@@ -184,6 +192,61 @@ export async function reactMessageHandler(req: Request, res: Response, next: Nex
         io.to(conversationId).emit("reactMessage", updatedMessage);
 
         return res.status(200).json({ message: "React message successfully", data: updatedMessage });
+    } catch (error) {
+        next(error);
+    }
+}
+
+function getEmojiFromClientInput(clientInput: string): string {
+    const uppercasedInput = clientInput.toUpperCase() as keyof typeof E_EMOJI;
+
+    if (uppercasedInput in E_EMOJI) {
+        return E_EMOJI[uppercasedInput];
+    }
+
+    throw new Error(`Emoji with key "${clientInput}" not found`);
+}
+
+export async function getUsersReactedMessageHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { emoji, messageId } = req.query;
+        if (!emoji || !messageId) {
+            return res.status(400).json({ message: "Emoji is required" });
+        }
+
+        let emojiIcon;
+        try {
+            emojiIcon = getEmojiFromClientInput(emoji as string); // Ex: convert 'heart' to '❤️'
+        } catch (error) {
+            return res.status(400).json({ message: "Invalid emoji" });
+        }
+
+        const message = await MessageModel.findOne({
+            _id: new mongoose.Types.ObjectId(messageId as string),
+            reactions: { $elemMatch: { emoji: emojiIcon } },
+        }).lean();
+
+        if (!message) {
+            return res.status(404).json({ message: "Message not found" });
+        }
+
+        const filteredReactions = message.reactions.filter((reaction) => reaction.emoji === emojiIcon);
+
+        const populatedReactions = await Promise.all(
+            filteredReactions.map(async (reaction) => {
+                if (reaction.user) {
+                    const populatedUser = await UserModel.findById(reaction.user)
+                        .select(USER_MODEL_HIDDEN_FIELDS)
+                        .lean();
+                    return { ...reaction, user: populatedUser };
+                }
+                return reaction;
+            })
+        );
+
+        const populatedMessage = { ...message, reactions: populatedReactions };
+
+        return res.status(200).json({ message: "Get users reacted message successfully", data: populatedMessage });
     } catch (error) {
         next(error);
     }

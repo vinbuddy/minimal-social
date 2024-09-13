@@ -47,7 +47,7 @@ export default function MessageItemGroup({ message, isOwnMessage }: IProps) {
             {isReaction && (
                 <div className={`relative z-10 ${isOwnMessage ? "text-right left-0" : "text-left right-0"}`}>
                     <div className="inline-block bg-content2 m-0 text-tiny py-[2px] px-1 border-2 border-background rounded-xl">
-                        <EmojiReactionsLabel reactions={message?.reactions} />
+                        <EmojiReactionsLabel reactions={message?.reactions} message={message} />
                     </div>
                 </div>
             )}
