@@ -1,12 +1,17 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { AuthClientApp, NextProvider as NextUIProvider, SWRConfigProvider } from "./providers";
-import { Toaster } from "sonner";
-import { AuthContextProvider } from "@/contexts/AuthContext";
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
+import dynamic from "next/dynamic";
+import { Inter } from "next/font/google";
+import { Toaster } from "sonner";
+import "./globals.css";
+
 import TokenRefresher from "@/components/TokenRefresher";
 import { SocketProvider } from "@/contexts/SocketContext";
+import { AuthClientApp, NextProvider as NextUIProvider, SWRConfigProvider } from "./providers";
+
+const AuthContextProvider = dynamic(() => import("@/contexts/AuthContext").then((mod) => mod.AuthContextProvider), {
+    ssr: false,
+});
 
 const inter = Inter({ subsets: ["latin"] });
 

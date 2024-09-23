@@ -11,7 +11,10 @@ export const useAuthContext = () => useContext(AuthContext);
 
 export const AuthContextProvider = ({ children }: { children: any }) => {
     const { currentUser, isAuthenticated, accessToken, refreshToken, isLoaded } = useAuthStore();
+
     const [loading, setLoading] = useState<boolean>(false);
+
+    console.log(loading);
 
     useEffect(() => {
         const initializeAuth = async () => {
