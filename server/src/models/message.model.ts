@@ -38,7 +38,7 @@ export class Message {
     @prop({ ref: () => Message, default: null })
     public replyTo: Ref<Message>;
 
-    @prop({ default: [] })
+    @prop({ type: () => [MessageReaction], default: [] })
     public reactions: MessageReaction[];
 
     @prop({ default: false })

@@ -67,9 +67,9 @@ export default function MessageList({ conversation }: IProps) {
                 sound.play().catch((error) => console.log("Error playing sound:", error));
             }
         };
+
         const handleReactMessage = (updatedMessage: IMessage) => {
             mutate((currentData) => {
-                console.log("currentData: ", currentData);
                 if (!currentData) return;
 
                 const updatedData = currentData.map((page) => ({
@@ -82,13 +82,17 @@ export default function MessageList({ conversation }: IProps) {
                 return updatedData;
             }, false);
         };
+
         socket.on("reactMessage", handleReactMessage);
 
         socket.on("newMessage", handleNewMessage);
 
+        socket.on("unreactMessage", handleReactMessage);
+
         return () => {
             socket.off("newMessage", handleNewMessage);
             socket.off("reactMessage", handleReactMessage);
+            socket.off("unreactMessage", handleReactMessage);
         };
     }, []);
 

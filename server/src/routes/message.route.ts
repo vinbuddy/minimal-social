@@ -5,6 +5,7 @@ import {
     getConversationMessagesHandler,
     getUsersReactedMessageHandler,
     reactMessageHandler,
+    unreactMessageHandler,
 } from "../controllers/message.controller";
 import multer from "multer";
 
@@ -16,5 +17,6 @@ router.get("/", verifyToken, getConversationMessagesHandler);
 router.get("/reaction", verifyToken, getUsersReactedMessageHandler);
 
 router.post("/reaction/:id", verifyToken, reactMessageHandler);
+router.post("/unreaction/:id", verifyToken, unreactMessageHandler);
 
 export default router;

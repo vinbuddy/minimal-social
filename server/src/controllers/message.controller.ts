@@ -197,6 +197,40 @@ export async function reactMessageHandler(req: Request, res: Response, next: Nex
     }
 }
 
+export async function unreactMessageHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { userId, conversationId } = req.body;
+        const messageId = req.params.id;
+
+        const message = await MessageModel.findById(messageId);
+
+        if (!message) {
+            return res.status(404).json({ message: "Message not found" });
+        }
+
+        const reactionIndex = message.reactions.findIndex((reaction) => reaction.user.toString() === userId);
+
+        if (reactionIndex !== -1) {
+            message.reactions.splice(reactionIndex, 1);
+            await message.save();
+        }
+
+        const updatedMessage = await MessageModel.findOne({ _id: new mongoose.Types.ObjectId(messageId) })
+            .populate({ path: "sender", select: USER_MODEL_HIDDEN_FIELDS })
+            .populate({ path: "replyTo" })
+            .populate({ path: "conversation" })
+            .populate({ path: "reactions.user", select: USER_MODEL_HIDDEN_FIELDS });
+
+        const io = req.app.get("io") as Server;
+
+        io.to(conversationId).emit("unreactMessage", updatedMessage);
+
+        return res.status(200).json({ message: "Unreact message successfully", data: updatedMessage });
+    } catch (error) {
+        next(error);
+    }
+}
+
 function getEmojiFromClientInput(clientInput: string): string {
     const uppercasedInput = clientInput.toUpperCase() as keyof typeof E_EMOJI;
 
@@ -227,7 +261,7 @@ export async function getUsersReactedMessageHandler(req: Request, res: Response,
         }).lean();
 
         if (!message) {
-            return res.status(404).json({ message: "Message not found" });
+            return res.status(200).json({ message: "This message has not reacted yet", data: [] });
         }
 
         const filteredReactions = message.reactions.filter((reaction) => reaction.emoji === emojiIcon);
