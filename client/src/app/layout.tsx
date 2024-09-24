@@ -5,11 +5,15 @@ import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-import TokenRefresher from "@/components/TokenRefresher";
+// import TokenRefresher from "@/components/TokenRefresher";
 import { SocketProvider } from "@/contexts/SocketContext";
 import { AuthClientApp, NextProvider as NextUIProvider, SWRConfigProvider } from "./providers";
 
 const AuthContextProvider = dynamic(() => import("@/contexts/AuthContext").then((mod) => mod.AuthContextProvider), {
+    ssr: false,
+});
+
+const TokenRefresher = dynamic(() => import("@/components/TokenRefresher").then((mod) => mod.default), {
     ssr: false,
 });
 
@@ -40,7 +44,6 @@ export default function RootLayout({
                                         {children}
                                         <Toaster />
                                     </TokenRefresher>
-                                    {/* <TokenRefresher /> */}
                                 </SocketProvider>
                             </AuthContextProvider>
                         </SWRConfigProvider>

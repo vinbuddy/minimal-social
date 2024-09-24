@@ -1,5 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+
 import useAuthStore from "../hooks/store/useAuthStore";
 import axiosInstance from "@/utils/httpRequest";
 import { IUser } from "../types/user";
@@ -14,13 +16,14 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
 
     const [loading, setLoading] = useState<boolean>(false);
 
+    const pathName = usePathname();
+    const router = useRouter();
+
     console.log(loading);
 
     useEffect(() => {
         const initializeAuth = async () => {
             try {
-                if (!isLoaded || typeof window === "undefined") return;
-
                 if (!accessToken && refreshToken) {
                     setLoading(true);
                     const { newAccessToken, newRefreshToken } = await refreshAccessToken();
@@ -40,6 +43,9 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
                 if (response.status === 200) {
                     const user = response.data.data as IUser;
                     useAuthStore.setState({ currentUser: user, isAuthenticated: true });
+                    if (pathName === "/login" || pathName === "/register") {
+                        router.push("/");
+                    }
                 }
             } catch (error: any) {
                 console.error(error?.message);
@@ -48,10 +54,12 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
             }
         };
 
-        initializeAuth();
+        if (typeof window !== "undefined") {
+            initializeAuth();
+        }
     }, [isLoaded, isAuthenticated, accessToken]);
 
-    if (!isLoaded || loading) return <PageLoading />;
+    if (loading) return <PageLoading />;
 
     return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
 };

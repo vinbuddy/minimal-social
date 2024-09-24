@@ -27,7 +27,7 @@ export class User {
     @prop({ required: true, unique: true })
     public email: string;
 
-    @prop({ required: true })
+    @prop({ required: false, default: null })
     public password: string;
 
     @prop({
@@ -50,6 +50,9 @@ export class User {
 
     @prop({ required: true, default: "I am a new user" })
     public bio: string;
+
+    @prop({ default: null })
+    public googleId?: string;
 
     @prop({ default: false })
     public isNotification: boolean;

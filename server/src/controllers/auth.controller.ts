@@ -1,4 +1,5 @@
-import { CookieOptions, NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
+import passport from "passport";
 import UserModel, { User } from "../models/user.model";
 import {
     CreateUserInput,
@@ -347,6 +348,52 @@ export async function getMeHandler(_req: Request, res: Response, next: NextFunct
         return res.status(200).json({ statusCode: 200, data: user });
         res.status(200).json({ statusCode: 200, data: "me" });
     } catch (error) {
+        next(error);
+    }
+}
+
+export async function googleAuthCallbackHandler(_req: Request, res: Response, next: NextFunction) {
+    console.log("res: ", res);
+    console.log("googleAuthCallbackHandler");
+
+    try {
+        const req = _req as RequestWithUser;
+
+        const user = req.user;
+
+        // Generate access token and refresh token
+        const accessToken = generateToken(user, "access");
+        const refreshToken = generateToken(user, "refresh");
+
+        user.refreshToken = refreshToken;
+        await UserModel.findByIdAndUpdate(user._id, { refreshToken });
+
+        const { password: _password, refreshToken: _refreshToken, ...userInfo } = user;
+        if (cookieMode.isCookieMode) {
+            const decodedAccessToken = jwt.decode(accessToken) as User & { exp: number; iat: number };
+            const decodedRefreshToken = jwt.decode(refreshToken) as User & { exp: number; iat: number };
+
+            req.logout((err) => {
+                if (err) {
+                    return next(err);
+                }
+            });
+
+            return res
+                .cookie("accessToken", accessToken, {
+                    ...cookieMode.options,
+                    expires: new Date(decodedAccessToken.exp * 1000),
+                })
+                .cookie("refreshToken", refreshToken, {
+                    ...cookieMode.options,
+                    expires: new Date(decodedRefreshToken.exp * 1000),
+                })
+                .redirect(`${process.env.CLIENT_BASE_URL as string}/login`);
+        }
+
+        return res.redirect(`${process.env.CLIENT_BASE_URL as string}/login`);
+    } catch (error) {
+        console.log("error: ", error);
         next(error);
     }
 }

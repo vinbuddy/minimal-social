@@ -3,7 +3,7 @@
 import useAuthStore from "@/hooks/store/useAuthStore";
 import { fetcher } from "@/utils/httpRequest";
 import { NextUIProvider } from "@nextui-org/react";
-import { useState } from "react";
+import { useEffect } from "react";
 import { SWRConfig } from "swr";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
@@ -40,16 +40,15 @@ interface AuthClientAppProps {
     children: any;
 }
 export function AuthClientApp({ accessToken, refreshToken, children }: AuthClientAppProps) {
-    useState(() => {
+    useEffect(() => {
         if (typeof window !== "undefined") {
-            // Set auth store
             useAuthStore.setState((state) => ({
                 accessToken,
                 refreshToken,
                 isLoaded: true,
             }));
         }
-    });
+    }, [accessToken, refreshToken]);
 
     return <>{children}</>;
 }

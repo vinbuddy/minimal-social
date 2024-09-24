@@ -1,19 +1,17 @@
 "use client";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button, Input } from "@nextui-org/react";
+import axios from "axios";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+
 import useAuthStore from "@/hooks/store/useAuthStore";
 import useLoading from "@/hooks/useLoading";
 import { IUser } from "@/types/user";
-import axiosInstance from "@/utils/httpRequest";
-import { Button, Input } from "@nextui-org/react";
-import axios from "axios";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { setCookie } from "cookies-next";
-import { jwtDecode } from "jwt-decode";
-import { getTokenExpire } from "@/utils/jwt";
+import { GoogleIcon } from "@/assets/icons";
 
 interface IUserLogin {
     password: string;
@@ -72,6 +70,11 @@ export default function LoginPage() {
         } finally {
             stopLoading();
         }
+    };
+
+    const handleLoginWithGoogle = () => {
+        const googleLoginURL = process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/google";
+        window.open(googleLoginURL, "_self");
     };
 
     return (
@@ -154,7 +157,13 @@ export default function LoginPage() {
                     <Button isLoading={loading} size="lg" color="primary" type="submit" className="w-full">
                         Login
                     </Button>
-                    <Button size="lg" variant="bordered" className="w-full">
+                    <Button
+                        size="lg"
+                        variant="bordered"
+                        className="w-full"
+                        startContent={<GoogleIcon />}
+                        onClick={handleLoginWithGoogle}
+                    >
                         Login with Google
                     </Button>
                 </form>

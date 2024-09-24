@@ -6,11 +6,7 @@ import cookieMode from "../configs/cookie";
 
 dotenv.config();
 
-interface CustomRequest extends Request {
-    user?: User;
-}
-
-export const verifyToken = (req: CustomRequest, res: Response, next: NextFunction) => {
+export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     let token = null;
     let accessToken = null;
 
@@ -40,11 +36,13 @@ export const verifyToken = (req: CustomRequest, res: Response, next: NextFunctio
     }
 };
 
-export const verifyAdminToken = (req: CustomRequest, res: Response, next: NextFunction) => {
+export const verifyAdminToken = (req: Request, res: Response, next: NextFunction) => {
     verifyToken(req, res, () => {
-        if (!req.user) return res.status(403).json({ message: "Unauthorized" });
+        const user = req.user as User;
 
-        if (req.user.isAdmin) {
+        if (!user) return res.status(403).json({ message: "Unauthorized" });
+
+        if (user?.isAdmin) {
             next();
         } else {
             return res.status(403).json({ message: "You are not allowed" });

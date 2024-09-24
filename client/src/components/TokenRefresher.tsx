@@ -2,7 +2,6 @@
 import useAuthStore from "@/hooks/store/useAuthStore";
 import axiosInstance from "@/utils/httpRequest";
 import { getTokenExpire, refreshAccessToken } from "@/utils/jwt";
-import { deleteCookie, setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -39,20 +38,20 @@ export default function TokenRefresher({ children }: { children: ReactNode }) {
     useEffect(() => {
         if (!isLoaded || !refreshToken) return;
 
-        setIsRefreshingToken(true);
+        const refreshTokenIfNeeded = async () => {
+            setIsRefreshingToken(true);
 
-        const refreshExpireAt = getTokenExpire(refreshToken);
-        if (refreshExpireAt && Date.now() >= refreshExpireAt) {
-            logout();
-            return;
-        }
+            const refreshExpireAt = getTokenExpire(refreshToken);
+            if (refreshExpireAt && Date.now() >= refreshExpireAt) {
+                logout();
+                return;
+            }
 
-        if (!accessToken) return;
+            if (!accessToken) return;
 
-        const expireAt = getTokenExpire(accessToken);
-        if (!expireAt) return;
+            const expireAt = getTokenExpire(accessToken);
+            if (!expireAt) return;
 
-        (async () => {
             if (!accessToken && refreshToken) {
                 const { newAccessToken, newRefreshToken } = await refreshAccessToken();
 
@@ -74,9 +73,7 @@ export default function TokenRefresher({ children }: { children: ReactNode }) {
             }
             setHasRefreshedInitially(true);
             setIsRefreshingToken(false);
-        })();
 
-        const interval = setInterval(async () => {
             const now = new Date().getTime();
             const timeLeft = expireAt - now;
 
@@ -89,12 +86,12 @@ export default function TokenRefresher({ children }: { children: ReactNode }) {
                     isAuthenticated: true,
                 });
             }
-        }, REFRESH_INTERVAL);
-
-        return () => {
-            clearInterval(interval);
         };
-    }, [isLoaded, accessToken, refreshToken, router]);
+
+        const interval = setInterval(refreshTokenIfNeeded, REFRESH_INTERVAL);
+
+        return () => clearInterval(interval);
+    }, [isLoaded, refreshToken, router]);
 
     if (isRefreshingToken && !hasRefreshedInitially) {
         return <PageLoading />;
