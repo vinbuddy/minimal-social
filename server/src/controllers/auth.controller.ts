@@ -28,7 +28,7 @@ export async function registerHandler(req: Request, res: Response, next: NextFun
         const userInput: CreateUserInput = registerSchema.parse(req.body);
 
         const isExists = await UserModel.findOne({
-            $or: [{ email: userInput.email }, { username: userInput.email }],
+            $or: [{ email: userInput.email }, { username: userInput.username }],
         });
 
         if (isExists) {
