@@ -58,33 +58,36 @@ export default function StickerGifDropdown({ popoverProps, children, onAfterPick
                                     hashNavigation={{
                                         watchState: true,
                                     }}
-                                    slidesPerView="auto"
-                                    spaceBetween={20}
+                                    spaceBetween={10}
+                                    slidesPerView={4}
+                                    centeredSlides={true}
                                     navigation={true}
                                     allowTouchMove
                                     modules={[Navigation, HashNavigation]}
-                                    className="max-w-full  h-[40px]"
+                                    className="max-w-full  h-[50px]"
                                 >
                                     {stickerData &&
                                         stickerData?.data?.map((sticker, index) => (
-                                            <SwiperSlide key={sticker?._id}>
-                                                <div
-                                                    onClick={() => setCurrentStickerIndex(index)}
-                                                    className={`cursor-pointer size-[40px] rounded-lg overflow-hidden bg-content2 mr-2 ${
-                                                        currentStickerIndex === index ? "bg-content2" : ""
-                                                    }`}
-                                                >
-                                                    <Image
-                                                        src={sticker?.thumbnail}
-                                                        alt=""
-                                                        className="!size-[40px] rounded-lg"
-                                                        sizes="40px"
-                                                        title={sticker?.name}
-                                                        width={0}
-                                                        height={0}
-                                                    />
-                                                </div>
-                                            </SwiperSlide>
+                                            <>
+                                                <SwiperSlide key={sticker?._id}>
+                                                    <div
+                                                        onClick={() => setCurrentStickerIndex(index)}
+                                                        className={`cursor-pointer size-[50px] rounded-full overflow-hidden ${
+                                                            currentStickerIndex === index ? "bg-content2 border-2" : ""
+                                                        }`}
+                                                    >
+                                                        <Image
+                                                            src={sticker?.thumbnail}
+                                                            alt=""
+                                                            className="!size-[50px] rounded-lg"
+                                                            sizes="50px"
+                                                            title={sticker?.name}
+                                                            width={0}
+                                                            height={0}
+                                                        />
+                                                    </div>
+                                                </SwiperSlide>
+                                            </>
                                         ))}
                                 </Swiper>
                             </div>
