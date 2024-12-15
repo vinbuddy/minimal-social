@@ -19,8 +19,6 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     const pathName = usePathname();
     const router = useRouter();
 
-    console.log(loading);
-
     useEffect(() => {
         const initializeAuth = async () => {
             try {
@@ -39,7 +37,6 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
 
                 if (isAuthenticated || currentUser) return;
                 const response = await axiosInstance.get("/auth/me");
-
                 if (response.status === 200) {
                     const user = response.data.data as IUser;
                     useAuthStore.setState({ currentUser: user, isAuthenticated: true });
@@ -57,7 +54,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         if (typeof window !== "undefined") {
             initializeAuth();
         }
-    }, [isLoaded, isAuthenticated, accessToken]);
+    }, [isLoaded, isAuthenticated, accessToken, refreshToken]);
 
     if (loading) return <PageLoading />;
 
