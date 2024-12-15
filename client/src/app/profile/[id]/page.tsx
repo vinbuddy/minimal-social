@@ -55,9 +55,9 @@ export default function ProfilePage() {
     return (
         <MainLayout>
             <div className="flex justify-center w-full">
-                <div className="w-[630px]">
+                <div className="w-screen md:w-[630px]">
                     <main className="px-4 py-5">
-                        <section className="flex items-center gap-10">
+                        <section className="flex flex-wrap justify-center items-center gap-10">
                             <Avatar
                                 isBordered
                                 src={user?.data?.photo}
@@ -68,7 +68,7 @@ export default function ProfilePage() {
                             />
 
                             <div className="flex-1">
-                                <div className="flex items-center justify-between">
+                                <div className="flex flex-wrap items-center justify-between gap-4">
                                     <UserName className="text-2xl justify-center" user={user?.data} />
                                     {user && user?.data?._id !== currentUser?._id ? (
                                         <FollowButton
@@ -88,7 +88,7 @@ export default function ProfilePage() {
                                     )}
                                 </div>
 
-                                <div className="flex gap-4 my-2">
+                                <div className="flex gap-4 my-4">
                                     <UserFollowInfoModal type="follower" user={user?.data}>
                                         <p>
                                             {followerCount} <span className="text-default-500">followers</span>

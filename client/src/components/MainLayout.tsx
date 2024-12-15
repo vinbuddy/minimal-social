@@ -110,7 +110,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     return (
         <div className="flex w-full bg-muted/40">
             <aside className="w-[80px] fixed top-0 left-0 bottom-0 flex flex-col justify-between h-full border-r-1 border-divider bg-background">
-                <nav className="flex flex-col items-center px-4 sm:py-4">
+                <nav className="flex flex-col items-center p-4">
                     <header className="h-[40px] flex items-center mb-5">
                         <Link
                             href="#"
@@ -181,7 +181,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                         })}
                     </div>
                 </nav>
-                <nav className="flex flex-col items-center gap-4 px-2 sm:py-4">
+                <nav className="flex flex-col items-center gap-4 px-2 py-4">
                     <Dropdown placement="bottom-end">
                         <DropdownTrigger>
                             <Avatar
@@ -251,7 +251,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 </nav>
             </aside>
 
-            <div className="flex-1">
+            <div className="flex-1 ms-[80px] md:ms-0">
                 <div>{children}</div>
             </div>
         </div>

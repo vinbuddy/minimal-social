@@ -41,7 +41,7 @@ function Home() {
     return (
         <MainLayout>
             <div className="flex justify-center w-full">
-                <div className="w-[630px]">
+                <div className="w-screen md:w-[630px]">
                     <header className="sticky top-0 z-10 p-4 flex justify-between items-center bg-background">
                         <Tabs
                             onSelectionChange={(key) => setPostType(key.toString() as typeof postType)}
