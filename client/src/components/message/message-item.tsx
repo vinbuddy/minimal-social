@@ -15,7 +15,7 @@ export default function MessageItem({ className = "", messages }: IProps) {
 
     return (
         <div
-            className={`flex items-end gap-3 w-fit max-w-[75%] ${
+            className={`flex items-end gap-3 w-fit max-w-full md:max-w-[75%] ${
                 isOwnMessage ? "ml-auto flex-row-reverse" : "justify-start"
             } ${className}`}
         >

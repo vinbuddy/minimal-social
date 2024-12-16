@@ -25,7 +25,11 @@ type ConversationResponse = {
     };
 };
 
-export default function ConversationList() {
+interface IProps {
+    onConversationClick?: (conversation: IConversation) => void;
+}
+
+export default function ConversationList({ onConversationClick }: IProps) {
     const [searchValue, setSearchValue] = useState<string>("");
     const { currentUser } = useAuthStore();
     const debouncedSearch = useDebounce(searchValue, 800);
@@ -98,6 +102,7 @@ export default function ConversationList() {
                         if (privateCon?.conversation && privateCon?.user) {
                             return (
                                 <Link
+                                    onClick={() => onConversationClick && onConversationClick(privateCon.conversation)}
                                     href={`/conversation/${privateCon.conversation._id}`}
                                     key={privateCon.conversation._id}
                                     className="hover:bg-content2 block rounded-xl px-2"
@@ -154,7 +159,11 @@ export default function ConversationList() {
                         dataLength={conversations?.length ?? 0}
                     >
                         {conversations.map((conversation) => (
-                            <div className="mb-2 last:mb-0" key={conversation?._id}>
+                            <div
+                                onClick={() => onConversationClick && onConversationClick(conversation)}
+                                className="mb-2 last:mb-0"
+                                key={conversation?._id}
+                            >
                                 <ConversationItem conversation={conversation} />
                             </div>
                         ))}
@@ -172,21 +181,21 @@ export default function ConversationList() {
                 <header className="h-[40px] flex items-center justify-between mb-5">
                     <h1 className="font-bold text-xl">Chat</h1>
 
-                    <Button isIconOnly variant="flat" radius="full">
+                    {/* <Button isIconOnly variant="flat" radius="full">
                         <PlusIcon size={18} />
-                    </Button>
+                    </Button> */}
                 </header>
                 <Input
                     isClearable={!isSearchLoading}
                     classNames={{
                         base: "w-full",
-                        inputWrapper: "h-[2.8rem] px-4 shadow",
+                        inputWrapper: "h-[2.8rem] px-4",
                     }}
                     defaultValue={""}
                     value={searchValue}
                     placeholder="Search..."
                     size="md"
-                    variant="flat"
+                    variant="faded"
                     radius="full"
                     startContent={<SearchIcon className="text-default-400 me-1" size={18} />}
                     endContent={isSearchLoading ? <LoaderIcon size={18} className="animate-spin" /> : undefined}

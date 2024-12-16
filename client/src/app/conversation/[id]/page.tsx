@@ -1,6 +1,6 @@
 "use client";
 import { Avatar, Button, Tooltip } from "@nextui-org/react";
-import { InfoIcon, Phone, Video } from "lucide-react";
+import { ArrowLeftIcon, InfoIcon, Phone, Video } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
@@ -12,6 +12,7 @@ import UserName from "@/components/user/user-name";
 
 import { useAuthStore } from "@/hooks/store";
 import { IConversation } from "@/types/conversation";
+import { useConversationContext } from "@/contexts/conversation-context";
 
 function ConversationDetailPage() {
     const [isOpenConversationInfo, setIsOpenConversationInfo] = useState<boolean>(false);
@@ -23,6 +24,7 @@ function ConversationDetailPage() {
     const otherUser =
         data && currentUser && data?.data?.participants?.find((participant) => participant._id !== currentUser._id);
 
+    const { onBack } = useConversationContext();
     return (
         <>
             <div className="grid grid-cols-12 h-full">
@@ -37,9 +39,12 @@ function ConversationDetailPage() {
                         {/* User - Actions */}
                         <header className="min-h-[40px] flex items-center justify-between pb-5 px-4  border-b-1 border-divider">
                             <div className="flex items-center cursor-pointer">
-                                {/* <Badge content="" color="default" shape="circle" placement="bottom-right">
-                                    <Avatar radius="full" src="https://i.pravatar.cc/150?u=a04258a2462d826712d" />
-                                </Badge> */}
+                                <div className="me-3 lg:hidden block">
+                                    <Button onClick={onBack} title="Back" isIconOnly radius="full" variant="light">
+                                        <ArrowLeftIcon size={20} />
+                                    </Button>
+                                </div>
+
                                 <Avatar radius="full" src={otherUser?.photo} />
 
                                 <div className="ms-3">

@@ -40,7 +40,7 @@ export default function MessageActions({ message, isOwnMessage }: IProps) {
 
     return (
         <section
-            className={`flex items-center flex-nowrap invisible group-hover:visible ${
+            className={`flex items-center flex-wrap invisible group-hover:visible ${
                 isOwnMessage ? "order-1" : "order-2"
             }`}
         >
