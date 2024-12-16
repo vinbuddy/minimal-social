@@ -1,12 +1,13 @@
-import useAuthStore from "@/hooks/store/useAuthStore";
-import { IConversation } from "@/types/conversation";
-import { Avatar, AvatarGroup, Badge, Button } from "@nextui-org/react";
-import { EllipsisIcon } from "lucide-react";
-import { ReactNode } from "react";
-import TimeAgo from "../TimeAgo";
-import UserName from "../User/UserName";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { Avatar, Button } from "@nextui-org/react";
+import { EllipsisIcon } from "lucide-react";
+import { ReactNode } from "react";
+
+import { useAuthStore } from "@/hooks/store";
+import { IConversation } from "@/types/conversation";
+import TimeAgo from "../TimeAgo";
+import UserName from "../User/UserName";
 
 interface IProps {
     conversation: IConversation;

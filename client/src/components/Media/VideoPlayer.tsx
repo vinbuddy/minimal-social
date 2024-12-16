@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { Slider, SliderValue } from "@nextui-org/react";
-
 import { PlayIcon, Volume1Icon, VolumeXIcon } from "lucide-react";
 
-import useVideoStore from "@/hooks/store/useVideoStore";
+import { useVideoStore } from "@/hooks/store";
 
 interface IProps {
     src: string;

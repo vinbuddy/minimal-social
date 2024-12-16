@@ -1,14 +1,14 @@
 "use client";
-import useLoading from "@/hooks/useLoading";
-import axiosInstance from "@/utils/httpRequest";
-import { Button, Input } from "@nextui-org/react";
-import axios from "axios";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Button, Input } from "@nextui-org/react";
+import axios from "axios";
+
+import { useLoading } from "@/hooks";
 
 interface IUserRegister {
     username: string;

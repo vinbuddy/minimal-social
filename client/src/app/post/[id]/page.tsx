@@ -1,16 +1,16 @@
 "use client";
+import { Spinner, User } from "@nextui-org/react";
+import { Fragment } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+
 import BackButton from "@/components/BackButton";
 import CommentForm from "@/components/Comment/CommentForm";
 import CommentItem from "@/components/Comment/CommentItem";
 import MainLayout from "@/components/MainLayout";
 import PostDetail from "@/components/Post/PostDetail";
-import useAuthStore from "@/hooks/store/useAuthStore";
-import usePagination from "@/hooks/usePagination";
+import { usePagination } from "@/hooks";
 import { IComment } from "@/types/comment";
 import { IPost } from "@/types/post";
-import { Avatar, Spinner, User } from "@nextui-org/react";
-import { Fragment } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
 
 import useSWR from "swr";
 

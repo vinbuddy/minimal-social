@@ -1,19 +1,19 @@
 "use client";
-import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
-import MainLayout from "@/components/MainLayout";
-import NotificationItem from "@/components/Notification/NotificationItem";
-import NotificationSkeletons from "@/components/Notification/NotificationSkeletons";
-import useAuthStore from "@/hooks/store/useAuthStore";
-import usePagination from "@/hooks/usePagination";
-import { INotification } from "@/types/notification";
-import { IUser } from "@/types/user";
-import axiosInstance from "@/utils/httpRequest";
-import { TOAST_OPTIONS } from "@/utils/toast";
 import { Spinner, Tab, Tabs } from "@nextui-org/react";
 import { AtSignIcon, UserIcon } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { toast } from "sonner";
+
+import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
+import MainLayout from "@/components/MainLayout";
+import NotificationItem from "@/components/Notification/NotificationItem";
+import NotificationSkeletons from "@/components/Notification/NotificationSkeletons";
+
+import { useAuthStore } from "@/hooks/store";
+import { usePagination } from "@/hooks";
+import { INotification } from "@/types/notification";
+import { IUser } from "@/types/user";
+import axiosInstance from "@/utils/httpRequest";
 
 type NotificationActionType = "all" | "like" | "follow" | "comment" | "mention" | "repost";
 

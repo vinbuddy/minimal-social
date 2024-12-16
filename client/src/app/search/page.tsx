@@ -1,21 +1,21 @@
 "use client";
+
+import { Avatar, Input, Spinner, User } from "@nextui-org/react";
+import { LoaderIcon, SearchIcon } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Fragment, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+import useSWR from "swr";
+
 import BackButton from "@/components/BackButton";
 import MainLayout from "@/components/MainLayout";
 import PostItem from "@/components/Post/PostItem";
 import UserItem from "@/components/User/UserItem";
 import UserSuggestionList from "@/components/User/UserSuggetionList";
-import useDebounce from "@/hooks/useDebounce";
-import usePagination from "@/hooks/usePagination";
+import { usePagination, useDebounce } from "@/hooks";
 import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
-
-import { Avatar, Input, Spinner, User } from "@nextui-org/react";
-import { LoaderIcon, SearchIcon } from "lucide-react";
-import Link from "next/link";
-import { useParams, useSearchParams } from "next/navigation";
-import { Fragment, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import useSWR from "swr";
 
 export default function SearchPage() {
     const [searchValue, setSearchValue] = useState("");

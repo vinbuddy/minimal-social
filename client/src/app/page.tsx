@@ -2,13 +2,15 @@
 import { Spinner, Tab, Tabs } from "@nextui-org/react";
 import { Fragment, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+
 import MainLayout from "@/components/MainLayout";
 import PostModalButton from "@/components/Post/PostModalButton";
-import useAuthStore from "@/hooks/store/useAuthStore";
-import usePagination from "@/hooks/usePagination";
-import { IPost } from "@/types/post";
 import PostItem from "@/components/Post/PostItem";
 import PostSkeletons from "@/components/Post/PostSkeletons";
+
+import { useAuthStore } from "@/hooks/store";
+import { usePagination } from "@/hooks";
+import { IPost } from "@/types/post";
 import { useSocketContext } from "@/contexts/SocketContext";
 
 function Home() {

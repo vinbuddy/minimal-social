@@ -1,19 +1,17 @@
 "use client";
 import { useRef, useState } from "react";
-
-import { IMediaFile } from "@/types/post";
 import { Swiper, SwiperSlide } from "swiper/react";
 import NextImage from "next/image";
-import VideoPlayer from "./VideoPlayer";
-
 import { XIcon } from "lucide-react";
-
 import { Navigation, A11y, Mousewheel } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
-import useVideoStore from "@/hooks/store/useVideoStore";
+
+import { IMediaFile } from "@/types/post";
+import VideoPlayer from "./VideoPlayer";
+import { useVideoStore } from "@/hooks/store";
 
 interface IProps {
     mediaFiles: IMediaFile[];

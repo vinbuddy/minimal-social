@@ -1,6 +1,4 @@
 "use client";
-import usePagination from "@/hooks/usePagination";
-import { IUser } from "@/types/user";
 import {
     Input,
     Modal,
@@ -11,13 +9,15 @@ import {
     Spinner,
     useDisclosure,
 } from "@nextui-org/react";
+import { useState } from "react";
 import { LoaderIcon, SearchIcon } from "lucide-react";
 import InfiniteScroll from "react-infinite-scroll-component";
+
 import UserItem from "./UserItem";
 import UserSkeletons from "./UserSkeletons";
-import { useState } from "react";
-import useDebounce from "@/hooks/useDebounce";
-import useSWR from "swr";
+
+import { IUser } from "@/types/user";
+import { usePagination, useDebounce } from "@/hooks";
 
 interface IProps {
     children: React.ReactNode;

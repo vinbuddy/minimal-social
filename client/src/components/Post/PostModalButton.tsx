@@ -1,30 +1,20 @@
 "use client";
-import {
-    Button,
-    Popover,
-    PopoverTrigger,
-    PopoverContent,
-    Avatar,
-    Modal,
-    ModalContent,
-    ModalBody,
-    useDisclosure,
-} from "@nextui-org/react";
-import EmojiPicker from "../EmojiPicker";
+import { Button, Popover, PopoverTrigger, PopoverContent, Avatar } from "@nextui-org/react";
+import axios from "axios";
+import { toast } from "sonner";
 import { ImagePlusIcon, SmileIcon } from "lucide-react";
-import MediaFileSlider from "../Media/MediaFileSlider";
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { IMediaFile, IPost } from "@/types/post";
-import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
+
+import EmojiPicker from "../EmojiPicker";
+import MediaFileSlider from "../Media/MediaFileSlider";
 import MediaFileUploaderButton from "../Media/MediaFileUploaderButton";
 import RichTextEditor from "../RichTextEditor";
-import useAuthStore from "@/hooks/store/useAuthStore";
+
+import { IMediaFile, IPost } from "@/types/post";
+import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
 import axiosInstance from "@/utils/httpRequest";
-import axios from "axios";
-import useLoading from "@/hooks/useLoading";
-import { toast } from "sonner";
-import { mutate, useSWRConfig } from "swr";
-import useGlobalMutation from "@/hooks/useGlobalMutation";
+import { useAuthStore } from "@/hooks/store";
+import { useGlobalMutation, useLoading } from "@/hooks";
 
 interface IProps {
     type?: "create" | "edit";

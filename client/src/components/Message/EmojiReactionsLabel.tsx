@@ -1,13 +1,13 @@
 "use client";
 
 import { XIcon } from "lucide-react";
-
-import { IMessage, IMessageReaction } from "@/types/message";
-import MessageReactionModal from "./MessageReactionModal";
-import axiosInstance from "@/utils/httpRequest";
-import useAuthStore from "@/hooks/store/useAuthStore";
 import { toast } from "sonner";
+
+import MessageReactionModal from "./MessageReactionModal";
+import { IMessage, IMessageReaction } from "@/types/message";
+import axiosInstance from "@/utils/httpRequest";
 import { TOAST_OPTIONS } from "@/utils/toast";
+import { useAuthStore } from "@/hooks/store";
 
 interface IProps {
     reactions: IMessageReaction[];

@@ -1,12 +1,12 @@
 "use client";
 
-import useAuthStore from "@/hooks/store/useAuthStore";
-import { IUser } from "@/types/user";
-import axiosInstance from "@/utils/httpRequest";
 import { Button, ButtonProps } from "@nextui-org/react";
 import { useState } from "react";
-import { set } from "react-hook-form";
 import { toast } from "sonner";
+
+import { useAuthStore } from "@/hooks/store";
+import { IUser } from "@/types/user";
+import axiosInstance from "@/utils/httpRequest";
 
 interface IProps {
     user: IUser;

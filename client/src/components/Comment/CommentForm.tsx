@@ -2,20 +2,18 @@
 import { Avatar, Button, Spinner } from "@nextui-org/react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { LoaderCircleIcon, LoaderIcon, RedoIcon, SendHorizontalIcon, SmileIcon, XIcon } from "lucide-react";
+import { RedoIcon, SendHorizontalIcon, SmileIcon, XIcon } from "lucide-react";
+import { toast } from "sonner";
+import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 
 import RichTextEditor from "@/components/RichTextEditor";
-import useAuthStore from "@/hooks/store/useAuthStore";
 import EmojiPicker from "../EmojiPicker";
-import useLoading from "@/hooks/useLoading";
 import axiosInstance from "@/utils/httpRequest";
-import { toast } from "sonner";
+import { useAuthStore, useReplyStore } from "@/hooks/store";
+import { useGlobalMutation, useLoading } from "@/hooks";
 import { TOAST_OPTIONS } from "@/utils/toast";
-import useGlobalMutation from "@/hooks/useGlobalMutation";
-import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { IComment } from "@/types/comment";
 import { IPost } from "@/types/post";
-import useReplyStore from "@/hooks/store/useReplyStore";
 
 // type TargetType = IPost | IVideo;
 type CommentTargetType = IPost;

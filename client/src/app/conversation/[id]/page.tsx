@@ -1,29 +1,17 @@
 "use client";
-import { ImageIcon } from "@/assets/icons";
-import ConversationInfo from "@/components/Conversation/ConversationInfo";
-import EmojiPicker from "@/components/EmojiPicker";
-import MessageForm from "@/components/Message/MessageForm";
-import MessageItem from "@/components/Message/MessageItem";
-import MessageList from "@/components/Message/MessageList";
-import RichTextEditor from "@/components/RichTextEditor";
-import UserName from "@/components/User/UserName";
-import useAuthStore from "@/hooks/store/useAuthStore";
-import { IConversation } from "@/types/conversation";
-import axiosInstance from "@/utils/httpRequest";
-import {
-    Avatar,
-    Badge,
-    Button,
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownTrigger,
-    Tooltip,
-} from "@nextui-org/react";
-import { InfoIcon, StickerIcon, PaperclipIcon, Phone, PlusIcon, SmileIcon, ThumbsUpIcon, Video } from "lucide-react";
+import { Avatar, Button, Tooltip } from "@nextui-org/react";
+import { InfoIcon, Phone, Video } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import useSWR from "swr";
+
+import ConversationInfo from "@/components/Conversation/ConversationInfo";
+import MessageForm from "@/components/Message/MessageForm";
+import MessageList from "@/components/Message/MessageList";
+import UserName from "@/components/User/UserName";
+
+import { useAuthStore } from "@/hooks/store";
+import { IConversation } from "@/types/conversation";
 
 function ConversationDetailPage() {
     const [isOpenConversationInfo, setIsOpenConversationInfo] = useState<boolean>(false);

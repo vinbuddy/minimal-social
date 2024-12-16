@@ -1,16 +1,17 @@
-import useAuthStore from "@/hooks/store/useAuthStore";
-import { getFileDimension } from "@/utils/mediaFile";
 import { Avatar, Button, ButtonProps, Input, Modal, ModalBody, ModalContent, useDisclosure } from "@nextui-org/react";
 import { CropIcon } from "lucide-react";
 import { useState } from "react";
-import AvatarCropper from "./AvatarCropper";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "sonner";
+
+import AvatarCropper from "./AvatarCropper";
+
+import { getFileDimension } from "@/utils/mediaFile";
 import { TOAST_OPTIONS } from "@/utils/toast";
-import useLoading from "@/hooks/useLoading";
 import { IUser } from "@/types/user";
-import useGlobalMutation from "@/hooks/useGlobalMutation";
+import { useAuthStore } from "@/hooks/store";
+import { useGlobalMutation, useLoading } from "@/hooks";
 
 interface IProps {
     buttonProps: ButtonProps;

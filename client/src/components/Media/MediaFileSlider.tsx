@@ -65,7 +65,7 @@ function MediaFileSlider({
                                     {file.type === "image" ? (
                                         onRemoveMediaFile ? (
                                             <NextImage
-                                                className="w-full h-auto block rounded-lg"
+                                                className="w-full h-auto block rounded-xl"
                                                 src={file?.url}
                                                 width={file.width}
                                                 height={file.height}
@@ -78,7 +78,7 @@ function MediaFileSlider({
                                                 // removeWrapper
                                                 classNames={{ wrapper: "h-full" }}
                                                 as={NextImage}
-                                                className="w-full h-auto block rounded-lg"
+                                                className="w-full h-auto block rounded-xl"
                                                 src={file?.url}
                                                 width={file.width}
                                                 height={file.height}

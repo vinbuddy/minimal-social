@@ -1,21 +1,22 @@
 "use client";
-import { HeartIcon } from "@/assets/icons";
-import { IComment } from "@/types/comment";
-import { Avatar, Button, Tooltip } from "@nextui-org/react";
+import { useState } from "react";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { ChevronDownIcon, EllipsisIcon, LoaderIcon } from "lucide-react";
+import { Avatar, Button, Tooltip } from "@nextui-org/react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
+import { toast } from "sonner";
+
 import UserName from "../User/UserName";
 import TimeAgo from "../TimeAgo";
 import UserProfileCard from "../User/UserProfileCard";
-import { useState } from "react";
-import useAuthStore from "@/hooks/store/useAuthStore";
-import { toast } from "sonner";
-import usePagination from "@/hooks/usePagination";
-import axiosInstance from "@/utils/httpRequest";
 import CommentMenuDropdown from "./CommentMenuDropdown";
-import { useParams } from "next/navigation";
-import useReplyStore from "@/hooks/store/useReplyStore";
+
+import axiosInstance from "@/utils/httpRequest";
+import { HeartIcon } from "@/assets/icons";
+import { IComment } from "@/types/comment";
+import { usePagination } from "@/hooks";
+import { useAuthStore, useReplyStore } from "@/hooks/store";
 
 interface IProps {
     comment: IComment;

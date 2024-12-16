@@ -3,19 +3,17 @@ import * as React from "react";
 import { LogOut, MoonIcon, SunDim, User } from "lucide-react";
 import Link from "next/link";
 import { Avatar, Badge, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
-import useAuthStore from "@/hooks/store/useAuthStore";
-import axiosInstance from "@/utils/httpRequest";
-import useLoading from "@/hooks/useLoading";
-import { toast } from "sonner";
-import { usePathname, useRouter } from "next/navigation";
-import { HomeIcon, HeartIcon, ConversationIcon, SearchIcon } from "@/assets/icons";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { useSocketContext } from "@/contexts/SocketContext";
-import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-// import logoDark from "@/assets/images/logo-dark.png";
-// import logoLight from "@/assets/images/logo-light.png";
+import useAuthStore from "@/hooks/store/useAuthStore";
+import axiosInstance from "@/utils/httpRequest";
+import { useLoading } from "@/hooks";
+import { HomeIcon, HeartIcon, ConversationIcon, SearchIcon } from "@/assets/icons";
+import { useSocketContext } from "@/contexts/SocketContext";
 import NotificationToast from "@/components/Notification/NotificationToast";
 
 const navLinks = [

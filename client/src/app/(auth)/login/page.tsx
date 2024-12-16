@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
-import useAuthStore from "@/hooks/store/useAuthStore";
-import useLoading from "@/hooks/useLoading";
+import { useAuthStore } from "@/hooks/store";
+import { useLoading } from "@/hooks";
 import { IUser } from "@/types/user";
 import { GoogleIcon } from "@/assets/icons";
 

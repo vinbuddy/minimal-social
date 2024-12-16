@@ -1,12 +1,13 @@
 "use client";
 
-import useLoading from "@/hooks/useLoading";
-import { Button, Input } from "@nextui-org/react";
-import axios from "axios";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Button, Input } from "@nextui-org/react";
+import axios from "axios";
+import Link from "next/link";
+
+import { useLoading } from "@/hooks";
 
 interface IForgotPassword {
     email: string;

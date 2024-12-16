@@ -1,10 +1,11 @@
 "use client";
-import useAuthStore from "@/hooks/store/useAuthStore";
+import { ReactNode, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+import { useAuthStore } from "@/hooks/store";
 import axiosInstance from "@/utils/httpRequest";
 import { getTokenExpire, refreshAccessToken } from "@/utils/jwt";
-import { useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
-import { toast } from "sonner";
 import PageLoading from "./PageLoading";
 
 const TEN_MINUTES = 10 * 60 * 1000;

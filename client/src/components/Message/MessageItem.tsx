@@ -1,8 +1,8 @@
-import useAuthStore from "@/hooks/store/useAuthStore";
-import { IMessage } from "@/types/message";
 import { Avatar } from "@nextui-org/react";
 
 import MessageItemGroup from "./MessageItemGroup";
+import { useAuthStore } from "@/hooks/store";
+import { IMessage } from "@/types/message";
 
 interface IProps {
     className?: string;

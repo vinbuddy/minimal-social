@@ -1,4 +1,10 @@
 "use client";
+import { Avatar, Spinner, Tab, Tabs } from "@nextui-org/react";
+import { useParams } from "next/navigation";
+import { Fragment, useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+import useSWR from "swr";
+
 import MainLayout from "@/components/MainLayout";
 import PostItem from "@/components/Post/PostItem";
 import PostSkeletons from "@/components/Post/PostSkeletons";
@@ -6,15 +12,10 @@ import EditProfileModalButton from "@/components/User/EditProfileModalButton";
 import FollowButton from "@/components/User/FollowButton";
 import UserFollowInfoModal from "@/components/User/UserFollowInfoModal";
 import UserName from "@/components/User/UserName";
-import useAuthStore from "@/hooks/store/useAuthStore";
-import usePagination from "@/hooks/usePagination";
+import { useAuthStore } from "@/hooks/store";
+import { usePagination } from "@/hooks";
 import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
-import { Avatar, Button, Card, Spinner, Tab, Tabs } from "@nextui-org/react";
-import { useParams } from "next/navigation";
-import { Fragment, useEffect, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import useSWR from "swr";
 
 export default function ProfilePage() {
     const params = useParams() as { id: string };

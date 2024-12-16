@@ -1,6 +1,4 @@
 "use client";
-import useAuthStore from "@/hooks/store/useAuthStore";
-import useLoading from "@/hooks/useLoading";
 import { Button, Input } from "@nextui-org/react";
 import axios from "axios";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
@@ -9,6 +7,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+
+import { useAuthStore } from "@/hooks/store";
+import { useLoading } from "@/hooks";
 
 interface IUserResetPassword {
     password: string;

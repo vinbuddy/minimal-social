@@ -1,18 +1,9 @@
 "use client";
-import useLoading from "@/hooks/useLoading";
-import {
-    Button,
-    Modal,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    useDisclosure,
-    Image,
-    ButtonProps,
-    ModalFooter,
-} from "@nextui-org/react";
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ButtonProps, ModalFooter } from "@nextui-org/react";
 import { TriangleAlertIcon } from "lucide-react";
 import React from "react";
+
+import { useLoading } from "@/hooks";
 
 interface IProps {
     buttonProps?: ButtonProps;

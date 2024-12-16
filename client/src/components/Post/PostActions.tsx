@@ -1,13 +1,14 @@
 "use client";
-import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
-import useAuthStore from "@/hooks/store/useAuthStore";
-import useGlobalMutation from "@/hooks/useGlobalMutation";
-import { IPost } from "@/types/post";
-import axiosInstance from "@/utils/httpRequest";
 import { Button } from "@nextui-org/react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
+import { useAuthStore } from "@/hooks/store";
+import { useGlobalMutation } from "@/hooks";
+import { IPost } from "@/types/post";
+import axiosInstance from "@/utils/httpRequest";
 
 interface IProps {
     post: IPost;

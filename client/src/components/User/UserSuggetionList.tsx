@@ -1,13 +1,15 @@
 "use client";
 
-import useAuthStore from "@/hooks/store/useAuthStore";
-import usePagination from "@/hooks/usePagination";
-import { IUser } from "@/types/user";
 import { Spinner } from "@nextui-org/react";
 import { Fragment } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+
 import UserItem from "./UserItem";
 import UserSkeletons from "./UserSkeletons";
+
+import { useAuthStore } from "@/hooks/store";
+import { usePagination } from "@/hooks";
+import { IUser } from "@/types/user";
 
 export default function UserSuggestionList() {
     const { currentUser } = useAuthStore();

@@ -1,14 +1,15 @@
 "use client";
-import usePagination from "@/hooks/usePagination";
-import { IConversation } from "@/types/conversation";
-import { IMessage } from "@/types/message";
 import { Spinner } from "@nextui-org/react";
 import { Fragment, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+
 import MessageItem from "./MessageItem";
+
+import { IConversation } from "@/types/conversation";
+import { IMessage } from "@/types/message";
 import { useSocketContext } from "@/contexts/SocketContext";
-import useGlobalMutation from "@/hooks/useGlobalMutation";
-import useAuthStore from "@/hooks/store/useAuthStore";
+import { usePagination, useGlobalMutation } from "@/hooks";
+import { useAuthStore } from "@/hooks/store";
 
 interface IProps {
     conversation: IConversation;

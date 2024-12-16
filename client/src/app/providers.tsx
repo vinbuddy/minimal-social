@@ -1,11 +1,12 @@
 "use client";
 
-import useAuthStore from "@/hooks/store/useAuthStore";
-import { fetcher } from "@/utils/httpRequest";
 import { NextUIProvider } from "@nextui-org/react";
 import { useEffect } from "react";
 import { SWRConfig } from "swr";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
+
+import { useAuthStore } from "@/hooks/store";
+import { fetcher } from "@/utils/httpRequest";
 
 export function SWRConfigProvider({ children }: { children: React.ReactNode }) {
     return (

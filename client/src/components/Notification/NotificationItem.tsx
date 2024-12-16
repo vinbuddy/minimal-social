@@ -1,17 +1,17 @@
 import { INotification } from "@/types/notification";
 import Link from "next/link";
 import { Avatar, AvatarGroup, Button, useDisclosure } from "@nextui-org/react";
-import { EllipsisIcon, LoaderIcon, TrashIcon } from "lucide-react";
+import { TrashIcon } from "lucide-react";
+import { toast } from "sonner";
+
 import TimeAgo from "../TimeAgo";
 import UserName from "../User/UserName";
 import ConfirmationModal from "../ConfirmationModal";
-import axiosInstance from "@/utils/httpRequest";
-import { useState } from "react";
-import { toast } from "sonner";
-import { TOAST_OPTIONS } from "@/utils/toast";
-import useLoading from "@/hooks/useLoading";
-import useGlobalMutation from "@/hooks/useGlobalMutation";
 import UserBadgeAvatar from "../User/UserBadgeAvatar";
+
+import axiosInstance from "@/utils/httpRequest";
+import { TOAST_OPTIONS } from "@/utils/toast";
+import { useGlobalMutation, useLoading } from "@/hooks";
 
 interface IProps {
     notification: INotification;

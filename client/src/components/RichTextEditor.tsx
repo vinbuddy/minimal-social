@@ -1,13 +1,12 @@
 "use client";
-import useDebounce from "@/hooks/useDebounce";
+import { Avatar, Spinner } from "@nextui-org/react";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import parse from "html-react-parser";
 
-// import { fallbackAvatar } from "@/assets/images";
-import { Avatar, Popover, PopoverContent, PopoverTrigger, Spinner } from "@nextui-org/react";
 import { IUser } from "@/types/user";
 import { setCaretAtTheEnd } from "@/utils/editor";
-import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 import axiosInstance from "@/utils/httpRequest";
+import { useDebounce } from "@/hooks";
 
 interface IProps {
     className?: string;

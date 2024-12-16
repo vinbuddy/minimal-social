@@ -1,5 +1,5 @@
-import useAuthStore from "@/hooks/store/useAuthStore";
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { useAuthStore } from "@/hooks/store";
+import axios from "axios";
 
 export async function fetchData(url: string, options: RequestInit = {}) {
     const response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + url, options);

@@ -1,14 +1,12 @@
 "use client";
-import useAuthStore from "@/hooks/store/useAuthStore";
-import useLoading from "@/hooks/useLoading";
-import { IUser } from "@/types/user";
-import axiosInstance from "@/utils/httpRequest";
-import { Button } from "@nextui-org/react";
-import axios from "axios";
-import { setCookie } from "cookies-next";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@nextui-org/react";
+import axios from "axios";
+
+import { useAuthStore } from "@/hooks/store";
+import { useLoading } from "@/hooks";
 
 const OTP_LENGTH = 6;
 

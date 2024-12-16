@@ -17,13 +17,15 @@ import {
     Spinner,
 } from "@nextui-org/react";
 import { TRANSITION_EASINGS } from "@nextui-org/framer-utils";
-import UserItem from "../User/UserItem";
+import InfiniteScroll from "react-infinite-scroll-component";
 import { Fragment, useState } from "react";
+
+import UserItem from "../User/UserItem";
+import UserSkeletons from "../User/UserSkeletons";
+
 import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
-import usePagination from "@/hooks/usePagination";
-import InfiniteScroll from "react-infinite-scroll-component";
-import UserSkeletons from "../User/UserSkeletons";
+import { usePagination } from "@/hooks";
 
 interface IProps {
     buttonProps: ButtonProps;

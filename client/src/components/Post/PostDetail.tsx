@@ -1,21 +1,23 @@
 "use client";
 
-import useVisibility from "@/hooks/useVisibility";
 import { IPost } from "@/types/post";
-import { Avatar, Button, Tooltip } from "@nextui-org/react";
+import { Avatar, Tooltip } from "@nextui-org/react";
 import { useState } from "react";
+import Link from "next/link";
+import { EllipsisIcon, WandSparklesIcon } from "lucide-react";
+import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
+
 import UserName from "../User/UserName";
 import UserProfileCard from "../User/UserProfileCard";
-import { EllipsisIcon, WandSparklesIcon } from "lucide-react";
 import TimeAgo from "../TimeAgo";
 import PostMenuDropdown from "./PostMenuDropdown";
 import PostModalButton from "./PostModalButton";
-import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
-import Link from "next/link";
 import MediaFileSlider from "../Media/MediaFileSlider";
 import PostActions from "./PostActions";
 import FullScreenMediaSlider from "../Media/FullScreenMediaSlider";
 import PostActivitiesModalButton from "./PostActivitiesModalButton";
+
+import { useVisibility } from "@/hooks";
 
 interface IProps {
     post: IPost;
