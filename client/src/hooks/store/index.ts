@@ -1,3 +1,3 @@
-export { default as useAuthStore } from "./useAuthStore";
-export { default as useReplyStore } from "./useReplyStore";
-export { default as useVideoStore } from "./useVideoStore";
+export { default as useAuthStore } from "./use-auth-store";
+export { default as useReplyStore } from "./use-reply-store";
+export { default as useVideoStore } from "./use-video-store";

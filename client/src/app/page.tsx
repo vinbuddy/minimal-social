@@ -3,15 +3,15 @@ import { Spinner, Tab, Tabs } from "@nextui-org/react";
 import { Fragment, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-import MainLayout from "@/components/MainLayout";
-import PostModalButton from "@/components/Post/PostModalButton";
-import PostItem from "@/components/Post/PostItem";
-import PostSkeletons from "@/components/Post/PostSkeletons";
+import MainLayout from "@/components/main-layout";
+import PostModalButton from "@/components/post/post-modal-button";
+import PostItem from "@/components/post/post-item";
+import PostSkeletons from "@/components/post/post-skeletons";
 
 import { useAuthStore } from "@/hooks/store";
 import { usePagination } from "@/hooks";
 import { IPost } from "@/types/post";
-import { useSocketContext } from "@/contexts/SocketContext";
+import { useSocketContext } from "@/contexts/socket-context";
 
 function Home() {
     const [postType, setPostType] = useState<"feed" | "following" | "liked">("feed");

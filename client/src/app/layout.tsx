@@ -5,10 +5,10 @@ import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-import { SocketProvider } from "@/contexts/SocketContext";
+import { SocketProvider } from "@/contexts/socket-context";
 import { AuthClientApp, NextProvider as NextUIProvider, SWRConfigProvider } from "./providers";
-import TokenRefresher from "@/components/TokenRefresher";
-import { AuthContextProvider } from "@/contexts/AuthContext";
+import TokenRefresher from "@/components/token-refresher";
+import { AuthContextProvider } from "@/contexts/auth-context";
 
 // const AuthContextProvider = dynamic(() => import("@/contexts/AuthContext").then((mod) => mod.AuthContextProvider), {
 //     ssr: false,

@@ -5,9 +5,9 @@ import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
-import MainLayout from "@/components/MainLayout";
-import NotificationItem from "@/components/Notification/NotificationItem";
-import NotificationSkeletons from "@/components/Notification/NotificationSkeletons";
+import MainLayout from "@/components/main-layout";
+import NotificationItem from "@/components/notification/notification-item";
+import NotificationSkeletons from "@/components/notification/notification-skeletons";
 
 import { useAuthStore } from "@/hooks/store";
 import { usePagination } from "@/hooks";

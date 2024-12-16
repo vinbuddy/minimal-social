@@ -8,11 +8,11 @@ import { Fragment, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import useSWR from "swr";
 
-import BackButton from "@/components/BackButton";
-import MainLayout from "@/components/MainLayout";
-import PostItem from "@/components/Post/PostItem";
-import UserItem from "@/components/User/UserItem";
-import UserSuggestionList from "@/components/User/UserSuggetionList";
+import BackButton from "@/components/back-button";
+import MainLayout from "@/components/main-layout";
+import PostItem from "@/components/post/post-item";
+import UserItem from "@/components/user/user-item";
+import UserSuggestionList from "@/components/user/user-suggetion-list";
 import { usePagination, useDebounce } from "@/hooks";
 import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";

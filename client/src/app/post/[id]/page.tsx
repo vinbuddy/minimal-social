@@ -1,18 +1,18 @@
 "use client";
 import { Spinner, User } from "@nextui-org/react";
 import { Fragment } from "react";
+import useSWR from "swr";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-import BackButton from "@/components/BackButton";
-import CommentForm from "@/components/Comment/CommentForm";
-import CommentItem from "@/components/Comment/CommentItem";
-import MainLayout from "@/components/MainLayout";
-import PostDetail from "@/components/Post/PostDetail";
+import BackButton from "@/components/back-button";
+import CommentForm from "@/components/comment/comment-form";
+import CommentItem from "@/components/comment/comment-item";
+import MainLayout from "@/components/main-layout";
+import PostDetail from "@/components/post/post-detail";
+
 import { usePagination } from "@/hooks";
 import { IComment } from "@/types/comment";
 import { IPost } from "@/types/post";
-
-import useSWR from "swr";
 
 export default function PostPage({ params }: { params: { id: string } }) {
     const { data, error } = useSWR(`/post/${params.id}`);

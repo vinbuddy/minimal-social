@@ -1,6 +1,5 @@
-import ConversationItem from "@/components/Conversation/ConversationItem";
-import ConversationList from "@/components/Conversation/ConversationList";
-import MainLayout from "@/components/MainLayout";
+import ConversationList from "@/components/conversation/conversation-list";
+import MainLayout from "@/components/main-layout";
 
 export default function ConversationLayout({ children }: { children: React.ReactNode }) {
     return (

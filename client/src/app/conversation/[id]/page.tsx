@@ -5,10 +5,10 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 
-import ConversationInfo from "@/components/Conversation/ConversationInfo";
-import MessageForm from "@/components/Message/MessageForm";
-import MessageList from "@/components/Message/MessageList";
-import UserName from "@/components/User/UserName";
+import ConversationInfo from "@/components/conversation/conversation-info";
+import MessageForm from "@/components/message/message-form";
+import MessageList from "@/components/message/message-list";
+import UserName from "@/components/user/user-name";
 
 import { useAuthStore } from "@/hooks/store";
 import { IConversation } from "@/types/conversation";
