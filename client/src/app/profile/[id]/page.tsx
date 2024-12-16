@@ -56,7 +56,7 @@ export default function ProfilePage() {
     return (
         <MainLayout>
             <div className="flex justify-center w-full">
-                <div className="w-screen md:w-[630px]">
+                <div className="w-[calc(100vw_-_80px)] md:w-[630px]">
                     <main className="px-4 py-5">
                         <section className="flex flex-wrap justify-center items-center gap-10">
                             <Avatar

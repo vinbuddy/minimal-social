@@ -49,7 +49,7 @@ export default function SearchPage() {
     return (
         <MainLayout>
             <div className="flex justify-center w-full">
-                <div className="w-screen md:w-[630px]">
+                <div className="w-[calc(100vw_-_80px)] md:w-[630px]">
                     <header className="sticky top-0 z-10 p-4 bg-background">
                         {!query && (
                             <Input

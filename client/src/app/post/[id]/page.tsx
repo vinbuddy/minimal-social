@@ -38,7 +38,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
             {!isLoading && error && <div className="flex justify-center">{error?.message}</div>}
             {!isLoading && !error && post && (
                 <div className="flex justify-center w-full">
-                    <div className="w-screen md:w-[630px]">
+                    <div className="w-[calc(100vw_-_80px)] md:w-[630px]">
                         <header className="sticky h-[80px] top-0 z-10 p-4 flex justify-between items-center bg-background">
                             <BackButton />
 
