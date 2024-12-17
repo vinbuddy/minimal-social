@@ -180,7 +180,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                 </header>
 
                 <div>
-                    <ConversationStorage />
+                    <ConversationStorage conversationId={conversation._id} />
                 </div>
             </div>
         );

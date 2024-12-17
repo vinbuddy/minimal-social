@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import ConversationModel from "../models/conversation.model";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
+import MessageModel from "../models/message.model";
 
 export async function createPrivateConversationHandler(req: Request, res: Response, next: NextFunction) {
     try {
@@ -161,6 +162,46 @@ export async function getConversationDetailHandler(req: Request, res: Response, 
         return res.status(200).json({
             message: "Get conversation detail successfully",
             data: conversation,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getConversationMediaFilesHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const conversationId = req.query.conversationId as string;
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+
+        if (!conversationId) return res.status(400).json({ message: "Conversation ID is required" });
+
+        const skip = (Number(page) - 1) * limit;
+
+        const condition = {
+            mediaFiles: { $ne: [] },
+            conversation: new mongoose.Types.ObjectId(conversationId),
+        };
+
+        const messagesWithMediaFile = await MessageModel.find(condition)
+            .select("mediaFiles createdAt")
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const totalMediaFiles = await MessageModel.countDocuments(condition);
+        const totalPages = Math.ceil(totalMediaFiles / limit);
+
+        const mediaFiles = messagesWithMediaFile.flatMap((message) => message.mediaFiles);
+
+        return res.status(200).json({
+            message: "Get media files successfully",
+            data: mediaFiles,
+            totalMediaFiles,
+            totalPages,
+            page,
+            limit,
         });
     } catch (error) {
         next(error);

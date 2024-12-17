@@ -71,12 +71,11 @@ function MediaFileSlider({
                                                 height={file.height}
                                                 placeholder="blur"
                                                 blurDataURL={file?.url}
-                                                alt="Preview Image"
+                                                alt="Next Preview Image"
                                             />
                                         ) : (
                                             <Image
-                                                // removeWrapper
-                                                classNames={{ wrapper: "h-full" }}
+                                                classNames={{ wrapper: "h-full", img: "!h-full" }}
                                                 as={NextImage}
                                                 className="w-full h-auto block rounded-xl"
                                                 src={file?.url}
