@@ -17,7 +17,7 @@ export default function ConversationLayout({ children }: { children: React.React
 
     return (
         <MainLayout>
-            <ConversationContext.Provider value={{ onBack: handleBack }}>
+            <ConversationContext.Provider value={{ onBack: handleBack, conversationItem: itemClicked }}>
                 <div className="grid grid-cols-12 h-full ps-0 md:ps-[80px]">
                     <section
                         className={cn(

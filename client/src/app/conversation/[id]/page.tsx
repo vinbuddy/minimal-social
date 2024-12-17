@@ -1,5 +1,15 @@
 "use client";
-import { Avatar, Button, Tooltip } from "@nextui-org/react";
+import {
+    Avatar,
+    Button,
+    Drawer,
+    DrawerBody,
+    DrawerContent,
+    DrawerFooter,
+    DrawerHeader,
+    Tooltip,
+    useDisclosure,
+} from "@nextui-org/react";
 import { ArrowLeftIcon, InfoIcon, Phone, Video } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -19,12 +29,14 @@ function ConversationDetailPage() {
     const params = useParams<{ id: string }>();
     const currentUser = useAuthStore((state) => state.currentUser);
 
-    const { data, error, isLoading } = useSWR<{ data: IConversation }>(`conversation/${params.id}`);
+    const { data } = useSWR<{ data: IConversation }>(`conversation/${params.id}`);
 
     const otherUser =
         data && currentUser && data?.data?.participants?.find((participant) => participant._id !== currentUser._id);
 
     const { onBack } = useConversationContext();
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
     return (
         <>
             <div className="grid grid-cols-12 h-full">
@@ -65,15 +77,30 @@ function ConversationDetailPage() {
                                     </Button>
                                 </Tooltip>
                                 <Tooltip content="Chat info">
-                                    <Button
-                                        onPress={() => setIsOpenConversationInfo(!isOpenConversationInfo)}
-                                        size="sm"
-                                        isIconOnly
-                                        color="default"
-                                        variant={isOpenConversationInfo ? "flat" : "light"}
-                                    >
-                                        <InfoIcon size={18} />
-                                    </Button>
+                                    <div className="lg:block hidden">
+                                        <Button
+                                            onPress={() => setIsOpenConversationInfo(!isOpenConversationInfo)}
+                                            size="sm"
+                                            isIconOnly
+                                            color="default"
+                                            variant={isOpenConversationInfo ? "flat" : "light"}
+                                        >
+                                            <InfoIcon size={18} />
+                                        </Button>
+                                    </div>
+                                </Tooltip>
+                                <Tooltip content="Chat info">
+                                    <div className="lg:hidden block">
+                                        <Button
+                                            onPress={onOpen}
+                                            size="sm"
+                                            isIconOnly
+                                            color="default"
+                                            variant={isOpenConversationInfo ? "flat" : "light"}
+                                        >
+                                            <InfoIcon size={18} />
+                                        </Button>
+                                    </div>
                                 </Tooltip>
                             </div>
                         </header>
@@ -86,9 +113,28 @@ function ConversationDetailPage() {
                 </section>
                 {isOpenConversationInfo && (
                     <section className="col-span-12 sm:col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4">
-                        <ConversationInfo />
+                        <ConversationInfo conversation={data?.data} partner={otherUser} />
                     </section>
                 )}
+
+                <Drawer
+                    classNames={{
+                        base: "!rounded-none",
+                    }}
+                    isOpen={isOpen}
+                    onOpenChange={onOpenChange}
+                >
+                    <DrawerContent>
+                        {(onClose) => (
+                            <>
+                                <DrawerHeader className="flex items-center gap-2"></DrawerHeader>
+                                <DrawerBody className="!px-0">
+                                    <ConversationInfo conversation={data?.data} partner={otherUser} />
+                                </DrawerBody>
+                            </>
+                        )}
+                    </DrawerContent>
+                </Drawer>
             </div>
         </>
     );

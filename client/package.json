@@ -13,7 +13,7 @@
     "@emoji-mart/react": "^1.1.1",
     "@giphy/js-fetch-api": "^5.6.0",
     "@giphy/react-components": "^9.6.0",
-    "@nextui-org/react": "^2.4.2",
+    "@nextui-org/react": "^2.6.8",
     "axios": "^1.7.2",
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.5.1",

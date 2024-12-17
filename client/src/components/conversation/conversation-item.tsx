@@ -1,13 +1,15 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Avatar, Button } from "@nextui-org/react";
-import { EllipsisIcon } from "lucide-react";
 import { ReactNode } from "react";
+import { EllipsisIcon } from "lucide-react";
 
 import { useAuthStore } from "@/hooks/store";
 import { IConversation } from "@/types/conversation";
 import TimeAgo from "../time-ago";
 import UserName from "../user/user-name";
+import { useConversationContext } from "@/contexts/conversation-context";
+import { useBreakpoint } from "@/hooks";
 
 interface IProps {
     conversation: IConversation;
@@ -16,8 +18,15 @@ interface IProps {
 export default function ConversationItem({ conversation }: IProps): ReactNode {
     const { currentUser } = useAuthStore();
     const pathname = usePathname();
+    const { conversationItem } = useConversationContext();
+    const breakpoint = useBreakpoint();
 
-    const isActive = pathname.includes(conversation._id);
+    let isActive: any = pathname.includes(conversation._id);
+    if (breakpoint !== "mobile") {
+        isActive = pathname.includes(conversation._id);
+    } else {
+        isActive = pathname.includes(conversation._id) && conversationItem;
+    }
 
     const otherUser =
         currentUser && conversation.participants.find((participant) => participant._id !== currentUser._id);
