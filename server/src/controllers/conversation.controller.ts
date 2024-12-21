@@ -3,6 +3,7 @@ import ConversationModel from "../models/conversation.model";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
 import MessageModel from "../models/message.model";
+import { RequestWithUser } from "../helpers/types/request";
 
 export async function createPrivateConversationHandler(req: Request, res: Response, next: NextFunction) {
     try {
@@ -44,9 +45,11 @@ export async function createPrivateConversationHandler(req: Request, res: Respon
     }
 }
 
-export async function getConversationsHandler(req: Request, res: Response, next: NextFunction) {
+export async function getConversationsHandler(_req: Request, res: Response, next: NextFunction) {
     try {
-        const userId = req.query.userId;
+        // const userId = req.query.userId;
+        const req = _req as RequestWithUser;
+        const userId = req.user._id?.toString();
 
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 15;
@@ -84,11 +87,13 @@ export async function getConversationsHandler(req: Request, res: Response, next:
     }
 }
 
-export async function searchConversationsByNameHandler(req: Request, res: Response, next: NextFunction) {
+export async function searchConversationsByNameHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         // Find conversation by name or username
         const search = req.query.search;
-        const userId = req.query.userId as string;
+        // const userId = req.query.userId as string;
+        const userId = req.user._id?.toString();
 
         if (!search) {
             return res.status(400).json({ error: "Search name is required" });

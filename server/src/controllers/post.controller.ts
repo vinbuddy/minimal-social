@@ -8,6 +8,7 @@ import { uploadToCloudinary } from "../helpers/cloudinary";
 import cloudinary from "../configs/cloudinary";
 import CommentModel from "../models/comment.model";
 import { getPostQueryHelper } from "../services/post.service";
+import { RequestWithUser } from "../helpers/types/request";
 
 interface RequestWithFiles extends Request {
     files: Express.Multer.File[];
@@ -159,7 +160,10 @@ export async function getAllPostsHandler(req: Request, res: Response, next: Next
 
 export async function getFollowingPostsHandler(req: Request, res: Response, next: NextFunction) {
     try {
+        // const req = _req as RequestWithUser;
+
         const userId = req.query.userId;
+        // const userId = req.user._id?.toString();
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 15;
 
@@ -263,7 +267,10 @@ export async function getPostDetailHandler(req: Request, res: Response, next: Ne
 
 export async function getLikedPostsHandler(req: Request, res: Response, next: NextFunction) {
     try {
+        // const req = _req as RequestWithUser;
+
         const userId = req.query.userId as string;
+        // const userId = req.user._id;
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 15;
 

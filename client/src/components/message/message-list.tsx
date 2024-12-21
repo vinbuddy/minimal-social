@@ -151,6 +151,18 @@ export default function MessageList({ conversation }: IProps) {
 
     const groupedMessages = groupMessages(messages);
 
+    if (error) {
+        if (error.response.status === 403) {
+            return <div className="text-center text-red-500">You are not allowed to access this conversation.</div>;
+        }
+
+        if (error.response.status === 404) {
+            return <div className="text-center text-red-500">Conversation not found.</div>;
+        }
+
+        return <div className="text-center text-red-500">An unexpected error occurred.</div>;
+    }
+
     return (
         <>
             <div
@@ -163,9 +175,7 @@ export default function MessageList({ conversation }: IProps) {
                 }}
                 className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col p-4 scrollbar"
             >
-                {/* <MessageItem /> */}
                 {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
-                {/* {messages.length === 0 && !isLoading && !error && <p className="text-center">Start a conversation </p>} */}
                 {isLoading && (
                     <div className="h-full flex justify-center items-center">
                         <Spinner size="md" />

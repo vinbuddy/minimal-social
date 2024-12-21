@@ -7,10 +7,7 @@ import { MediaFile } from "../models/post.model";
 import { uploadToCloudinary } from "../helpers/cloudinary";
 import MessageModel from "../models/message.model";
 import { Server } from "socket.io";
-
-interface RequestWithFiles extends Request {
-    files: Express.Multer.File[];
-}
+import { RequestWithUser, RequestWithFiles } from "../helpers/types/request";
 
 enum E_EMOJI {
     HEART = "❤️",
@@ -100,13 +97,25 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
     }
 }
 
-export async function getConversationMessagesHandler(req: Request, res: Response, next: NextFunction) {
+export async function getConversationMessagesHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const conversationId = req.query.conversationId as string;
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
+        const userId = req.user._id?.toString();
 
         if (!conversationId) return res.status(400).json({ message: "Conversation ID is required" });
+
+        const conversation = await ConversationModel.findById(conversationId);
+        if (!conversation) {
+            return res.status(404).json({ message: "Conversation not found" });
+        }
+
+        const isMember = conversation.participants.some((participant) => participant._id.toString() === userId);
+        if (!isMember) {
+            return res.status(403).json({ message: "You are not a member of this conversation" });
+        }
 
         const condition = {
             conversation: new mongoose.Types.ObjectId(conversationId),

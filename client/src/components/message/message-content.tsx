@@ -2,9 +2,10 @@
 import emojiRegex from "emoji-regex";
 import { Chip } from "@nextui-org/react";
 import Image from "next/image";
+import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 
-import GalleryImages from "../gallery-images";
 import { IMessage } from "@/types/message";
+import GalleryImages from "../gallery-images";
 import { formatTimeStamp } from "@/utils/datetime";
 
 interface IProps {
@@ -22,6 +23,33 @@ export default function MessageContent({ message, isOwnMessage }: IProps) {
         return match && match.length === 1 && match[0] === content;
     };
 
+    const convertLinksToAnchors = (content: string) => {
+        // Regex URL
+        const urlRegex = /(https?:\/\/(?:www\.)?[^\s/$.?#].[^\s]*)/gi;
+
+        // Replace URL -> `<a>`
+        return content.replace(
+            urlRegex,
+            (url) => `<a class="text-link" href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+        );
+    };
+
+    const parserOptions: HTMLReactParserOptions = {
+        replace({ attribs, children }: any) {
+            if (!attribs) {
+                return;
+            }
+
+            if (attribs.class === "text-link") {
+                return (
+                    <a target="_blank" href={attribs.href} className="text-link cursor-pointer hover:underline">
+                        {domToReact(children, parserOptions)}
+                    </a>
+                );
+            }
+        },
+    };
+
     const messageClassName = `min-w text-[15px] rounded-[18px] px-3 py-2 ${
         isOwnMessage && message?.content ? "order-2 bg-primary text-primary-foreground" : "order-1 bg-content2"
     }`;
@@ -37,9 +65,10 @@ export default function MessageContent({ message, isOwnMessage }: IProps) {
     const className = isImojiMessageOnly(message?.content) ? emojiMessageClassName : messageClassName;
 
     if (message?.content) {
+        const content = convertLinksToAnchors(message?.content);
         return (
             <section className={className}>
-                <span>{message?.content}</span>
+                <span>{parse(content, parserOptions)}</span>
             </section>
         );
     }
