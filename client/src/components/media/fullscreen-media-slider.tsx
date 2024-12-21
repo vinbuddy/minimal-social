@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import NextImage from "next/image";
 import { XIcon } from "lucide-react";
@@ -24,6 +24,12 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
     const [activeSlide, setActiveSlide] = useState<number>(activeSlideIndex);
     const { turnOffFullscreenVideo } = useVideoStore();
+    const swiperRef = useRef<any>(null);
+    useEffect(() => {
+        if (swiperRef.current && isOpen) {
+            swiperRef.current.slideTo(activeSlideIndex, 0); // Transition instantly
+        }
+    }, [activeSlideIndex, isOpen]);
 
     const handleHide = (): void => {
         onHide();
@@ -34,6 +40,9 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
         if (mediaFiles[activeSlide].type === "video" && currentSlide) {
             turnOffFullscreenVideo(currentSlide?.src);
         }
+
+        // set active slide to 0
+        setActiveSlide(0);
     };
 
     return (
@@ -51,6 +60,7 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
             </button>
 
             <Swiper
+                ref={swiperRef}
                 className="w-full"
                 initialSlide={activeSlideIndex}
                 modules={[Navigation, Mousewheel, A11y]}
@@ -62,6 +72,9 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
                 }}
                 allowTouchMove={false}
                 speed={650}
+                onSwiper={(swiperInstance) => {
+                    swiperRef.current = swiperInstance;
+                }}
                 onSlideChange={(swiper) => {
                     const { activeIndex, previousIndex } = swiper;
 

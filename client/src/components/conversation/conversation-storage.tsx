@@ -3,8 +3,10 @@
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Spinner, Tab, Tabs } from "@nextui-org/react";
 import Image from "next/image";
+import { useState } from "react";
 
-import { usePagination } from "@/hooks";
+import FullScreenMediaSlider from "../media/fullscreen-media-slider";
+import { usePagination, useVisibility } from "@/hooks";
 import { IMediaFile } from "@/types/post";
 
 interface IProps {
@@ -14,14 +16,20 @@ interface IProps {
 export default function ConversationStorage({ conversationId }: IProps) {
     const {
         data: mediaFiles,
-        loadingMore,
         error,
         isReachedEnd,
         size,
         isLoading,
         setSize: setPage,
-        mutate,
     } = usePagination<IMediaFile>(`/conversation/storage/media-file?conversationId=${conversationId}`);
+
+    const { isVisible: open, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
+    const [activeIndex, setActiveIndex] = useState<number>(0);
+
+    const handleMediaFileClick = (index: number) => {
+        setActiveIndex(index);
+        showFullscreenSlider();
+    };
 
     const renderMediaFiles = () => {
         if (error && !isLoading) {
@@ -34,9 +42,10 @@ export default function ConversationStorage({ conversationId }: IProps) {
 
         return (
             <>
-                <div className="grid grid-cols-3 gap-2 ">
+                <div>
                     {mediaFiles.length > 0 && (
                         <InfiniteScroll
+                            className="grid grid-cols-3 gap-2 items-center"
                             scrollableTarget="conversation-list"
                             next={() => setPage(size + 1)}
                             hasMore={!isReachedEnd}
@@ -47,14 +56,15 @@ export default function ConversationStorage({ conversationId }: IProps) {
                             }
                             dataLength={mediaFiles?.length ?? 0}
                         >
-                            {mediaFiles.map((mediaFile) => (
+                            {mediaFiles.map((mediaFile, index) => (
                                 <div className="mb-2 last:mb-0" key={mediaFile.publicId}>
                                     <Image
-                                        className="rounded-lg"
+                                        className="rounded-lg cursor-pointer"
                                         width={mediaFile.width}
                                         height={mediaFile.height}
                                         src={mediaFile.url}
                                         alt="media"
+                                        onClick={() => handleMediaFileClick(index)}
                                     />
                                 </div>
                             ))}
@@ -73,6 +83,12 @@ export default function ConversationStorage({ conversationId }: IProps) {
 
     return (
         <div>
+            <FullScreenMediaSlider
+                onHide={hideFullscreenSlider}
+                isOpen={open}
+                activeSlideIndex={activeIndex}
+                mediaFiles={mediaFiles}
+            />
             <div>
                 <Tabs className="sticky top-[76px] bg-content1 pb-4" fullWidth size="md">
                     <Tab key="media" title="Media files">
