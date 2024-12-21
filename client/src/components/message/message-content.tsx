@@ -1,10 +1,11 @@
 "use client";
-import { IMessage } from "@/types/message";
-import GalleryImages from "../gallery-images";
 import emojiRegex from "emoji-regex";
-import { formatTimeStamp } from "@/utils/datetime";
 import { Chip } from "@nextui-org/react";
 import Image from "next/image";
+
+import GalleryImages from "../gallery-images";
+import { IMessage } from "@/types/message";
+import { formatTimeStamp } from "@/utils/datetime";
 
 interface IProps {
     message: IMessage;

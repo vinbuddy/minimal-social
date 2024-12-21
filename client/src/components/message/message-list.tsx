@@ -36,7 +36,10 @@ export default function MessageList({ conversation }: IProps) {
     } = usePagination<IMessage>(`/message?conversationId=${conversation._id}`);
 
     useEffect(() => {
-        if (!socket) return;
+        if (!socket) {
+            console.error("Socket is not defined");
+            return;
+        }
 
         const handleNewMessage = (newMessage: IMessage) => {
             mutate((currentData) => {
@@ -95,7 +98,7 @@ export default function MessageList({ conversation }: IProps) {
             socket.off("reactMessage", handleReactMessage);
             socket.off("unreactMessage", handleReactMessage);
         };
-    }, []);
+    }, [socket, currentUser]);
 
     const sortMessagesByTime = (messages: IMessage[]): IMessage[] => {
         return messages.slice().sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());

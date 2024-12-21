@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import NextImage from "next/image";
 import { XIcon } from "lucide-react";
+import { Button } from "@nextui-org/react";
 import { Navigation, A11y, Mousewheel } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -23,8 +24,10 @@ interface IProps {
 function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFiles, onHide = () => {} }: IProps) {
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
     const [activeSlide, setActiveSlide] = useState<number>(activeSlideIndex);
-    const { turnOffFullscreenVideo } = useVideoStore();
     const swiperRef = useRef<any>(null);
+
+    const { turnOffFullscreenVideo } = useVideoStore();
+
     useEffect(() => {
         if (swiperRef.current && isOpen) {
             swiperRef.current.slideTo(activeSlideIndex, 0); // Transition instantly
@@ -47,17 +50,20 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
 
     return (
         <div
-            className={`animate-[fadeIn_0.2s_ease-in] fixed top-0 left-0 right-0 bottom-0 z-10 flex justify-center bg-black fade ${
+            className={`animate-[fadeIn_0.2s_ease-in] fixed top-0 left-0 right-0 bottom-0 z-20 flex justify-center bg-black fade ${
                 isOpen ? "show pointer-events-auto" : "pointer-events-none"
             }`}
         >
             {/* Exit button */}
-            <button
+            <Button
+                className="absolute top-4 right-2.5 z-10"
+                isIconOnly
+                color="default"
+                radius="full"
                 onClick={handleHide}
-                className="animation-tap absolute top-4 left-2.5 cursor-pointer z-10 rounded-full p-3 bg-[#1e1e1e]"
             >
                 <XIcon className="text-[#777] text-xl" />
-            </button>
+            </Button>
 
             <Swiper
                 ref={swiperRef}

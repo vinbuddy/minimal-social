@@ -32,7 +32,7 @@ export default function MessageActions({ message, isOwnMessage }: IProps) {
             });
 
             // Mutate message using swr
-            //mutate((key) => typeof key === "string" && key.includes("/message"));
+            mutate((key) => typeof key === "string" && key.includes("/message"));
         } catch (error) {
             toast.error("Failed to react to the message", TOAST_OPTIONS);
         }
