@@ -1,8 +1,17 @@
 "use client";
-import { Button, Popover, PopoverTrigger, PopoverContent, Avatar } from "@nextui-org/react";
+import {
+    Button,
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    Avatar,
+    Modal,
+    ModalContent,
+    ModalBody,
+} from "@nextui-org/react";
 import axios from "axios";
 import { toast } from "sonner";
-import { ImagePlusIcon, SmileIcon } from "lucide-react";
+import { ImagePlusIcon, PlusIcon, SmileIcon } from "lucide-react";
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 import EmojiPicker from "../emoji-picker";
@@ -14,7 +23,7 @@ import { IMediaFile, IPost } from "@/types/post";
 import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
 import axiosInstance from "@/utils/httpRequest";
 import { useAuthStore } from "@/hooks/store";
-import { useGlobalMutation, useLoading } from "@/hooks";
+import { useBreakpoint, useGlobalMutation, useLoading } from "@/hooks";
 
 interface IProps {
     type?: "create" | "edit";
@@ -27,8 +36,8 @@ export default function PostModalButton({ type = "create", post, children, open,
     const [isOpen, setIsOpen] = useState<boolean>(!!open);
     const { currentUser } = useAuthStore();
     const { startLoading, stopLoading, loading } = useLoading();
-    // const { mutate, cache } = useSWRConfig();
     const mutate = useGlobalMutation();
+    const breakpoint = useBreakpoint();
 
     const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>(post?.mediaFiles ?? []);
     const [caption, setCaption] = useState<string>(post?.caption ?? "");
@@ -44,11 +53,12 @@ export default function PostModalButton({ type = "create", post, children, open,
     useEffect(() => {
         const clickOutsidePopover = (event: MouseEvent) => {
             const isClickInsidePopover = popoverRef.current?.contains(event.target as Node);
+            // const isClickInsideModal = modalRef.current?.contains(event.target as Node);
 
             const emojiPickerElement = document.querySelector("em-emoji-picker");
             const isClickInsideEmojiPicker = emojiPickerElement?.contains(event.target as Node);
 
-            // Determine if the click is outside both popover and emoji picker
+            // // Determine if the click is outside both popover and emoji picker
             if (type === "edit" && !isClickInsidePopover && !isClickInsideEmojiPicker) {
                 handleOpenChange(false);
             }
@@ -137,6 +147,7 @@ export default function PostModalButton({ type = "create", post, children, open,
     };
 
     const handleOpenChange = (_open: boolean) => {
+        console.log("_open: ", _open);
         setIsOpen(_open);
         setOpen && setOpen(_open);
     };
@@ -246,7 +257,7 @@ export default function PostModalButton({ type = "create", post, children, open,
 
     const renderPostForm = () => {
         return (
-            <>
+            <div>
                 <div className="flex">
                     <section>
                         <Avatar size="lg" src={currentUser?.photo} />
@@ -319,16 +330,18 @@ export default function PostModalButton({ type = "create", post, children, open,
                     </section>
                 </div>
                 <div className="flex justify-end mt-4 gap-2">
-                    <Button
-                        variant="light"
-                        color="default"
-                        onClick={() => {
-                            setIsOpen(false);
-                            setOpen && setOpen(false);
-                        }}
-                    >
-                        Close
-                    </Button>
+                    {breakpoint !== "mobile" && (
+                        <Button
+                            variant="light"
+                            color="default"
+                            onClick={() => {
+                                setIsOpen(false);
+                                setOpen && setOpen(false);
+                            }}
+                        >
+                            Close
+                        </Button>
+                    )}
                     <Button
                         onClick={type === "create" ? handleCreatePost : handleEditPost}
                         isDisabled={
@@ -341,9 +354,44 @@ export default function PostModalButton({ type = "create", post, children, open,
                         {type === "create" ? "Post" : "Edit"}
                     </Button>
                 </div>
-            </>
+            </div>
         );
     };
+
+    // Show modal if breakpoint is mobile
+    if (breakpoint === "mobile") {
+        return (
+            <>
+                {children ? (
+                    children
+                ) : (
+                    <Button
+                        onClick={() => {
+                            setIsOpen(true);
+                            setOpen && setOpen(true);
+                        }}
+                        color="primary"
+                        isIconOnly
+                        radius="full"
+                        size="sm"
+                    >
+                        <PlusIcon />
+                    </Button>
+                )}
+                <Modal placement="bottom" isOpen={isOpen} onOpenChange={handleOpenChange}>
+                    <ModalContent>
+                        {(onClose) => (
+                            <>
+                                <ModalBody className="!p-5">
+                                    <div ref={popoverRef}>{renderPostForm()}</div>
+                                </ModalBody>
+                            </>
+                        )}
+                    </ModalContent>
+                </Modal>
+            </>
+        );
+    }
 
     return (
         <>
@@ -360,7 +408,7 @@ export default function PostModalButton({ type = "create", post, children, open,
             >
                 <PopoverTrigger>{children ? children : <Button color="primary">Create</Button>}</PopoverTrigger>
                 <PopoverContent className="p-0">
-                    <div ref={popoverRef} className="w-[598px] p-4 ">
+                    <div ref={popoverRef} className="w-[calc(100vw_-_115px)] md:w-[598px] p-4">
                         {renderPostForm()}
                     </div>
                 </PopoverContent>

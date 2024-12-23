@@ -96,10 +96,10 @@ export default function PostDetail({ post }: IProps) {
                                 <EllipsisIcon size={16} />
                             </button>
                         </PostMenuDropdown>
-                        <PostModalButton post={post} open={openEditModal} setOpen={setOpenEditModal} type="edit">
-                            <div></div>
-                        </PostModalButton>
                     </div>
+                    <PostModalButton post={post} open={openEditModal} setOpen={setOpenEditModal} type="edit">
+                        <div></div>
+                    </PostModalButton>
                 </div>
             </section>
             <section className="mt-4">
