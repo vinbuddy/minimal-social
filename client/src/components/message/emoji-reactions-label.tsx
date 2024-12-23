@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import MessageReactionModal from "./message-reaction-modal";
 import { IMessage, IMessageReaction } from "@/types/message";
 import axiosInstance from "@/utils/httpRequest";
-import { TOAST_OPTIONS } from "@/utils/toast";
+import { showToast } from "@/utils/toast";
 import { useAuthStore } from "@/hooks/store";
 
 interface IProps {
@@ -31,7 +31,8 @@ export default function EmojiReactionsLabel({ reactions, message }: IProps) {
                 conversationId: message?.conversation._id,
             });
         } catch (error) {
-            toast.error("Failed to unreact to the message", TOAST_OPTIONS);
+            console.log("ERROR UNREACT MESSAGE", error);
+            showToast("Unreact message failed", "error");
         }
     };
 

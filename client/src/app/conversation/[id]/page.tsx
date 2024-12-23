@@ -29,7 +29,7 @@ function ConversationDetailPage() {
     const params = useParams<{ id: string }>();
     const currentUser = useAuthStore((state) => state.currentUser);
 
-    const { data } = useSWR<{ data: IConversation }>(`conversation/${params.id}`);
+    const { data } = useSWR<{ data: IConversation }>(`/conversation/${params.id}`);
 
     const otherUser =
         data && currentUser && data?.data?.participants?.find((participant) => participant._id !== currentUser._id);

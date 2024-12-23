@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import AvatarCropper from "./avatar-cropper";
 
 import { getFileDimension } from "@/utils/mediaFile";
-import { TOAST_OPTIONS } from "@/utils/toast";
+import { showToast } from "@/utils/toast";
 import { IUser } from "@/types/user";
 import { useAuthStore } from "@/hooks/store";
 import { useGlobalMutation, useLoading } from "@/hooks";
@@ -132,10 +132,10 @@ export default function EditProfileModalButton({ buttonProps }: IProps) {
                     },
                 }));
 
-                toast.success("Profile edited successfully", TOAST_OPTIONS);
+                showToast("Profile edited successfully", "success");
             }
         } catch (error) {
-            toast.error("An error occurred while editing your profile", TOAST_OPTIONS);
+            showToast("An error occurred while editing your profile", "error");
         } finally {
             stopLoading();
         }

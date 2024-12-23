@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import { verifyToken } from "../middlewares/verifyToken";
 import {
+    changeConversationEmojiHandler,
     createPrivateConversationHandler,
     getConversationDetailHandler,
     getConversationMediaFilesHandler,
@@ -18,5 +19,6 @@ router.get("/storage/media-file", verifyToken, getConversationMediaFilesHandler)
 router.get("/:id", verifyToken, getConversationDetailHandler);
 
 router.post("/", verifyToken, createPrivateConversationHandler);
+router.put("/change-emoji/:id", verifyToken, changeConversationEmojiHandler);
 
 export default router;

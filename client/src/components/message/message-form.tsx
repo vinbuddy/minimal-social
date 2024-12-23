@@ -14,7 +14,7 @@ import { ImageIcon } from "@/assets/icons";
 import { IMediaFile } from "@/types/post";
 import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
 import { IConversation } from "@/types/conversation";
-import { TOAST_OPTIONS } from "@/utils/toast";
+import { showToast } from "@/utils/toast";
 import { useAuthStore } from "@/hooks/store";
 import { useGlobalMutation, useLoading } from "@/hooks";
 
@@ -48,6 +48,12 @@ export default function MessageForm({ conversation }: IProps) {
             unReply();
         };
     }, []);
+
+    useEffect(() => {
+        if (conversation) {
+            setEmoji(conversation.emoji ?? "👍");
+        }
+    }, [conversation?.emoji]);
 
     const uploadMediaFiles = async (e: ChangeEvent<HTMLInputElement>) => {
         const files: any = e.target.files;
@@ -201,8 +207,7 @@ export default function MessageForm({ conversation }: IProps) {
 
             reset();
         } catch (error: any) {
-            toast.error("Failed to send message.", TOAST_OPTIONS);
-            toast.error(error?.response?.data?.message, TOAST_OPTIONS);
+            showToast("Failed to send message.", "error");
 
             console.log(error);
         } finally {
@@ -231,7 +236,7 @@ export default function MessageForm({ conversation }: IProps) {
             mutate((key) => typeof key === "string" && key.includes("/conversation"));
             reset();
         } catch (error) {
-            toast.error("Failed to send message.", TOAST_OPTIONS);
+            showToast("Failed to send message.", "error");
             console.log(error);
         } finally {
             stopLoading();
@@ -263,7 +268,7 @@ export default function MessageForm({ conversation }: IProps) {
             mutate((key) => typeof key === "string" && key.includes("/conversation"));
             reset();
         } catch (error) {
-            toast.error("Failed to send message.", TOAST_OPTIONS);
+            showToast("Failed to send message.", "error");
             console.log(error);
         } finally {
             stopLoading();

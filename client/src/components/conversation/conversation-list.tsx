@@ -16,7 +16,7 @@ import { useAuthStore } from "@/hooks/store";
 import { usePagination, useDebounce } from "@/hooks";
 import { IConversation, IPrivateConversationResult } from "@/types/conversation";
 import axiosInstance from "@/utils/httpRequest";
-import { TOAST_OPTIONS } from "@/utils/toast";
+import { showToast } from "@/utils/toast";
 
 type ConversationResponse = {
     data: {
@@ -88,8 +88,7 @@ export default function ConversationList({ onConversationClick }: IProps) {
 
             router.push(`/conversation/${conversationId}`);
         } catch (error: any) {
-            toast.error("Failed to create conversation", TOAST_OPTIONS);
-            toast.error(error.response.data.message, TOAST_OPTIONS);
+            showToast(error.response.data.message, "error");
         }
     };
 

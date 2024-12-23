@@ -4,7 +4,9 @@ import { Button, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/rea
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import { SmileIcon } from "lucide-react";
+import { useTheme } from "next-themes";
 import React, { ReactElement, ReactNode } from "react";
+
 import { setCaretAtTheEnd } from "@/utils/editor";
 
 type Placement =
@@ -30,6 +32,8 @@ interface IProps {
 }
 
 export default function EmojiPicker({ placement = "top-end", button, contentRef, onChange, onAfterPicked }: IProps) {
+    const { theme } = useTheme();
+
     const handlePickEmoji = (emoji: any) => {
         onChange && onChange(emoji.native);
 
@@ -44,9 +48,6 @@ export default function EmojiPicker({ placement = "top-end", button, contentRef,
     return (
         <Popover placement={placement} offset={10}>
             <PopoverTrigger>
-                {/* <Button className={buttonClassName} isIconOnly variant="light" radius="full">
-                    <SmileIcon className="text-muted-foreground" size={18} />
-                </Button> */}
                 {button ? (
                     button
                 ) : (
@@ -56,7 +57,13 @@ export default function EmojiPicker({ placement = "top-end", button, contentRef,
                 )}
             </PopoverTrigger>
             <PopoverContent className="p-0">
-                <Picker emojiSize={18} theme="light" data={data} maxFrequentRows={1} onEmojiSelect={handlePickEmoji} />
+                <Picker
+                    emojiSize={18}
+                    theme={theme ?? "light"}
+                    data={data}
+                    maxFrequentRows={1}
+                    onEmojiSelect={handlePickEmoji}
+                />
             </PopoverContent>
         </Popover>
     );

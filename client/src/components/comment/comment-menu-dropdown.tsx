@@ -3,7 +3,7 @@ import { CopyIcon, TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { IComment } from "@/types/comment";
-import { TOAST_OPTIONS } from "@/utils/toast";
+import { showToast } from "@/utils/toast";
 import ConfirmationModal from "../confirmation-modal";
 import axiosInstance from "@/utils/httpRequest";
 import { useAuthStore } from "@/hooks/store";
@@ -33,9 +33,9 @@ export default function CommentMenuDropdown({ children, comment }: IProps) {
     const handleCopy = async (): Promise<void> => {
         try {
             await navigator.clipboard.writeText(comment.content);
-            toast.success("Copied comment", TOAST_OPTIONS);
+            showToast("Copied comment", "success");
         } catch (err) {
-            toast.error("Copied error", TOAST_OPTIONS);
+            showToast("Copy comment failed", "error");
         }
     };
 
@@ -48,9 +48,9 @@ export default function CommentMenuDropdown({ children, comment }: IProps) {
             mutate((key) => typeof key === "string" && key.includes("/comment"));
             mutate((key) => typeof key === "string" && key.includes("/post"));
 
-            toast.success("Delete comment successfully", TOAST_OPTIONS);
+            showToast("Delete comment successfully", "success");
         } catch (error: any) {
-            toast.error(error.response.data.message, TOAST_OPTIONS);
+            showToast(error.response.data.message, "error");
         }
     };
 

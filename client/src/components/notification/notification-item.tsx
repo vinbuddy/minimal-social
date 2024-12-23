@@ -10,7 +10,7 @@ import ConfirmationModal from "../confirmation-modal";
 import UserBadgeAvatar from "../user/user-badge-avatar";
 
 import axiosInstance from "@/utils/httpRequest";
-import { TOAST_OPTIONS } from "@/utils/toast";
+import { showToast } from "@/utils/toast";
 import { useGlobalMutation, useLoading } from "@/hooks";
 
 interface IProps {
@@ -32,11 +32,11 @@ export default function NotificationItem({ notification }: IProps) {
 
             mutate((key) => typeof key === "string" && key.includes("/notification"));
 
-            toast.success("Delete notification successfully", TOAST_OPTIONS);
+            showToast("Delete notification successfully", "success");
         } catch (error) {
             console.error(error);
 
-            toast.error("Delete notification failed", TOAST_OPTIONS);
+            showToast("Delete notification failed", "error");
         } finally {
             stopLoading();
         }

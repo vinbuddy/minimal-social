@@ -212,3 +212,27 @@ export async function getConversationMediaFilesHandler(req: Request, res: Respon
         next(error);
     }
 }
+
+export async function changeConversationEmojiHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const conversationId = req.params.id;
+        const emoji = req.body.emoji;
+
+        const conversation = await ConversationModel.findByIdAndUpdate(conversationId, {
+            emoji,
+        });
+
+        if (!conversation) {
+            return res.status(404).json({
+                message: "Conversation not found",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Change emoji successfully",
+            data: conversation,
+        });
+    } catch (error) {
+        next(error);
+    }
+}

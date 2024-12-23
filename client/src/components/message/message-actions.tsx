@@ -8,7 +8,7 @@ import MessageEmojiReaction from "./message-emoji-reaction";
 import { IMessage } from "@/types/message";
 import { formatTimeStamp } from "@/utils/datetime";
 import axiosInstance from "@/utils/httpRequest";
-import { TOAST_OPTIONS } from "@/utils/toast";
+import { showToast } from "@/utils/toast";
 import { useAuthStore, useReplyStore } from "@/hooks/store";
 import { useGlobalMutation } from "@/hooks";
 
@@ -34,7 +34,8 @@ export default function MessageActions({ message, isOwnMessage }: IProps) {
             // Mutate message using swr
             mutate((key) => typeof key === "string" && key.includes("/message"));
         } catch (error) {
-            toast.error("Failed to react to the message", TOAST_OPTIONS);
+            console.log("ERROR REACT MESSAGE", error);
+            showToast("React message failed", "error");
         }
     };
 

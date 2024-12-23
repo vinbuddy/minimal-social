@@ -19,6 +19,7 @@ import ConversationStorage from "./conversation-storage";
 import UserName from "../user/user-name";
 import { IUser } from "@/types/user";
 import { IConversation } from "@/types/conversation";
+import ChangeEmojiConversationModal from "./change-emoji-conversation-modal";
 
 interface IProps {
     partner?: IUser | null;
@@ -26,6 +27,7 @@ interface IProps {
 }
 
 export default function ConversationInfo({ partner, conversation }: IProps) {
+    console.log("conversation: ", conversation);
     const [storageType, setStorageType] = useState<"media" | "link" | "file" | null>(null);
 
     if (!conversation || !partner) {
@@ -140,7 +142,12 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                             key="copy"
                                             startContent={<ThumbsUpIcon size={18} />}
                                         >
-                                            Emoji icon
+                                            <ChangeEmojiConversationModal
+                                                conversationId={conversation?._id}
+                                                defaultEmoji={conversation?.emoji}
+                                            >
+                                                Emoji icon
+                                            </ChangeEmojiConversationModal>
                                         </ListboxItem>
                                     </Listbox>
                                 </div>

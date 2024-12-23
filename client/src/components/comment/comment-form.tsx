@@ -11,7 +11,7 @@ import EmojiPicker from "../emoji-picker";
 import axiosInstance from "@/utils/httpRequest";
 import { useAuthStore, useReplyStore } from "@/hooks/store";
 import { useGlobalMutation, useLoading } from "@/hooks";
-import { TOAST_OPTIONS } from "@/utils/toast";
+import { showToast } from "@/utils/toast";
 import { IComment } from "@/types/comment";
 import { IPost } from "@/types/post";
 
@@ -107,11 +107,10 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                 mutate((key) => typeof key === "string" && key.includes("/comment"));
             }
 
-            toast.success("Commented successfully", TOAST_OPTIONS);
+            showToast("Commented successfully", "success");
         } catch (error: any) {
             console.error(error);
-            toast.error("Failed to comment", TOAST_OPTIONS);
-            toast.error(error.response?.data?.message, TOAST_OPTIONS);
+            showToast("Failed to comment", "error");
         } finally {
             stopLoading();
         }
