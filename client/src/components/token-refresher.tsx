@@ -2,6 +2,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import dynamic from "next/dynamic";
 
 import { useAuthStore } from "@/hooks/store";
 import axiosInstance from "@/utils/httpRequest";
@@ -11,8 +12,9 @@ import PageLoading from "./page-loading";
 const TEN_MINUTES = 10 * 60 * 1000;
 const REFRESH_INTERVAL = TEN_MINUTES;
 
-export default function TokenRefresher({ children }: { children: ReactNode }) {
+function TokenRefresher({ children }: { children: ReactNode }) {
     const { isLoaded, accessToken, refreshToken } = useAuthStore();
+
     const [hasRefreshedInitially, setHasRefreshedInitially] = useState<boolean>(false);
     const [isRefreshingToken, setIsRefreshingToken] = useState<boolean>(false);
     const router = useRouter();
@@ -100,3 +102,5 @@ export default function TokenRefresher({ children }: { children: ReactNode }) {
 
     return children;
 }
+
+export default dynamic(() => Promise.resolve(TokenRefresher), { ssr: false });

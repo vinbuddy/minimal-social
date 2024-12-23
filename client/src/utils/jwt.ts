@@ -35,7 +35,6 @@ export async function refreshAccessToken(): Promise<IRefreshTokenResponse> {
         const response = await axiosInstance.post("/auth/refresh");
 
         if (response.status == 200) {
-            console.log("Token refreshed: " + response.data?.accessToken);
             return {
                 newAccessToken: response.data.accessToken,
                 newRefreshToken: response.data.refreshToken,

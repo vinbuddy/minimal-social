@@ -8,15 +8,8 @@ import "./globals.css";
 import { SocketProvider } from "@/contexts/socket-context";
 import { AuthClientApp, NextProvider as NextUIProvider, SWRConfigProvider } from "./providers";
 import TokenRefresher from "@/components/token-refresher";
-import { AuthContextProvider } from "@/contexts/auth-context";
-
-// const AuthContextProvider = dynamic(() => import("@/contexts/AuthContext").then((mod) => mod.AuthContextProvider), {
-//     ssr: false,
-// });
-
-// const TokenRefresher = dynamic(() => import("@/components/TokenRefresher").then((mod) => mod.default), {
-//     ssr: false,
-// });
+// import { AuthContextProvider } from "@/contexts/auth-context";
+import AuthContextProvider from "@/contexts/auth-context";
 
 const inter = Inter({ subsets: ["latin"] });
 

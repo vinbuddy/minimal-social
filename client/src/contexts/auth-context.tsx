@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 
 import useAuthStore from "../hooks/store/use-auth-store";
 import axiosInstance from "@/utils/httpRequest";
@@ -11,7 +12,7 @@ import { refreshAccessToken } from "@/utils/jwt";
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
 
-export const AuthContextProvider = ({ children }: { children: any }) => {
+const AuthContextProvider = ({ children }: { children: any }) => {
     const { currentUser, isAuthenticated, accessToken, refreshToken, isLoaded } = useAuthStore();
 
     const [loading, setLoading] = useState<boolean>(false);
@@ -60,3 +61,5 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
 
     return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
 };
+
+export default dynamic(() => Promise.resolve(AuthContextProvider), { ssr: false });
