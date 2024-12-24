@@ -32,14 +32,13 @@ interface IRefreshTokenResponse {
 
 export async function refreshAccessToken(): Promise<IRefreshTokenResponse> {
     try {
-        const response = await axiosInstance.post("/auth/refresh");
-
-        if (response.status == 200) {
-            return {
-                newAccessToken: response.data.accessToken,
-                newRefreshToken: response.data.refreshToken,
-            };
-        }
+        // const response = await axiosInstance.post("/auth/refresh");
+        // if (response.status == 200) {
+        //     return {
+        //         newAccessToken: response.data.accessToken,
+        //         newRefreshToken: response.data.refreshToken,
+        //     };
+        // }
     } catch (error) {}
 
     return {};

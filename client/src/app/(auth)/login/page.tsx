@@ -53,8 +53,8 @@ export default function LoginPage() {
                 useAuthStore.setState({
                     currentUser: user,
                     isAuthenticated: true,
-                    accessToken: response.data?.accessToken,
-                    refreshToken: response.data?.refreshToken,
+                    // accessToken: response.data?.accessToken,
+                    // refreshToken: response.data?.refreshToken,
                 });
             }
 

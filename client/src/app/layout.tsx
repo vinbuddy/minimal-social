@@ -1,14 +1,11 @@
-import { cookies } from "next/headers";
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
+
 import "./globals.css";
 
 import { SocketProvider } from "@/contexts/socket-context";
-import { AuthClientApp, NextProvider as NextUIProvider, SWRConfigProvider } from "./providers";
-import TokenRefresher from "@/components/token-refresher";
-// import { AuthContextProvider } from "@/contexts/auth-context";
+import { NextProvider as NextUIProvider, SWRConfigProvider } from "./providers";
 import AuthContextProvider from "@/contexts/auth-context";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -26,23 +23,16 @@ export default function RootLayout({
     return (
         <html lang="en" className="light" suppressHydrationWarning>
             <body className={inter.className}>
-                <AuthClientApp
-                    accessToken={cookies().get("accessToken")?.value}
-                    refreshToken={cookies().get("refreshToken")?.value}
-                >
+                <AuthContextProvider>
                     <NextUIProvider>
                         <SWRConfigProvider>
-                            <AuthContextProvider>
-                                <SocketProvider>
-                                    <TokenRefresher>
-                                        {children}
-                                        <Toaster />
-                                    </TokenRefresher>
-                                </SocketProvider>
-                            </AuthContextProvider>
+                            <SocketProvider>
+                                {children}
+                                <Toaster />
+                            </SocketProvider>
                         </SWRConfigProvider>
                     </NextUIProvider>
-                </AuthClientApp>
+                </AuthContextProvider>
             </body>
         </html>
     );

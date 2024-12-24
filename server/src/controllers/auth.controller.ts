@@ -189,7 +189,7 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
         }
 
         if (!refreshToken) {
-            return res.status(401).json({ statusCode: 401, message: "You are not authorized" });
+            return res.status(404).json({ statusCode: 401, message: "Refresh token not found" });
         }
 
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY as string) as User & {
@@ -203,15 +203,15 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
             return res.status(404).json({ statusCode: 404, message: "User not found" });
         }
 
-        if (user.refreshToken !== refreshToken) {
-            return res.status(401).json({ statusCode: 401, message: "Invalid refresh token" });
-        }
+        // if (user.refreshToken !== refreshToken) {
+        //     return res.status(403).json({ statusCode: 403, message: "Invalid refresh token" });
+        // }
 
-        // Check if the refresh token is expired
-        const currentTime = Date.now() / 1000;
-        if (decoded.exp < currentTime) {
-            return res.status(401).json({ statusCode: 401, message: "Refresh token expired" });
-        }
+        // // Check if the refresh token is expired
+        // const currentTime = Date.now() / 1000;
+        // if (decoded.exp < currentTime) {
+        //     return res.status(403).json({ statusCode: 403, message: "Refresh token expired" });
+        // }
 
         const newAccessToken = generateToken(user, "access");
         const newRefreshToken = generateToken(user, "refresh");
@@ -239,6 +239,7 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
             .status(200)
             .json({ statusCode: 200, data: user, accessToken: newAccessToken, refreshToken: newRefreshToken });
     } catch (error) {
+        console.log("error: ", error);
         next(error);
     }
 }
