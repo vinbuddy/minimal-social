@@ -10,7 +10,8 @@ import {
 } from "@nextui-org/react";
 import { CopyIcon, InfoIcon, PinIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import ConfirmationModal from "../confirmation-modal";
-import { useAuthStore } from "@/hooks/store";
+import { useAuthStore, useMessagesStore } from "@/hooks/store";
+import axiosInstance from "@/utils/httpRequest";
 
 interface IProps {
     message: IMessage;
@@ -31,7 +32,8 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
         onOpenChange: onOpenChangeRetract,
         onClose: onCloseRetract,
     } = useDisclosure();
-    const { currentUser } = useAuthStore();
+    const { messageList, setMessageList } = useMessagesStore();
+
     const handleCopy = async (): Promise<void> => {
         try {
             await navigator.clipboard.writeText(message.content);
@@ -40,6 +42,26 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
             showToast("Copy comment failed", "error");
         }
     };
+
+    const handleDeleteMessage = async (): Promise<void> => {
+        try {
+            if (!message._id) throw new Error("Message id is required");
+
+            const res = await axiosInstance.delete(`/message/delete/${message._id}`);
+
+            if (res.status !== 200) {
+                throw new Error("Delete message failed");
+            }
+
+            const newMessageList = messageList.filter((msg) => msg._id !== message._id);
+            setMessageList(newMessageList);
+
+            showToast("Deleted message", "success");
+        } catch (err) {
+            showToast("Delete message failed", "error");
+        }
+    };
+
     return (
         <>
             <ConfirmationModal
@@ -48,7 +70,7 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                 icon={<Trash2Icon size={24} />}
                 isOpen={isOpenDelete}
                 onOpenChange={onOpenDelete}
-                onOk={async () => {}}
+                onOk={handleDeleteMessage}
                 onClose={onCloseDelete}
             />
             <ConfirmationModal
@@ -63,7 +85,7 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
             <Dropdown placement="bottom">
                 <DropdownTrigger>{children}</DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                    <DropdownSection showDivider={message?.sender?._id === currentUser?._id}>
+                    <DropdownSection showDivider={isOwnMessage}>
                         <DropdownItem textValue="" startContent={<InfoIcon size={16} />} key="view">
                             View detail
                         </DropdownItem>
@@ -79,7 +101,7 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                             Pin message
                         </DropdownItem>
                     </DropdownSection>
-                    {message?.sender?._id === currentUser?._id ? (
+                    {isOwnMessage ? (
                         <>
                             <DropdownItem
                                 textValue=""

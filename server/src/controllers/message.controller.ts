@@ -294,3 +294,35 @@ export async function getUsersReactedMessageHandler(req: Request, res: Response,
         next(error);
     }
 }
+
+export async function deleteMessageHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+        const messageId = req.params.id;
+        const userId = req.user._id?.toString();
+
+        const message = await MessageModel.findById(messageId);
+
+        if (!message) {
+            return res.status(404).json({ message: "Message not found" });
+        }
+
+        if (message.sender.toString() !== userId) {
+            return res.status(403).json({ message: "You are not the sender of this message" });
+        }
+
+        if (message.excludedFor.includes(new mongoose.Types.ObjectId(userId))) {
+            return res.status(403).json({ message: "You have already deleted this message" });
+        }
+
+        await MessageModel.findByIdAndUpdate(messageId, {
+            $addToSet: {
+                excludedFor: new mongoose.Types.ObjectId(userId),
+            },
+        });
+
+        return res.status(200).json({ message: "Delete message successfully" });
+    } catch (error) {
+        next(error);
+    }
+}

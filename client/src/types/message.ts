@@ -20,6 +20,7 @@ export interface IMessage {
     isEdited: boolean;
     isRetracted: boolean;
     seenBy: IUser[];
+    excludedFor: string[];
     createdAt: string;
     updatedAt: string;
 }

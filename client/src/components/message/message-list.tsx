@@ -9,7 +9,7 @@ import { IConversation } from "@/types/conversation";
 import { IMessage } from "@/types/message";
 import { useSocketContext } from "@/contexts/socket-context";
 import { usePagination, useGlobalMutation } from "@/hooks";
-import { useAuthStore } from "@/hooks/store";
+import { useAuthStore, useMessagesStore } from "@/hooks/store";
 
 interface IProps {
     conversation: IConversation;
@@ -24,6 +24,9 @@ export default function MessageList({ conversation }: IProps) {
     const { socket } = useSocketContext();
     const swrMutate = useGlobalMutation();
     const { currentUser } = useAuthStore();
+
+    const { messageList, setMessageList } = useMessagesStore();
+
     const {
         data: messages,
         loadingMore,
@@ -34,6 +37,12 @@ export default function MessageList({ conversation }: IProps) {
         setSize: setPage,
         mutate,
     } = usePagination<IMessage>(`/message?conversationId=${conversation._id}`);
+
+    useEffect(() => {
+        if (messages) {
+            setMessageList(messages);
+        }
+    }, [messages.length]);
 
     useEffect(() => {
         if (!socket) {
@@ -149,7 +158,7 @@ export default function MessageList({ conversation }: IProps) {
         return groupedMessages;
     };
 
-    const groupedMessages = groupMessages(messages);
+    const groupedMessages = groupMessages(messageList);
 
     if (error) {
         if (error.response.status === 403) {
@@ -181,7 +190,7 @@ export default function MessageList({ conversation }: IProps) {
                         <Spinner size="md" />
                     </div>
                 )}
-                {!error && messages.length > 0 && (
+                {!error && messageList.length > 0 && (
                     <InfiniteScroll
                         scrollThreshold={0.7}
                         scrollableTarget="messageList"
@@ -195,7 +204,7 @@ export default function MessageList({ conversation }: IProps) {
                             </div>
                         }
                         endMessage={<p className="text-center text-default-500">You have seen it all</p>}
-                        dataLength={messages?.length ?? 0}
+                        dataLength={messageList?.length ?? 0}
                     >
                         {/*  Add h-[100px] to avoid being hidden scrollbar */}
 

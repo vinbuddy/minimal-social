@@ -2,6 +2,7 @@ import express, { Router } from "express";
 import { verifyToken } from "../middlewares/verifyToken";
 import {
     createMessageHandler,
+    deleteMessageHandler,
     getConversationMessagesHandler,
     getUsersReactedMessageHandler,
     reactMessageHandler,
@@ -18,5 +19,6 @@ router.get("/reaction", verifyToken, getUsersReactedMessageHandler);
 
 router.post("/reaction/:id", verifyToken, reactMessageHandler);
 router.post("/unreaction/:id", verifyToken, unreactMessageHandler);
+router.delete("/delete/:id", verifyToken, deleteMessageHandler);
 
 export default router;

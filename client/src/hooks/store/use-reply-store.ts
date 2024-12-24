@@ -11,8 +11,6 @@ interface UseReplyState {
 const useReplyStore = create<UseReplyState>((set) => ({
     replyTo: null,
     reply: (data) => {
-        console.log(data);
-
         return set({ replyTo: data });
     },
     unReply: () => set({ replyTo: null }),

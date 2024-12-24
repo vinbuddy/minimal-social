@@ -64,6 +64,10 @@ export default function MessageContent({ message, isOwnMessage }: IProps) {
 
     const className = isImojiMessageOnly(message?.content) ? emojiMessageClassName : messageClassName;
 
+    if (message?.excludedFor?.includes(message?.sender?._id)) {
+        return null;
+    }
+
     if (message?.content) {
         const content = convertLinksToAnchors(message?.content);
         return (

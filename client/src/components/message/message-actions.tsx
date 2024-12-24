@@ -40,6 +40,10 @@ export default function MessageActions({ message, isOwnMessage }: IProps) {
         }
     };
 
+    if (message?.excludedFor?.includes(message?.sender?._id)) {
+        return null;
+    }
+
     return (
         <section
             className={`flex items-center flex-wrap invisible group-hover:visible ${
