@@ -75,6 +75,7 @@ export default function ChangeEmojiConversationModal({ children, defaultEmoji, c
                                     theme={theme ?? "light"}
                                     data={data}
                                     maxFrequentRows={1}
+                                    previewPosition="none"
                                     onEmojiSelect={handlePickEmoji}
                                 />
                             </ModalBody>

@@ -50,6 +50,7 @@ export default function NotificationItem({ notification }: IProps) {
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 onOk={handleDeleteNotification}
+                onClose={onClose}
             />
             <div className="group flex items-center justify-between py-5 border-b border-divider last:border-none ps-1">
                 <Link href={notification?.url ?? "#"} className="flex flex-1 gap-5">

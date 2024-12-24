@@ -92,7 +92,7 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
 
     return (
         <>
-            <ConfirmationModal isOpen={isOpen} onOpenChange={onOpenChange} onOk={handleDeletePost} />
+            <ConfirmationModal isOpen={isOpen} onOpenChange={onOpenChange} onOk={handleDeletePost} onClose={onClose} />
             <Dropdown placement="bottom-end">
                 <DropdownTrigger>{children}</DropdownTrigger>
                 <DropdownMenu variant="flat" aria-label="Static Actions">

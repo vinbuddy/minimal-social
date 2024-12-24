@@ -17,6 +17,7 @@ interface IProps {
     isOpen: boolean;
     onOpenChange: (isOpen: boolean) => void;
     onOk: () => Promise<void>;
+    onClose: () => void;
 }
 
 export default function ConfirmationModal({
@@ -30,13 +31,14 @@ export default function ConfirmationModal({
     isOpen = false,
     onOk,
     onOpenChange,
+    onClose,
 }: IProps): React.ReactNode {
     const { loading, startLoading, stopLoading } = useLoading();
     return (
         <>
             <Modal backdrop={modalBackdrop} hideCloseButton isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
-                    {(onClose) => (
+                    {() => (
                         <>
                             <ModalHeader></ModalHeader>
                             <ModalBody className="pt-0 px-6 pb-6">

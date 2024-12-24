@@ -85,6 +85,7 @@ export default function CommentMenuDropdown({ children, comment }: IProps) {
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 onOk={handleDeleteComment}
+                onClose={onClose}
             />
             <Dropdown>
                 <DropdownTrigger>{children}</DropdownTrigger>

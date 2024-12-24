@@ -62,6 +62,7 @@ export default function EmojiPicker({ placement = "top-end", button, contentRef,
                     theme={theme ?? "light"}
                     data={data}
                     maxFrequentRows={1}
+                    previewPosition="none"
                     onEmojiSelect={handlePickEmoji}
                 />
             </PopoverContent>

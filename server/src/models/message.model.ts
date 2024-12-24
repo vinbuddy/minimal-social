@@ -50,6 +50,9 @@ export class Message {
     @prop({ default: [] })
     public seenBy: Ref<User>[];
 
+    @prop({ default: [] })
+    public excludedFor: Ref<User>[];
+
     @prop({ default: Date.now })
     public createdAt?: Date;
 }

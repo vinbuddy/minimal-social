@@ -1,9 +1,10 @@
 "use client";
-import { Button, Chip } from "@nextui-org/react";
+import { Button, Chip, useDisclosure } from "@nextui-org/react";
 import { toast } from "sonner";
 import { EllipsisVerticalIcon, ReplyIcon, SmileIcon } from "lucide-react";
 
 import MessageEmojiReaction from "./message-emoji-reaction";
+import MessageMenuDropdown from "./message-menu-dropdown";
 
 import { IMessage } from "@/types/message";
 import { formatTimeStamp } from "@/utils/datetime";
@@ -53,9 +54,11 @@ export default function MessageActions({ message, isOwnMessage }: IProps) {
             <Button onPress={() => reply(message)} isIconOnly size="sm" radius="full" color="default" variant="light">
                 <ReplyIcon size={16} className="text-default-400" />
             </Button>
-            <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                <EllipsisVerticalIcon size={16} className="text-default-400" />
-            </Button>
+            <MessageMenuDropdown message={message} isOwnMessage={isOwnMessage}>
+                <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                    <EllipsisVerticalIcon size={16} className="text-default-400" />
+                </Button>
+            </MessageMenuDropdown>
             {!message?.mediaFiles?.length && (
                 <Chip size="sm" variant="flat" className={`px-1 text-default-500 text-tiny`}>
                     {formatTimeStamp(message?.createdAt)}
