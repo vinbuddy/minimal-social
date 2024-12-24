@@ -119,6 +119,7 @@ export async function getConversationMessagesHandler(_req: Request, res: Respons
 
         const condition = {
             conversation: new mongoose.Types.ObjectId(conversationId),
+            excludedFor: { $nin: new mongoose.Types.ObjectId(userId) },
         };
 
         const skip = (Number(page) - 1) * limit;
