@@ -64,6 +64,14 @@ export default function MessageContent({ message, isOwnMessage }: IProps) {
 
     const className = isImojiMessageOnly(message?.content) ? emojiMessageClassName : messageClassName;
 
+    if (message?.isRetracted) {
+        return (
+            <section className={className}>
+                <span className="text-default-400 italic">This message was retracted</span>
+            </section>
+        );
+    }
+
     if (message?.content) {
         const content = convertLinksToAnchors(message?.content);
         return (

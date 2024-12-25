@@ -62,6 +62,32 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
         }
     };
 
+    const handleRetractMessage = async (): Promise<void> => {
+        try {
+            if (!message._id) throw new Error("Message id is required");
+
+            const res = await axiosInstance.delete(`/message/retract/${message._id}`);
+
+            if (res.status !== 200) {
+                throw new Error("Retract message failed");
+            }
+
+            // Update isRetracted field of the message
+            const newMessageList = messageList.map((msg) => {
+                if (msg._id === message._id) {
+                    return { ...msg, isRetracted: true };
+                }
+                return msg;
+            });
+
+            setMessageList(newMessageList);
+
+            showToast("Retracted message", "success");
+        } catch (err: any) {
+            showToast("Retract message failed", err.message);
+        }
+    };
+
     return (
         <>
             <ConfirmationModal
@@ -79,13 +105,13 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                 icon={<RotateCcwIcon size={24} />}
                 isOpen={isOpenRetract}
                 onOpenChange={onOpenRetract}
-                onOk={async () => {}}
+                onOk={handleRetractMessage}
                 onClose={onCloseRetract}
             />
             <Dropdown placement="bottom">
                 <DropdownTrigger>{children}</DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                    <DropdownSection showDivider={isOwnMessage}>
+                    <DropdownSection showDivider={isOwnMessage && !message?.isRetracted}>
                         <DropdownItem textValue="" startContent={<InfoIcon size={16} />} key="view">
                             View detail
                         </DropdownItem>
@@ -97,11 +123,15 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                         >
                             Copy message
                         </DropdownItem>
-                        <DropdownItem textValue="" startContent={<PinIcon size={16} />} key="copy">
-                            Pin message
-                        </DropdownItem>
+                        <>
+                            {!message?.isRetracted && (
+                                <DropdownItem textValue="" startContent={<PinIcon size={16} />} key="copy">
+                                    Pin message
+                                </DropdownItem>
+                            )}
+                        </>
                     </DropdownSection>
-                    {isOwnMessage ? (
+                    {isOwnMessage && !message?.isRetracted ? (
                         <>
                             <DropdownItem
                                 textValue=""
