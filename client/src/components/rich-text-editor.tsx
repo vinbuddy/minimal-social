@@ -15,10 +15,19 @@ interface IProps {
     value?: string;
     placeholder?: string;
     handleInputChange: (value: string) => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 function RichTextEditor(
-    { value = "", placeholder = "Type something...", isMention = false, isTag, className, handleInputChange }: IProps,
+    {
+        value = "",
+        placeholder = "Type something...",
+        isMention = false,
+        isTag,
+        className,
+        handleInputChange,
+        onKeyDown,
+    }: IProps,
     ref: React.ForwardedRef<HTMLDivElement>
 ) {
     const [isTypingMention, setIsTypingMention] = useState<boolean>(false);
@@ -241,6 +250,7 @@ function RichTextEditor(
                             aria-placeholder={placeholder}
                             contentEditable={true}
                             onKeyUp={handleInput}
+                            onKeyDown={onKeyDown && onKeyDown}
                         >
                             {parse(value)}
                         </div>

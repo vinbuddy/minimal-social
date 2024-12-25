@@ -48,8 +48,8 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
         },
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSubmit = async () => {
+        // e.preventDefault();
 
         if (!comment.trim()) return;
 
@@ -142,7 +142,15 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                     </Button>
                 </div>
             )}
-            <form onSubmit={handleSubmit} className="flex items-end">
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    if (comment.trim().length > 0) {
+                        handleSubmit();
+                    }
+                }}
+                className="flex items-end"
+            >
                 <Avatar size="sm" src={currentUser?.photo} className="!size-[40px]" />
 
                 <div className="min-h-[40px] relative p-2 px-3 flex-1 flex items-end ms-3 bg-content2 border border-divider rounded-3xl">
@@ -153,6 +161,14 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                         ref={commentInputRef}
                         handleInputChange={(value) => {
                             setComment(value);
+                        }}
+                        onKeyDown={(event) => {
+                            if (event.key === "Enter" && !event.shiftKey) {
+                                event.preventDefault();
+                                if (comment.trim().length > 0) {
+                                    handleSubmit();
+                                }
+                            }
                         }}
                         className="leading-[1.6] flex-1"
                         placeholder="Type your comment..."

@@ -1,8 +1,10 @@
 "use client";
-import { IMessage } from "@/types/message";
+import { motion } from "framer-motion";
+
 import EmojiReactionsLabel from "./emoji-reactions-label";
 import MessageContent from "./message-content";
 import MessageActions from "./message-actions";
+import { IMessage } from "@/types/message";
 
 interface IProps {
     message: IMessage;
@@ -12,7 +14,21 @@ interface IProps {
 export default function MessageItemGroup({ message, isOwnMessage }: IProps) {
     const isReaction = message?.reactions?.length > 0;
     return (
-        <div key={message?._id}>
+        <motion.div
+            layout
+            initial={{ opacity: 0, scale: 1, y: 50, x: 0 }}
+            animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, scale: 1, y: 1, x: 0 }}
+            transition={{
+                opacity: { duration: 0.1 },
+                layout: {
+                    type: "spring",
+                    bounce: 0.3,
+                    duration: 0.05 + 0.2,
+                },
+            }}
+            key={message?._id}
+        >
             {message?.replyTo ? (
                 <div
                     className={`relative flex flex-col !text-sm rounded-[18px] ${isReaction && "top-5"} ${
@@ -51,6 +67,6 @@ export default function MessageItemGroup({ message, isOwnMessage }: IProps) {
                     </div>
                 </div>
             )}
-        </div>
+        </motion.div>
     );
 }

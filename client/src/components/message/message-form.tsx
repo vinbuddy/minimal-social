@@ -126,8 +126,8 @@ export default function MessageForm({ conversation }: IProps) {
         if (replyTo) unReply();
     };
 
-    const handleSendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSendMessage = async () => {
+        // e.preventDefault();
 
         if (!currentUser || !conversation) {
             alert("User or conversation not found.");
@@ -291,8 +291,13 @@ export default function MessageForm({ conversation }: IProps) {
                 </div>
             )}
             <form
-                onSubmit={handleSendMessage}
-                className={`flex  gap-x-2 px-4 ${mediaFiles.length > 0 ? "items-end" : "items-center"}`}
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    if (message.trim() || mediaFiles.length > 0) {
+                        handleSendMessage();
+                    }
+                }}
+                className={`flex gap-x-2 px-4 pt-4 ${mediaFiles.length > 0 ? "items-end" : "items-center"}`}
             >
                 <div>
                     <MediaFileUploaderButton
@@ -347,6 +352,17 @@ export default function MessageForm({ conversation }: IProps) {
                             ref={messageInputRef}
                             handleInputChange={(value) => {
                                 setMessage(value);
+                            }}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter" && !event.shiftKey) {
+                                    event.preventDefault();
+                                    if (
+                                        message.replace(/&nbsp;|<[^>]*>/g, "").trim().length > 0 ||
+                                        mediaFiles.length > 0
+                                    ) {
+                                        handleSendMessage();
+                                    }
+                                }
                             }}
                             className="leading-[1.6] flex-1 max-h-52 overflow-y-scroll scrollbar "
                             placeholder="Type your message..."

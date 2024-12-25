@@ -1,6 +1,6 @@
 "use client";
 import { Spinner } from "@nextui-org/react";
-import { Fragment, use, useEffect } from "react";
+import { Fragment, use, useEffect, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import MessageItem from "./message-item";
@@ -21,6 +21,7 @@ interface GroupedMessage {
 }
 
 export default function MessageList({ conversation }: IProps) {
+    const messageListRef = useRef<HTMLDivElement>(null);
     const { socket } = useSocketContext();
     const swrMutate = useGlobalMutation();
     const { currentUser } = useAuthStore();
@@ -59,6 +60,11 @@ export default function MessageList({ conversation }: IProps) {
                 }
                 return { ...state };
             });
+
+            // Scroll to bottom when a new message is added
+            if (messageListRef.current) {
+                messageListRef.current.scrollTo({ top: 0, behavior: "smooth" });
+            }
 
             mutate((currentData) => {
                 if (!currentData) return [{ data: [newMessage] }];
@@ -195,6 +201,7 @@ export default function MessageList({ conversation }: IProps) {
     return (
         <>
             <div
+                ref={messageListRef}
                 id="messageList"
                 style={{
                     height: "100%",
