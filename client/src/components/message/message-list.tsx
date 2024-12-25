@@ -1,6 +1,6 @@
 "use client";
 import { Spinner } from "@nextui-org/react";
-import { Fragment, useEffect } from "react";
+import { Fragment, use, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import MessageItem from "./message-item";
@@ -42,7 +42,7 @@ export default function MessageList({ conversation }: IProps) {
         if (messages) {
             setMessageList(messages);
         }
-    }, [messages.length]);
+    }, [loadingMore]);
 
     useEffect(() => {
         if (!socket) {
@@ -51,6 +51,15 @@ export default function MessageList({ conversation }: IProps) {
         }
 
         const handleNewMessage = (newMessage: IMessage) => {
+            // Update message in the store
+            useMessagesStore.setState((state) => {
+                const updatedMessageIndex = state.messageList.findIndex((message) => message._id === newMessage._id);
+                if (updatedMessageIndex === -1) {
+                    state.messageList.push(newMessage);
+                }
+                return { ...state };
+            });
+
             mutate((currentData) => {
                 if (!currentData) return [{ data: [newMessage] }];
 
@@ -82,6 +91,17 @@ export default function MessageList({ conversation }: IProps) {
         };
 
         const handleReactMessage = (updatedMessage: IMessage) => {
+            // Update message in the store
+            useMessagesStore.setState((state) => {
+                const updatedMessageIndex = state.messageList.findIndex(
+                    (message) => message._id === updatedMessage._id
+                );
+                if (updatedMessageIndex === -1) return state;
+
+                state.messageList[updatedMessageIndex] = updatedMessage;
+                return { ...state };
+            });
+
             mutate((currentData) => {
                 if (!currentData) return;
 

@@ -129,9 +129,9 @@ export default function PostItem({ post: _post }: IProps) {
                             )}
 
                             {/* Time */}
-                            <p className="text-grey text-sm cursor-pointer leading-none">
+                            <div className="text-grey text-sm cursor-pointer leading-none">
                                 <TimeAgo date={post?.createdAt} />
-                            </p>
+                            </div>
 
                             {/* Menu */}
                             <div className="flex flex-col justify-center">

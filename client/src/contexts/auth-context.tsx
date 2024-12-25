@@ -1,13 +1,10 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
 
 import useAuthStore from "../hooks/store/use-auth-store";
-import axiosInstance from "@/utils/httpRequest";
 import { IUser } from "../types/user";
 import PageLoading from "@/components/page-loading";
-import axios from "axios";
 
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
@@ -103,4 +100,5 @@ const AuthContextProvider = ({ children }: { children: any }) => {
     return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
 };
 
-export default dynamic(() => Promise.resolve(AuthContextProvider), { ssr: false });
+// export default dynamic(() => Promise.resolve(AuthContextProvider), { ssr: false });
+export default AuthContextProvider;

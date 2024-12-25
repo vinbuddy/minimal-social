@@ -85,9 +85,9 @@ export default function PostDetail({ post }: IProps) {
                     )}
 
                     {/* Time */}
-                    <p className="text-grey cursor-pointer">
+                    <div className="text-grey cursor-pointer">
                         <TimeAgo date={post?.createdAt} />
-                    </p>
+                    </div>
 
                     {/* Menu */}
                     <div className="flex flex-col justify-center">

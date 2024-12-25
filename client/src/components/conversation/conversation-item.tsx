@@ -55,11 +55,11 @@ export default function ConversationItem({ conversation }: IProps): ReactNode {
                             {conversation?.lastMessage?.sender === currentUser?._id && "You: "}
                             {conversation?.lastMessage?.content ?? ""}
                         </p>
-                        <p className="me-2 text-tiny text-default-400">
+                        <div className="me-2 text-tiny text-default-400">
                             {conversation?.lastMessage?.createdAt && (
                                 <TimeAgo className="!text-tiny" date={conversation?.lastMessage?.createdAt} />
                             )}
-                        </p>
+                        </div>
                     </div>
                     {/* <div className="flex items-center  mt-1">
                         <AvatarGroup
