@@ -122,16 +122,42 @@ export default function MessageList({ conversation }: IProps) {
             }, false);
         };
 
+        const handleRetractMessage = (updatedMessage: IMessage) => {
+            // Update message in the store
+            useMessagesStore.setState((state) => {
+                const updatedMessageIndex = state.messageList.findIndex(
+                    (message) => message._id === updatedMessage._id
+                );
+                if (updatedMessageIndex === -1) return state;
+
+                state.messageList[updatedMessageIndex] = updatedMessage;
+                return { ...state };
+            });
+
+            mutate((currentData) => {
+                if (!currentData) return;
+
+                const updatedData = currentData.map((page) => ({
+                    ...page,
+                    data: page.data.map((message: IMessage) =>
+                        message._id === updatedMessage._id ? updatedMessage : message
+                    ),
+                }));
+
+                return updatedData;
+            }, false);
+        };
+
         socket.on("reactMessage", handleReactMessage);
-
         socket.on("newMessage", handleNewMessage);
-
         socket.on("unreactMessage", handleReactMessage);
+        socket.on("retractMessage", handleRetractMessage);
 
         return () => {
             socket.off("newMessage", handleNewMessage);
             socket.off("reactMessage", handleReactMessage);
             socket.off("unreactMessage", handleReactMessage);
+            socket.off("retractMessage", handleRetractMessage);
         };
     }, [socket, currentUser]);
 

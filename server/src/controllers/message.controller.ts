@@ -352,6 +352,19 @@ export async function retractMessageHandler(_req: Request, res: Response, next: 
             isRetracted: true,
         });
 
+        const updatedMessage = await MessageModel.findOne({ _id: new mongoose.Types.ObjectId(messageId) })
+            .populate({ path: "sender", select: USER_MODEL_HIDDEN_FIELDS })
+            .populate({ path: "replyTo" })
+            .populate({ path: "conversation" })
+            .populate({ path: "reactions.user", select: USER_MODEL_HIDDEN_FIELDS });
+
+        const conversationId = message.conversation.toString();
+
+        // Send io
+        const io = req.app.get("io") as Server;
+
+        io.to(conversationId).emit("retractMessage", updatedMessage);
+
         return res.status(200).json({ message: "Retract message successfully" });
     } catch (error) {
         next(error);
