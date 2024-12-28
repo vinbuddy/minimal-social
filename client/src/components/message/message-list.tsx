@@ -1,7 +1,9 @@
 "use client";
-import { Spinner } from "@nextui-org/react";
+import { Avatar, Spinner } from "@nextui-org/react";
 import { Fragment, use, useEffect, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { motion } from "framer-motion";
+import { CheckCheckIcon } from "lucide-react";
 
 import MessageItem from "./message-item";
 

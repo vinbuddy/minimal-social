@@ -47,7 +47,7 @@ export class Message {
     @prop({ default: false })
     public isRetracted: boolean;
 
-    @prop({ default: [] })
+    @prop({ default: [], ref: () => User })
     public seenBy: Ref<User>[];
 
     @prop({ default: [] })

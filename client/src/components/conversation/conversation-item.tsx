@@ -1,6 +1,6 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Avatar, Button } from "@nextui-org/react";
+import { Avatar, Badge, Button } from "@nextui-org/react";
 import { ReactNode } from "react";
 import { EllipsisIcon } from "lucide-react";
 
@@ -45,7 +45,16 @@ export default function ConversationItem({ conversation }: IProps): ReactNode {
             }`}
         >
             <div className="flex items-center w-full">
-                <Avatar size="lg" radius="full" src={otherUser?.photo} />
+                <Badge
+                    showOutline={false}
+                    color="danger"
+                    content={conversation?.unreadCount ?? 0}
+                    placement="top-right"
+                    shape="circle"
+                    isInvisible={!conversation?.unreadCount}
+                >
+                    <Avatar size="lg" radius="full" src={otherUser?.photo} />
+                </Badge>
                 <div className="ms-3 flex-1 overflow-hidden">
                     <h3>
                         <UserName isLink={false} className="font-semibold hover:no-underline" user={otherUser} />

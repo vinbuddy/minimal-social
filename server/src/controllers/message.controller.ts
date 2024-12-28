@@ -49,6 +49,7 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
             mediaFiles: uploadedFiles || [],
             stickerUrl: stickerUrl ?? null,
             gifUrl: gifUrl ?? null,
+            seenBy: [new mongoose.Types.ObjectId(senderId)],
         });
 
         const message = await MessageModel.populate(newMessage, [
@@ -62,6 +63,10 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
             },
             {
                 path: "replyTo",
+            },
+            {
+                path: "seenBy",
+                select: USER_MODEL_HIDDEN_FIELDS,
             },
         ]);
 
@@ -132,6 +137,10 @@ export async function getConversationMessagesHandler(_req: Request, res: Respons
             .sort({ createdAt: -1 })
             .populate({
                 path: "sender",
+                select: USER_MODEL_HIDDEN_FIELDS,
+            })
+            .populate({
+                path: "seenBy",
                 select: USER_MODEL_HIDDEN_FIELDS,
             })
             .populate({

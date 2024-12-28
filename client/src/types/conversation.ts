@@ -19,6 +19,7 @@ export interface IConversation {
     lastMessage: ILastMessage | null;
     theme: string | null;
     emoji: string | null;
+    unreadCount: number;
     createdAt: string;
     updatedAt: string;
 }

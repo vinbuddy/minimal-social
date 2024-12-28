@@ -72,11 +72,26 @@ export async function getConversationsHandler(_req: Request, res: Response, next
             .populate({
                 path: "participants",
                 select: USER_MODEL_HIDDEN_FIELDS,
-            });
+            })
+            .lean();
+
+        const conversationWithUnreadCount = await Promise.all(
+            conversations.map(async (conversation) => {
+                const unreadCount = await MessageModel.countDocuments({
+                    conversation: conversation._id,
+                    seenBy: { $nin: [new mongoose.Types.ObjectId(userId)] },
+                });
+
+                return {
+                    ...conversation,
+                    unreadCount,
+                };
+            })
+        );
 
         return res.status(200).json({
             message: "Get conversations successfully",
-            data: conversations,
+            data: conversationWithUnreadCount,
             totalConversations,
             totalPages,
             page,

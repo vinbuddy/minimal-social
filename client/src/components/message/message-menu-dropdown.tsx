@@ -37,9 +37,9 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
     const handleCopy = async (): Promise<void> => {
         try {
             await navigator.clipboard.writeText(message.content);
-            showToast("Copied comment", "success");
+            showToast("Copied message", "success");
         } catch (err) {
-            showToast("Copy comment failed", "error");
+            showToast("Copy message failed", "error");
         }
     };
 

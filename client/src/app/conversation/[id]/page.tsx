@@ -112,7 +112,7 @@ function ConversationDetailPage() {
                     </div>
                 </section>
                 {isOpenConversationInfo && (
-                    <section className="col-span-12 sm:col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4">
+                    <section className="col-span-12 sm:col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4 border-default border-l">
                         <ConversationInfo conversation={data?.data} partner={otherUser} />
                     </section>
                 )}

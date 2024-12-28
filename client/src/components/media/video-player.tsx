@@ -246,7 +246,14 @@ function VideoPlayer(
                 {timeline && (
                     <div className="flex items-center absolute bottom-0 left-0 w-full px-3">
                         <div className="flex-1">
-                            <Slider value={currentTimeSec} maxValue={durationSec} minValue={0} onChange={handleSeek} />
+                            <Slider
+                                size="sm"
+                                hideThumb={true}
+                                value={currentTimeSec}
+                                maxValue={durationSec}
+                                minValue={0}
+                                onChange={handleSeek}
+                            />
                         </div>
                         <div className="text-white text-sm  rounded-full ps-2">
                             {currentTime[0]}:{currentTime[1]} / {duration[0]}:{duration[1]}
