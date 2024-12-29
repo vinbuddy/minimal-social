@@ -1,7 +1,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Avatar, Badge, Button } from "@nextui-org/react";
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import { EllipsisIcon } from "lucide-react";
 
 import { useAuthStore } from "@/hooks/store";
@@ -21,15 +21,15 @@ export default function ConversationItem({ conversation }: IProps): ReactNode {
     const { conversationItem } = useConversationContext();
     const breakpoint = useBreakpoint();
 
-    let isActive: any = pathname.includes(conversation._id);
-    if (breakpoint !== "mobile") {
-        isActive = pathname.includes(conversation._id);
-    } else {
-        isActive = pathname.includes(conversation._id) && conversationItem;
-    }
+    const isActive = useMemo(() => {
+        const isDesktopActive = breakpoint !== "mobile" && pathname.includes(conversation._id);
+        const isMobileActive = breakpoint === "mobile" && pathname.includes(conversation._id) && conversationItem;
+        return isDesktopActive || isMobileActive;
+    }, [breakpoint, pathname, conversation._id, conversationItem]);
 
-    const otherUser =
-        currentUser && conversation.participants.find((participant) => participant._id !== currentUser._id);
+    const otherUser = useMemo(() => {
+        return currentUser && conversation.participants.find((p) => p._id !== currentUser._id);
+    }, [currentUser, conversation.participants]);
 
     const handleMenuButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();

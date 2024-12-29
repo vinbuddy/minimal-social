@@ -1,12 +1,12 @@
 "use client";
+
 import { Button, Input, Spinner } from "@nextui-org/react";
-import { LoaderIcon, PlusIcon, SearchIcon } from "lucide-react";
+import { LoaderIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { useState } from "react";
-import useSWR from "swr";
 import Link from "next/link";
+import { useState, useCallback, useMemo } from "react";
+import useSWR from "swr";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import ConversationItem from "./conversation-item";
 import ConversationSkeletons from "./conversation-skeletons";
@@ -35,12 +35,12 @@ export default function ConversationList({ onConversationClick }: IProps) {
     const debouncedSearch = useDebounce(searchValue, 800);
     const router = useRouter();
 
-    const getURL = () => {
-        if (!currentUser) return null;
+    // Generate API URL
+    const getURL = useCallback(() => {
+        return currentUser ? `/conversation?userId=${currentUser._id}` : null;
+    }, [currentUser]);
 
-        return `/conversation?userId=${currentUser._id}`;
-    };
-
+    // Fetch conversations
     const {
         data: conversations,
         loadingMore,
@@ -52,159 +52,142 @@ export default function ConversationList({ onConversationClick }: IProps) {
         mutate,
     } = usePagination<IConversation>(getURL());
 
+    // Fetch search results
     const {
         data: conversationResults,
         error: searchError,
         isLoading: isSearchLoading,
-        mutate: mutateSearch,
     } = useSWR<ConversationResponse>(
         debouncedSearch && currentUser
             ? `/conversation/search?userId=${currentUser?._id}&search=${debouncedSearch}`
             : null
     );
 
-    const isSearchResultEmpty =
-        !conversationResults?.data?.privateConversations?.length ||
-        !conversationResults?.data?.privateConversations?.length;
-    const isShowedSearchError = error && !isLoading;
-    const isShowedNoSearchResults = conversationResults && !isLoading && !error && isSearchResultEmpty;
-    const isShowedResults = !isLoading && !error && !isSearchResultEmpty;
+    // Derived states
+    const isSearchResultEmpty = useMemo(
+        () =>
+            !conversationResults?.data?.privateConversations?.length &&
+            !conversationResults?.data?.groupConversations?.length,
+        [conversationResults]
+    );
 
-    const handleNavigateToConversation = async (userId: string) => {
-        if (!currentUser || !userId) return;
+    const handleNavigateToConversation = useCallback(
+        async (userId: string) => {
+            if (!currentUser || !userId) return;
 
-        try {
-            const res = await axiosInstance.post("/conversation", {
-                participants: [currentUser?._id, userId],
-            });
+            try {
+                const res = await axiosInstance.post("/conversation", {
+                    participants: [currentUser._id, userId],
+                });
 
-            const conversationResponded = res.data.data as IConversation;
+                const conversationId = res.data.data._id;
 
-            const conversationId = conversationResponded._id;
+                setSearchValue("");
+                mutate(); // Refresh conversations list
+                router.push(`/conversation/${conversationId}`);
+            } catch (error: any) {
+                showToast(error?.response?.data?.message || "An error occurred", "error");
+            }
+        },
+        [currentUser, router, mutate]
+    );
 
-            setSearchValue("");
+    const renderPrivateConversationResults = useMemo(() => {
+        if (!debouncedSearch) return null;
 
-            mutate();
+        if (isSearchResultEmpty) return <p className="text-center">No search results</p>;
+        if (searchError) return <p className="text-center text-danger">{searchError?.message}</p>;
 
-            router.push(`/conversation/${conversationId}`);
-        } catch (error: any) {
-            showToast(error.response.data.message, "error");
-        }
-    };
-
-    const renderPrivateConversationResults = () => {
         return (
             <div>
-                {isShowedResults &&
-                    !isLoading &&
-                    conversationResults.data.privateConversations.map((privateCon, index) => {
-                        if (privateCon?.conversation && privateCon?.user) {
-                            return (
-                                <Link
-                                    onClick={() => onConversationClick && onConversationClick(privateCon.conversation)}
-                                    href={`/conversation/${privateCon.conversation._id}`}
-                                    key={privateCon.conversation._id}
-                                    className="hover:bg-content2 block rounded-xl px-2"
-                                >
-                                    <UserItem
-                                        avatarProps={{ size: "lg", isBordered: false }}
-                                        isShowedFollowButton={false}
-                                        href={undefined}
-                                        user={privateCon.user}
-                                    />
-                                </Link>
-                            );
-                        }
-
+                {conversationResults?.data.privateConversations.map((privateCon) => {
+                    if (privateCon?.conversation && privateCon?.user) {
                         return (
-                            <div
-                                onClick={() => handleNavigateToConversation(privateCon.user._id)}
-                                key={Date.now()}
+                            <Link
+                                onClick={() => onConversationClick?.(privateCon.conversation)}
+                                href={`/conversation/${privateCon.conversation._id}`}
+                                key={privateCon.conversation._id}
                                 className="hover:bg-content2 block rounded-xl px-2"
                             >
                                 <UserItem
                                     avatarProps={{ size: "lg", isBordered: false }}
-                                    href={undefined}
                                     isShowedFollowButton={false}
                                     user={privateCon.user}
                                 />
-                            </div>
+                            </Link>
                         );
-                    })}
+                    }
 
-                {isShowedSearchError && <p className="text-center text-danger">{error?.message}</p>}
-                {isShowedNoSearchResults && <p className="text-center">No search results</p>}
+                    return (
+                        <div
+                            onClick={() => handleNavigateToConversation(privateCon.user._id)}
+                            key={privateCon.user._id}
+                            className="hover:bg-content2 block rounded-xl px-2"
+                        >
+                            <UserItem
+                                avatarProps={{ size: "lg", isBordered: false }}
+                                isShowedFollowButton={false}
+                                user={privateCon.user}
+                            />
+                        </div>
+                    );
+                })}
             </div>
         );
-    };
+    }, [debouncedSearch, conversationResults, searchError, handleNavigateToConversation, onConversationClick]);
 
-    const renderConversations = () => {
+    const renderConversations = useMemo(() => {
+        if (isLoading) return <ConversationSkeletons length={5} />;
+        if (error) return <p className="text-center text-danger">{error?.message}</p>;
+        if (conversations.length === 0) return <p className="text-center">No conversations yet</p>;
+
         return (
-            <div>
-                {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
-                {currentUser && conversations.length === 0 && !isLoading && !error && (
-                    <p className="text-center">No conversations yet</p>
-                )}
-                {!error && conversations.length > 0 && (
-                    <InfiniteScroll
-                        scrollableTarget="conversation-list"
-                        next={() => setPage(size + 1)}
-                        hasMore={!isReachedEnd}
-                        loader={
-                            <div className="flex justify-center items-center overflow-hidden h-[70px]">
-                                <Spinner size="md" />
-                            </div>
-                        }
-                        dataLength={conversations?.length ?? 0}
+            <InfiniteScroll
+                scrollableTarget="conversation-list"
+                next={() => setPage(size + 1)}
+                hasMore={!isReachedEnd}
+                loader={
+                    <div className="flex justify-center items-center overflow-hidden h-[70px]">
+                        <Spinner size="md" />
+                    </div>
+                }
+                dataLength={conversations?.length ?? 0}
+            >
+                {conversations.map((conversation) => (
+                    <div
+                        onClick={() => onConversationClick?.(conversation)}
+                        className="mb-2 last:mb-0"
+                        key={conversation._id}
                     >
-                        {conversations.map((conversation) => (
-                            <div
-                                onClick={() => onConversationClick && onConversationClick(conversation)}
-                                className="mb-2 last:mb-0"
-                                key={conversation?._id}
-                            >
-                                <ConversationItem conversation={conversation} />
-                            </div>
-                        ))}
-                    </InfiniteScroll>
-                )}
-
-                {isLoading && <ConversationSkeletons length={5} />}
-            </div>
+                        <ConversationItem conversation={conversation} />
+                    </div>
+                ))}
+            </InfiniteScroll>
         );
-    };
+    }, [isLoading, error, conversations, setPage, size, isReachedEnd, onConversationClick]);
 
     return (
         <div id="conversation-list" className="h-screen overflow-auto border-r-1 border-divider px-4 pb-4 scrollbar">
             <div className="sticky top-0 py-4 bg-background z-10">
                 <header className="h-[40px] flex items-center justify-between mb-5">
                     <h1 className="font-bold text-xl">Chat</h1>
-
-                    {/* <Button isIconOnly variant="flat" radius="full">
-                        <PlusIcon size={18} />
-                    </Button> */}
                 </header>
                 <Input
                     isClearable={!isSearchLoading}
-                    classNames={{
-                        base: "w-full",
-                        inputWrapper: "h-[2.8rem] px-4",
-                    }}
-                    defaultValue={""}
+                    classNames={{ base: "w-full", inputWrapper: "h-[2.8rem] px-4" }}
                     value={searchValue}
                     placeholder="Search..."
                     size="md"
                     variant="faded"
                     radius="full"
                     startContent={<SearchIcon className="text-default-400 me-1" size={18} />}
-                    endContent={isSearchLoading ? <LoaderIcon size={18} className="animate-spin" /> : undefined}
+                    endContent={isSearchLoading && <LoaderIcon size={18} className="animate-spin" />}
                     type="text"
                     onChange={(e) => setSearchValue(e.target.value)}
                     onClear={() => setSearchValue("")}
                 />
             </div>
-
-            {debouncedSearch ? renderPrivateConversationResults() : renderConversations()}
+            {debouncedSearch ? renderPrivateConversationResults : renderConversations}
         </div>
     );
 }

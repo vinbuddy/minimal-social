@@ -20,6 +20,7 @@ import UserName from "../user/user-name";
 import { IUser } from "@/types/user";
 import { IConversation } from "@/types/conversation";
 import ChangeEmojiConversationModal from "./change-emoji-conversation-modal";
+import ChangeThemeConversationModal from "./change-theme-conversation-modal";
 
 interface IProps {
     partner?: IUser | null;
@@ -27,7 +28,6 @@ interface IProps {
 }
 
 export default function ConversationInfo({ partner, conversation }: IProps) {
-    console.log("conversation: ", conversation);
     const [storageType, setStorageType] = useState<"media" | "link" | "file" | null>(null);
 
     if (!conversation || !partner) {
@@ -133,7 +133,9 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                             key="new"
                                             startContent={<PaletteIcon size={18} />}
                                         >
-                                            Theme
+                                            <ChangeThemeConversationModal conversation={conversation}>
+                                                Theme
+                                            </ChangeThemeConversationModal>
                                         </ListboxItem>
                                         <ListboxItem
                                             classNames={{

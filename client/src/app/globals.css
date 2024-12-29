@@ -14,7 +14,7 @@ body {
 /* Custom All Scrollbar Vertical into  */
 .scrollbar::-webkit-scrollbar {
     border-radius: 0;
-    width: 8px;
+    width: 6px;
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
@@ -25,6 +25,11 @@ body {
 .scrollbar::-webkit-scrollbar-track {
     border-radius: 0;
     background-color: rgba(0, 0, 0, 0);
+}
+
+/* Scroll bar dark mode if html has class dark  */
+html.dark .scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.25);
 }
 
 [contenteditable="true"] {
