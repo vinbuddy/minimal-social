@@ -5,6 +5,7 @@ import {
     deleteMessageHandler,
     getConversationMessagesHandler,
     getUsersReactedMessageHandler,
+    markMessageAsSeenHandler,
     reactMessageHandler,
     retractMessageHandler,
     unreactMessageHandler,
@@ -22,5 +23,6 @@ router.post("/reaction/:id", verifyToken, reactMessageHandler);
 router.post("/unreaction/:id", verifyToken, unreactMessageHandler);
 router.delete("/delete/:id", verifyToken, deleteMessageHandler);
 router.delete("/retract/:id", verifyToken, retractMessageHandler);
+router.post("/mark-seen", verifyToken, markMessageAsSeenHandler);
 
 export default router;

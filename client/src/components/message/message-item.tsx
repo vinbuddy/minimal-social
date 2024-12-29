@@ -7,30 +7,18 @@ import { IMessage } from "@/types/message";
 interface IProps {
     className?: string;
     messages: IMessage[];
+    originalMessages: IMessage[];
 }
 
-export default function MessageItem({ className = "", messages }: IProps) {
+export default function MessageItem({ className = "", messages, originalMessages }: IProps) {
     const { currentUser } = useAuthStore();
     const isOwnMessage = messages[0]?.sender?._id === currentUser?._id;
 
-    const getLastSeenPositions = () => {
-        const positions: Record<string, number> = {};
-
-        [...messages].reverse().forEach((message, reverseIndex) => {
-            message.seenBy?.forEach((user) => {
-                const userId = user._id;
-                const originalIndex = messages.length - 1 - reverseIndex;
-
-                if (!positions[userId] && userId !== currentUser?._id && isOwnMessage) {
-                    positions[userId] = originalIndex;
-                }
-            });
-        });
-
-        return positions;
-    };
-
-    const lastSeenPositions = getLastSeenPositions();
+    const lastSeenMessage = [...originalMessages].reverse().find((message) => {
+        return (
+            message.seenBy.length > 0 && message.seenBy.some((user) => user._id !== currentUser?._id) // Người xem không phải currentUser
+        );
+    });
 
     return (
         <div
@@ -48,7 +36,10 @@ export default function MessageItem({ className = "", messages }: IProps) {
                             <div className="flex items-center gap-2 justify-end">
                                 {message.seenBy
                                     ?.filter(
-                                        (user) => lastSeenPositions[user._id] === index && user._id !== currentUser?._id
+                                        (user) =>
+                                            user._id !== currentUser?._id &&
+                                            lastSeenMessage?._id === message._id &&
+                                            isOwnMessage
                                     )
                                     .map((user) => (
                                         <Avatar
@@ -58,18 +49,6 @@ export default function MessageItem({ className = "", messages }: IProps) {
                                             alt={user.username}
                                         />
                                     ))}
-                                {/* {message.seenBy
-                                    .filter(
-                                        (user) => lastSeenPositions[user._id] === index && user._id !== currentUser?._id
-                                    )
-                                    .map((user) => (
-                                        <Avatar
-                                            className="!size-4"
-                                            key={user._id}
-                                            src={user.photo}
-                                            alt={user.username}
-                                        />
-                                    ))} */}
                             </div>
                         </>
                     ))}

@@ -379,3 +379,47 @@ export async function retractMessageHandler(_req: Request, res: Response, next: 
         next(error);
     }
 }
+
+export async function markMessageAsSeenHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+        const userSeenId = req.body.userId as string;
+        const conversationId = req.body.conversationId as string;
+
+        await MessageModel.updateMany(
+            {
+                conversation: new mongoose.Types.ObjectId(conversationId),
+                seenBy: { $nin: new mongoose.Types.ObjectId(userSeenId) },
+            },
+            { $addToSet: { seenBy: new mongoose.Types.ObjectId(userSeenId) } }
+        );
+
+        // Get last message and seen
+        const lastMessage = await MessageModel.findOne({
+            conversation: new mongoose.Types.ObjectId(conversationId),
+            seenBy: {
+                $in: [new mongoose.Types.ObjectId(userSeenId)],
+            },
+        })
+            .sort({ createdAt: -1 })
+            .populate({ path: "sender", select: USER_MODEL_HIDDEN_FIELDS })
+            .populate({
+                path: "conversation",
+                populate: {
+                    path: "participants",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                },
+            })
+            .populate({ path: "replyTo" })
+            .populate({ path: "seenBy", select: USER_MODEL_HIDDEN_FIELDS });
+
+        // Send io
+        const io = req.app.get("io") as Server;
+
+        io.to(conversationId).emit("markMessageAsSeen", lastMessage);
+
+        return res.status(200).json({ message: "Mark message as seen successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
