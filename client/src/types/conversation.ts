@@ -1,3 +1,4 @@
+import { ITheme } from "./theme";
 import { IUser } from "./user";
 
 export interface IGroupInfo {
@@ -17,7 +18,7 @@ export interface IConversation {
     isGroup: boolean;
     groupInfo: IGroupInfo | null;
     lastMessage: ILastMessage | null;
-    theme: string | null;
+    theme: ITheme | null;
     emoji: string | null;
     unreadCount: number;
     createdAt: string;

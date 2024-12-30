@@ -2,6 +2,7 @@
 
 import {
     Button,
+    Chip,
     Listbox,
     ListboxItem,
     Modal,
@@ -12,140 +13,57 @@ import {
     Selection,
     useDisclosure,
 } from "@nextui-org/react";
+import { useMemo, useState } from "react";
+import useSWR from "swr";
 
-import { Key, useMemo, useState } from "react";
 import { IConversation } from "@/types/conversation";
+import { ITheme } from "@/types/theme";
+import { useGlobalMutation, useLoading } from "@/hooks";
+import axiosInstance from "@/utils/httpRequest";
+import { showToast } from "@/utils/toast";
+import { CheckIcon } from "lucide-react";
 
 interface IProps {
     children: React.ReactNode;
     conversation: IConversation;
 }
 
-const themes = [
-    {
-        _id: 1,
-        name: "Theme 1",
-        description: "This is theme 1",
-        color: "#f44336",
-    },
-    {
-        _id: 2,
-        name: "Theme 2",
-        description: "This is theme 2",
-        color: "#2196f3",
-    },
-    {
-        _id: 3,
-        name: "Theme 3",
-        description: "This is theme 3",
-        color: "#4caf50",
-    },
-    {
-        _id: 4,
-        name: "Theme 4",
-        description: "This is theme 4",
-        color: "#ff9800",
-    },
-    {
-        _id: 5,
-        name: "Theme 5",
-        description: "This is theme 5",
-        color: "#9c27b0",
-    },
-    {
-        _id: 6,
-        name: "Theme 6",
-        description: "This is theme 6",
-        color: "#795548",
-    },
-    {
-        _id: 7,
-        name: "Theme 7",
-        description: "This is theme 7",
-        color: "#607d8b",
-    },
-    {
-        _id: 8,
-        name: "Theme 8",
-        description: "This is theme 8",
-        color: "#00bcd4",
-    },
-    {
-        _id: 9,
-        name: "Theme 9",
-        description: "This is theme 9",
-        color: "#ffeb3b",
-    },
-    {
-        _id: 10,
-        name: "Theme 10",
-        description: "This is theme 10",
-        color: "#ff5722",
-    },
-    {
-        _id: 11,
-        name: "Theme 11",
-        description: "This is theme 11",
-        color: "#9e9e9e",
-    },
-    {
-        _id: 12,
-        name: "Theme 12",
-        description: "This is theme 12",
-        color: "#3f51b5",
-    },
-    {
-        _id: 13,
-        name: "Theme 13",
-        description: "This is theme 13",
-        color: "#8bc34a",
-    },
-    {
-        _id: 14,
-        name: "Theme 14",
-        description: "This is theme 14",
-        color: "#e91e63",
-    },
-    {
-        _id: 15,
-        name: "Theme 15",
-        description: "This is theme 15",
-        color: "#cddc39",
-    },
-    {
-        _id: 16,
-        name: "Theme 16",
-        description: "This is theme 16",
-        color: "#673ab7",
-    },
-    {
-        _id: 17,
-        name: "Theme 17",
-        description: "This is theme 17",
-        color: "#ff9800",
-    },
-    {
-        _id: 18,
-        name: "Theme 18",
-        description: "This is theme 18",
-        color: "#4caf50",
-    },
-    {
-        _id: 19,
-        name: "Theme 19",
-        description: "This is theme 19",
-        color: "#2196f3",
-    },
-    {
-        _id: 20,
-    },
-];
-
 export default function ChangeThemeConversationModal({ children, conversation }: IProps) {
-    const { isOpen, onOpenChange, onOpen } = useDisclosure();
-    const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set(["text"]));
+    const { data: result, isLoading: isThemeLoading } = useSWR<{ data: ITheme[] }>("/theme");
+    const { isOpen, onOpenChange, onOpen, onClose } = useDisclosure();
+    const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
+    const { loading, startLoading, stopLoading } = useLoading();
+    const mutate = useGlobalMutation();
 
-    const selectedThemeId = useMemo(() => Array.from(selectedKeys).join(", "), [selectedKeys]);
+    const themes: ITheme[] = useMemo(() => result?.data ?? [], [result]);
+
+    const selectedTheme = useMemo(
+        () => themes.find((theme) => theme._id === Array.from(selectedKeys).join(", ")) ?? conversation?.theme,
+        [selectedKeys, themes]
+    );
+
+    const handleChangeTheme = async () => {
+        try {
+            if (!selectedTheme || !conversation) throw new Error("Theme or conversation not found");
+
+            startLoading();
+
+            await axiosInstance.put(`/conversation/change-theme/${conversation._id}`, {
+                themeId: selectedTheme?._id,
+            });
+
+            mutate((key) => typeof key === "string" && key.includes("/conversation"));
+
+            showToast("Change theme successfully", "success");
+        } catch (error: any) {
+            console.error(error);
+            showToast(error.message, "error");
+        } finally {
+            stopLoading();
+
+            onClose();
+        }
+    };
 
     return (
         <>
@@ -153,47 +71,86 @@ export default function ChangeThemeConversationModal({ children, conversation }:
                 {children}
             </div>
 
-            <Modal scrollBehavior="inside" size="lg" isOpen={isOpen} onOpenChange={onOpenChange}>
+            <Modal scrollBehavior="inside" size="2xl" isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex items-center justify-between gap-7">Change Theme</ModalHeader>
-                            <ModalBody className="scrollbar">
-                                <Listbox
-                                    className="px-0 overflow-visible"
-                                    disallowEmptySelection
-                                    items={themes}
-                                    selectedKeys={selectedKeys}
-                                    defaultSelectedKeys={[themes[0]._id]}
-                                    selectionMode="single"
-                                    variant="flat"
-                                    onSelectionChange={(keys: Selection) => setSelectedKeys(new Set(keys))}
-                                >
-                                    {(item) => (
-                                        <ListboxItem key={item._id} textValue={item.name}>
-                                            <div className="flex gap-2 items-center">
-                                                <div
-                                                    className="size-7 rounded-full flex justify-center items-center"
-                                                    style={{ backgroundColor: item.color }}
-                                                >
-                                                    <div className="size-3 rounded-full bg-content2"></div>
+                            <ModalHeader className="flex items-center justify-between gap-7">
+                                Preview & Change Theme
+                            </ModalHeader>
+                            <ModalBody className="grid grid-cols-2 gap-5 scrollbar">
+                                <section>
+                                    <div
+                                        className="flex gap-3 items-center px-2 pb-4 border-b cursor-pointer"
+                                        onClick={() => setSelectedKeys(new Set())}
+                                    >
+                                        <div
+                                            className="size-7 rounded-full flex justify-center items-center"
+                                            style={{ backgroundColor: conversation?.theme?.color }}
+                                        >
+                                            <div className="size-2 rounded-full bg-content2"></div>
+                                        </div>
+                                        <div className="flex flex-col flex-1">
+                                            <span className="text-small">{conversation?.theme?.name}</span>
+                                            <span className="text-tiny text-default-400">
+                                                {conversation?.theme?.description}
+                                            </span>
+                                        </div>
+                                        <Chip color="default" variant="bordered">
+                                            Current theme
+                                        </Chip>
+                                    </div>
+                                    <Listbox
+                                        className="px-0 overflow-visible"
+                                        disallowEmptySelection
+                                        items={themes}
+                                        selectedKeys={selectedKeys}
+                                        selectionMode="single"
+                                        variant="flat"
+                                        onSelectionChange={(keys: Selection) => setSelectedKeys(new Set(keys))}
+                                    >
+                                        {(item) => (
+                                            <ListboxItem key={item._id} textValue={item.name}>
+                                                <div className="flex gap-3 items-center">
+                                                    <div
+                                                        className="size-7 rounded-full flex justify-center items-center"
+                                                        style={{ backgroundColor: item.color }}
+                                                    >
+                                                        <div className="size-2 rounded-full bg-content2"></div>
+                                                    </div>
+                                                    <div className="flex flex-col flex-1">
+                                                        <span className="text-small">{item.name}</span>
+                                                        <span className="text-tiny text-default-400">
+                                                            {item.description}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-small">{item.name}</span>
-                                                    <span className="text-tiny text-default-400">
-                                                        {item.description}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </ListboxItem>
-                                    )}
-                                </Listbox>
+                                            </ListboxItem>
+                                        )}
+                                    </Listbox>
+                                </section>
+                                {/* Preview */}
+                                <section>
+                                    <div className="group flex items-center gap-2 justify-end w-full mb-5 cursor-pointer">
+                                        <span
+                                            style={{ backgroundColor: selectedTheme?.color ?? "#333" }}
+                                            className="p-3 rounded-3xl text-white max-w-[65%]"
+                                        >
+                                            Hello Peter, how are you doing today?
+                                        </span>
+                                    </div>
+                                    <div className="group flex items-center gap-2 justify-start w-full">
+                                        <span className="p-3 rounded-3xl text-content2-foreground max-w-[65%] bg-content2">
+                                            I am doing great, thank you for asking!
+                                        </span>
+                                    </div>
+                                </section>
                             </ModalBody>
                             <ModalFooter>
-                                <Button color="default" variant="light" onClick={onClose} fullWidth>
+                                <Button color="default" variant="light" fullWidth onClick={onClose}>
                                     Cancel
                                 </Button>
-                                <Button color="primary" fullWidth>
+                                <Button color="primary" fullWidth isLoading={loading} onClick={handleChangeTheme}>
                                     Change theme
                                 </Button>
                             </ModalFooter>

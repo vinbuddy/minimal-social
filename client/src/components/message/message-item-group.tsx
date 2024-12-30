@@ -5,13 +5,15 @@ import EmojiReactionsLabel from "./emoji-reactions-label";
 import MessageContent from "./message-content";
 import MessageActions from "./message-actions";
 import { IMessage } from "@/types/message";
+import { IConversation } from "@/types/conversation";
 
 interface IProps {
     message: IMessage;
     isOwnMessage: boolean;
+    conversation: IConversation;
 }
 
-export default function MessageItemGroup({ message, isOwnMessage }: IProps) {
+export default function MessageItemGroup({ message, isOwnMessage, conversation }: IProps) {
     const isReaction = message?.reactions?.length > 0;
     return (
         <motion.div
@@ -45,7 +47,7 @@ export default function MessageItemGroup({ message, isOwnMessage }: IProps) {
                     </div>
 
                     <div className="group gap-2 flex items-center relative top-[-12px] right-0">
-                        <MessageContent message={message} isOwnMessage={isOwnMessage} />
+                        <MessageContent conversation={conversation} message={message} isOwnMessage={isOwnMessage} />
                         <MessageActions message={message} isOwnMessage={isOwnMessage} />
                     </div>
                 </div>
@@ -55,7 +57,7 @@ export default function MessageItemGroup({ message, isOwnMessage }: IProps) {
                         isOwnMessage ? "justify-end" : "justify-start"
                     }`}
                 >
-                    <MessageContent message={message} isOwnMessage={isOwnMessage} />
+                    <MessageContent conversation={conversation} message={message} isOwnMessage={isOwnMessage} />
                     <MessageActions message={message} isOwnMessage={isOwnMessage} />
                 </div>
             )}

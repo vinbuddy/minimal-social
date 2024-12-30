@@ -73,6 +73,7 @@ export async function getConversationsHandler(_req: Request, res: Response, next
                 path: "participants",
                 select: USER_MODEL_HIDDEN_FIELDS,
             })
+            .populate("theme")
             .lean();
 
         const conversationWithUnreadCount = await Promise.all(
@@ -168,10 +169,12 @@ export async function getConversationDetailHandler(req: Request, res: Response, 
     try {
         const conversationId = req.params.id;
 
-        const conversation = await ConversationModel.findById(conversationId).populate({
-            path: "participants",
-            select: USER_MODEL_HIDDEN_FIELDS,
-        });
+        const conversation = await ConversationModel.findById(conversationId)
+            .populate({
+                path: "participants",
+                select: USER_MODEL_HIDDEN_FIELDS,
+            })
+            .populate("theme");
 
         if (!conversation) {
             return res.status(404).json({
@@ -245,6 +248,30 @@ export async function changeConversationEmojiHandler(req: Request, res: Response
 
         return res.status(200).json({
             message: "Change emoji successfully",
+            data: conversation,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function changeThemeConversationHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const conversationId = req.params.id;
+        const themeId = req.body.themeId as string;
+
+        const conversation = await ConversationModel.findByIdAndUpdate(conversationId, {
+            theme: new mongoose.Types.ObjectId(themeId),
+        });
+
+        if (!conversation) {
+            return res.status(404).json({
+                message: "Conversation not found",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Change theme successfully",
             data: conversation,
         });
     } catch (error) {

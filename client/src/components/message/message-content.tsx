@@ -3,18 +3,22 @@ import emojiRegex from "emoji-regex";
 import { Chip } from "@nextui-org/react";
 import Image from "next/image";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
+import { CSSProperties } from "react";
+import cn from "classnames";
 
 import { IMessage } from "@/types/message";
 import GalleryImages from "../gallery-images";
 import { formatTimeStamp } from "@/utils/datetime";
+import { IConversation } from "@/types/conversation";
 
 interface IProps {
     message: IMessage;
     isOwnMessage: boolean;
+    conversation: IConversation;
 }
 
-export default function MessageContent({ message, isOwnMessage }: IProps) {
-    const isImojiMessageOnly = (content: string): boolean => {
+export default function MessageContent({ message, isOwnMessage, conversation }: IProps) {
+    const isEmojiMessageOnly = (content: string): boolean => {
         const regex = emojiRegex();
         const match = content && content.match(regex);
 
@@ -30,7 +34,8 @@ export default function MessageContent({ message, isOwnMessage }: IProps) {
         // Replace URL -> `<a>`
         return content.replace(
             urlRegex,
-            (url) => `<a class="text-link" href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+            (url) =>
+                `<a class="text-primary-foreground underline font-medium" href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
         );
     };
 
@@ -50,56 +55,59 @@ export default function MessageContent({ message, isOwnMessage }: IProps) {
         },
     };
 
-    const messageClassName = `min-w text-[15px] rounded-[18px] px-3 py-2 ${
-        isOwnMessage && message?.content ? "order-2 bg-primary text-primary-foreground" : "order-1 bg-content2"
-    }`;
+    const getMessageStyle = (): string => {
+        if (isEmojiMessageOnly(message?.content || "")) {
+            return `text-2xl rounded-[18px] ${isOwnMessage ? "order-2" : "order-1"}`;
+        }
 
-    const emojiMessageClassName = `text-2xl rounded-[18px] ${
-        isOwnMessage && message?.content ? "order-2 " : "order-1"
-    }`;
+        return `min-w text-[15px] rounded-[18px] px-3 py-2 ${
+            isOwnMessage ? "order-2 bg-primary text-primary-foreground" : "order-1 bg-content2"
+        }`;
+    };
 
-    const stickerOrGifClassName = `text-2xl rounded-[18px] ${
-        (isOwnMessage && message?.stickerUrl) || message?.gifUrl ? "order-2 " : "order-1"
-    }`;
-
-    const className = isImojiMessageOnly(message?.content) ? emojiMessageClassName : messageClassName;
+    const getThemeStyle = (): CSSProperties | undefined => {
+        return isOwnMessage && !isEmojiMessageOnly(message?.content)
+            ? { backgroundColor: conversation?.theme?.color, color: "white" }
+            : undefined;
+    };
 
     if (message?.isRetracted) {
         return (
-            <section className={className}>
+            <section style={getThemeStyle()} className={getMessageStyle()}>
                 <span className="text-default-400 italic">This message was retracted</span>
             </section>
         );
     }
 
     if (message?.content) {
-        const content = convertLinksToAnchors(message?.content);
+        const content = convertLinksToAnchors(message.content);
         return (
-            <section className={className}>
+            <section style={getThemeStyle()} className={getMessageStyle()}>
                 <span>{parse(content, parserOptions)}</span>
             </section>
         );
     }
 
-    if (!message?.content && message?.stickerUrl) {
+    if (message?.stickerUrl) {
         return (
-            <section className={stickerOrGifClassName}>
+            <section className={cn("text-2xl rounded-[18px]", { "order-2": isOwnMessage, "order-1": !isOwnMessage })}>
                 <Image
                     className="size-[100px] rounded-xl object-cover"
-                    width={0}
-                    height={0}
-                    sizes="100vw"
-                    src={message?.stickerUrl || ""}
-                    alt=""
+                    width={100}
+                    height={100}
+                    src={message.stickerUrl}
+                    alt="Sticker"
                 />
             </section>
         );
-    } else if (!message?.content && message?.gifUrl) {
+    }
+
+    if (message?.gifUrl) {
         return (
-            <section className={stickerOrGifClassName}>
+            <section className={cn("text-2xl rounded-[18px]", { "order-2": isOwnMessage, "order-1": !isOwnMessage })}>
                 <iframe
                     className="size-[200px] shadow-none rounded-xl"
-                    src={message?.gifUrl || ""}
+                    src={message.gifUrl}
                     allowFullScreen
                     scrolling="no"
                     allow="encrypted-media"
@@ -108,24 +116,21 @@ export default function MessageContent({ message, isOwnMessage }: IProps) {
         );
     }
 
-    return (
-        <>
-            {message?.mediaFiles?.length > 0 && (
-                <section
-                    className={`max-w-full overflow-hidden ${
-                        isOwnMessage && message?.mediaFiles.length > 0
-                            ? "order-2 [&_.swiper-slide]:first:!me-0"
-                            : "order-1"
-                    }`}
-                >
-                    <GalleryImages images={message?.mediaFiles} />
-                    <div className={`flex mt-1 ${isOwnMessage ? "justify-end" : "justify-start"}`}>
-                        <Chip size="sm" variant="flat" className={`px-1 text-default-500 text-tiny`}>
-                            {formatTimeStamp(message?.createdAt)}
-                        </Chip>
-                    </div>
-                </section>
-            )}
-        </>
-    );
+    if (message?.mediaFiles?.length > 0) {
+        return (
+            <section
+                className={cn("max-w-full overflow-hidden", {
+                    "order-2 [&_.swiper-slide]:first:!me-0": isOwnMessage,
+                    "order-1": !isOwnMessage,
+                })}
+            >
+                <GalleryImages images={message.mediaFiles} />
+                <div className={cn("flex mt-1", { "justify-end": isOwnMessage, "justify-start": !isOwnMessage })}>
+                    <Chip size="sm" variant="flat" className="px-1 text-default-500 text-tiny">
+                        {formatTimeStamp(message.createdAt)}
+                    </Chip>
+                </div>
+            </section>
+        );
+    }
 }

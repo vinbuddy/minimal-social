@@ -3,14 +3,16 @@ import { Avatar } from "@nextui-org/react";
 import MessageItemGroup from "./message-item-group";
 import { useAuthStore } from "@/hooks/store";
 import { IMessage } from "@/types/message";
+import { IConversation } from "@/types/conversation";
 
 interface IProps {
     className?: string;
     messages: IMessage[];
     originalMessages: IMessage[];
+    conversation: IConversation;
 }
 
-export default function MessageItem({ className = "", messages, originalMessages }: IProps) {
+export default function MessageItem({ className = "", messages, originalMessages, conversation }: IProps) {
     const { currentUser } = useAuthStore();
     const isOwnMessage = messages[0]?.sender?._id === currentUser?._id;
 
@@ -31,7 +33,12 @@ export default function MessageItem({ className = "", messages, originalMessages
                 {messages.length > 0 &&
                     messages?.map((message, index) => (
                         <>
-                            <MessageItemGroup key={message?._id} message={message} isOwnMessage={isOwnMessage} />
+                            <MessageItemGroup
+                                key={message?._id}
+                                message={message}
+                                isOwnMessage={isOwnMessage}
+                                conversation={conversation}
+                            />
 
                             <div className="flex items-center gap-2 justify-end">
                                 {message.seenBy

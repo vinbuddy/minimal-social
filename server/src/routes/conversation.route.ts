@@ -2,6 +2,7 @@ import express, { Router } from "express";
 import { verifyToken } from "../middlewares/verifyToken";
 import {
     changeConversationEmojiHandler,
+    changeThemeConversationHandler,
     createPrivateConversationHandler,
     getConversationDetailHandler,
     getConversationMediaFilesHandler,
@@ -20,5 +21,6 @@ router.get("/:id", verifyToken, getConversationDetailHandler);
 
 router.post("/", verifyToken, createPrivateConversationHandler);
 router.put("/change-emoji/:id", verifyToken, changeConversationEmojiHandler);
+router.put("/change-theme/:id", verifyToken, changeThemeConversationHandler);
 
 export default router;

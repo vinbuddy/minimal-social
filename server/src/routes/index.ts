@@ -9,6 +9,7 @@ import searchRoutes from "./search.route";
 import messageRoutes from "./message.route";
 import conversationRoutes from "./conversation.route";
 import stickerRoutes from "./sticker.route";
+import themeRoutes from "./theme.route";
 
 const router = express.Router();
 
@@ -21,5 +22,6 @@ router.use("/search", searchRoutes);
 router.use("/message", messageRoutes);
 router.use("/conversation", conversationRoutes);
 router.use("/sticker", stickerRoutes);
+router.use("/theme", themeRoutes);
 
 export default router;

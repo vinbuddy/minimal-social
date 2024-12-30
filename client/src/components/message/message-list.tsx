@@ -346,6 +346,7 @@ export default function MessageList({ conversation }: IProps) {
                                         originalMessages={messageList}
                                         messages={group.messages}
                                         className={`${group.marginBottom}`}
+                                        conversation={conversation}
                                     />
                                 </Fragment>
                             ))}
