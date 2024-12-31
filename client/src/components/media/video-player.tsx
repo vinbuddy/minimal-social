@@ -12,6 +12,7 @@ interface IProps {
     loop?: boolean;
     autoPlay?: boolean;
     playOrPause?: boolean;
+    showVolume?: boolean;
     inViewOptions?: IntersectionObserverInit;
 }
 
@@ -22,6 +23,7 @@ function VideoPlayer(
         autoPlay = true,
         timeline = true,
         playOrPause = true,
+        showVolume = true,
         className = "w-full h-auto rounded-xl",
         inViewOptions = { root: null, rootMargin: "0px", threshold: 0.5 },
         ...props
@@ -232,15 +234,17 @@ function VideoPlayer(
                 )}
 
                 {/* Muted Toggle button */}
-                <div className={`absolute right-3 ${!timeline ? "bottom-3" : "bottom-10"}`}>
-                    <button onClick={handleToggleMute} className=" rounded-full p-2 bg-[rgba(0,0,0,0.5)]">
-                        {muted ? (
-                            <VolumeXIcon size={18} className="text-white" />
-                        ) : (
-                            <Volume1Icon size={18} className="text-white" />
-                        )}
-                    </button>
-                </div>
+                {showVolume && (
+                    <div className={`absolute right-3 ${!timeline ? "bottom-3" : "bottom-10"}`}>
+                        <button onClick={handleToggleMute} className=" rounded-full p-2 bg-[rgba(0,0,0,0.5)]">
+                            {muted ? (
+                                <VolumeXIcon size={18} className="text-white" />
+                            ) : (
+                                <Volume1Icon size={18} className="text-white" />
+                            )}
+                        </button>
+                    </div>
+                )}
 
                 {/* Range timeline */}
                 {timeline && (

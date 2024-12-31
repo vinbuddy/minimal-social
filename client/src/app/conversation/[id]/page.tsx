@@ -5,7 +5,6 @@ import {
     Drawer,
     DrawerBody,
     DrawerContent,
-    DrawerFooter,
     DrawerHeader,
     Tooltip,
     useDisclosure,
@@ -14,6 +13,7 @@ import { ArrowLeftIcon, InfoIcon, Phone, Video } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
+import { FileRejection, useDropzone } from "react-dropzone";
 
 import ConversationInfo from "@/components/conversation/conversation-info";
 import MessageForm from "@/components/message/message-form";
@@ -23,9 +23,14 @@ import UserName from "@/components/user/user-name";
 import { useAuthStore } from "@/hooks/store";
 import { IConversation } from "@/types/conversation";
 import { useConversationContext } from "@/contexts/conversation-context";
+import { IMediaFile } from "@/types/post";
+import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
+import { showToast } from "@/utils/toast";
 
 function ConversationDetailPage() {
     const [isOpenConversationInfo, setIsOpenConversationInfo] = useState<boolean>(false);
+    const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>([]);
+
     const params = useParams<{ id: string }>();
     const currentUser = useAuthStore((state) => state.currentUser);
 
@@ -37,6 +42,67 @@ function ConversationDetailPage() {
     const { onBack } = useConversationContext();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+    const handleOnDropFiles = async (files: File[]) => {
+        if (!files) {
+            return;
+        }
+
+        const fileInfos: IMediaFile[] = [];
+        for (let i = 0; i < files?.length; i++) {
+            const file = files[i];
+
+            if (!checkLimitSize(file)) {
+                alert("LIMIT");
+                return;
+            }
+
+            const localURL = URL.createObjectURL(file);
+            const dimension: any = await getFileDimension(file);
+
+            fileInfos.push({
+                url: localURL,
+                file: file,
+                width: dimension.width,
+                height: dimension.height,
+                type: getFileFormat(file.type),
+            });
+        }
+
+        // Preview
+        setMediaFiles((prev) => [...prev, ...fileInfos]);
+    };
+
+    const handleOnDropRejectedFiles = (rejectedFiles: FileRejection[]) => {
+        const errorMessages = rejectedFiles.map((file) => {
+            const fileName = file.file.name;
+            const error = file.errors[0];
+
+            if (error.code === "file-invalid-type") {
+                return `File "${fileName}" is not supported`;
+            }
+
+            if (error.code === "file-too-large") {
+                return `File "${fileName}" exceeds the size limit`;
+            }
+
+            return `File "${fileName}" could not be uploaded`;
+        });
+
+        showToast(errorMessages.join("\n"), "error");
+    };
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop: handleOnDropFiles,
+        onDropRejected: handleOnDropRejectedFiles,
+        noClick: true,
+        accept: {
+            "image/jpeg": [],
+            "image/png": [],
+            "video/mp4": [],
+            "video/quicktime": [],
+        },
+    });
+
     return (
         <>
             <div className="grid grid-cols-12 h-full">
@@ -47,7 +113,8 @@ function ConversationDetailPage() {
                             : "md:col-span-12 lg:col-span-12 xl:col-span-12 2xl:col-span-12"
                     }`}
                 >
-                    <div className="h-screen flex flex-col justify-between overflow-auto py-4">
+                    <div {...getRootProps()} className="h-screen flex flex-col justify-between overflow-auto py-4">
+                        <input {...getInputProps()} />
                         {/* User - Actions */}
                         <header className="min-h-[40px] flex items-center justify-between pb-5 px-4  border-b-1 border-divider">
                             <div className="flex items-center cursor-pointer">
@@ -105,10 +172,21 @@ function ConversationDetailPage() {
                             </div>
                         </header>
 
-                        {/* Message */}
-                        {data?.data && <MessageList conversation={data?.data} />}
+                        {isDragActive && (
+                            <div className="p-5 h-full overflow-hidden">
+                                <div className="rounded-2xl border-2 border-dashed border-default w-full overflow-y-auto overflow-x-hidden h-full flex justify-center items-center">
+                                    <h4>Drag and drop files here</h4>
+                                </div>
+                            </div>
+                        )}
 
-                        <MessageForm conversation={data?.data} />
+                        {/* Message */}
+                        {data?.data && !isDragActive && <MessageList conversation={data?.data} />}
+
+                        <MessageForm
+                            conversation={data?.data}
+                            mediaFiles={mediaFiles?.length > 0 ? mediaFiles : undefined}
+                        />
                     </div>
                 </section>
                 {isOpenConversationInfo && (

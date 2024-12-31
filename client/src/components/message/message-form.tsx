@@ -28,9 +28,10 @@ init({ data });
 
 interface IProps {
     conversation?: IConversation;
+    mediaFiles?: IMediaFile[];
 }
 
-export default function MessageForm({ conversation }: IProps) {
+export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: IProps) {
     const [message, setMessage] = useState<string>("");
     const [emoji, setEmoji] = useState<string>(conversation?.emoji ?? "👍");
     const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>([]);
@@ -42,6 +43,12 @@ export default function MessageForm({ conversation }: IProps) {
     const { replyTo, unReply } = useReplyStore();
     const { startLoading, stopLoading, loading } = useLoading();
     const mutate = useGlobalMutation();
+
+    useEffect(() => {
+        if (_mediaFiles) {
+            setMediaFiles((prev) => [...prev, ..._mediaFiles]);
+        }
+    }, [_mediaFiles]);
 
     useEffect(() => {
         return () => {

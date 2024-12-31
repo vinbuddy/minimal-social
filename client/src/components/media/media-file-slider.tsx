@@ -87,38 +87,6 @@ function MediaFileSlider({
                                             />
                                         )
                                     ) : (
-                                        // <NextImage
-                                        //     // as={NextImage}
-                                        //     className="w-full h-auto block rounded-lg"
-                                        //     src={file?.url}
-                                        //     width={file.width}
-                                        //     height={file.height}
-                                        //     placeholder="blur"
-                                        //     blurDataURL={file?.url}
-                                        //     alt="Preview Image"
-                                        // />
-                                        // onRemoveMediaFile ? (
-                                        //     <NextImage
-                                        //         className="w-full h-auto block rounded-lg"
-                                        //         src={file?.url}
-                                        //         width={file.width}
-                                        //         height={file.height}
-                                        //         placeholder="blur"
-                                        //         blurDataURL={file?.url}
-                                        //         alt="Preview Image"
-                                        //     />
-                                        // ) : (
-                                        //     <Image
-                                        //         as={NextImage}
-                                        //         className="w-full h-auto block rounded-lg"
-                                        //         src={file?.url}
-                                        //         width={file.width}
-                                        //         height={file.height}
-                                        //         placeholder="blur"
-                                        //         blurDataURL={file?.url}
-                                        //         alt="Preview Image"
-                                        //     />
-                                        // )
                                         <>
                                             <VideoPlayer
                                                 src={file.url}
@@ -131,6 +99,7 @@ function MediaFileSlider({
 
                                     {!!onRemoveMediaFile && (
                                         <button
+                                            type="button"
                                             onClick={() => onRemoveMediaFile(index)}
                                             className="group-hover:visible invisible transition ease-linear absolute top-2 right-2 text-lg p-1 text-white bg-[#00000080] rounded-full"
                                         >
