@@ -8,6 +8,7 @@ import { useState } from "react";
 import FullScreenMediaSlider from "../media/fullscreen-media-slider";
 import { usePagination, useVisibility } from "@/hooks";
 import { IMediaFile } from "@/types/post";
+import VideoPlayer from "../media/video-player";
 
 interface IProps {
     conversationId: string;
@@ -57,15 +58,30 @@ export default function ConversationStorage({ conversationId }: IProps) {
                             dataLength={mediaFiles?.length ?? 0}
                         >
                             {mediaFiles.map((mediaFile, index) => (
-                                <div className="mb-2 last:mb-0" key={mediaFile.publicId}>
-                                    <Image
-                                        className="rounded-lg cursor-pointer"
-                                        width={mediaFile.width}
-                                        height={mediaFile.height}
-                                        src={mediaFile.url}
-                                        alt="media"
-                                        onClick={() => handleMediaFileClick(index)}
-                                    />
+                                <div
+                                    className="mb-2 last:mb-0"
+                                    key={mediaFile.publicId}
+                                    onClick={() => handleMediaFileClick(index)}
+                                >
+                                    {mediaFile.type === "image" ? (
+                                        <Image
+                                            className="rounded-lg cursor-pointer"
+                                            width={mediaFile.width}
+                                            height={mediaFile.height}
+                                            src={mediaFile.url}
+                                            alt="media"
+                                        />
+                                    ) : (
+                                        <VideoPlayer
+                                            className="rounded-lg cursor-pointer"
+                                            src={mediaFile.url}
+                                            showVolume={false}
+                                            timeline={false}
+                                            autoPlay={false}
+                                            playOrPause={true}
+                                            isThumbnail={true}
+                                        />
+                                    )}
                                 </div>
                             ))}
                         </InfiniteScroll>
@@ -90,7 +106,7 @@ export default function ConversationStorage({ conversationId }: IProps) {
                 mediaFiles={mediaFiles}
             />
             <div>
-                <Tabs className="sticky top-[76px] bg-content1 pb-4" fullWidth size="md">
+                <Tabs className="sticky top-[76px] bg-content1 pb-4 z-10" fullWidth size="md">
                     <Tab key="media" title="Media files">
                         <div>{renderMediaFiles()}</div>
                     </Tab>

@@ -32,6 +32,14 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
         if (swiperRef.current && isOpen) {
             swiperRef.current.slideTo(activeSlideIndex, 0); // Transition instantly
         }
+
+        // Play video if active slide is video and is open
+        const currentSlide = videoRefs.current[activeSlide];
+        if (!currentSlide) return;
+
+        if (mediaFiles[activeSlide].type === "video" && currentSlide) {
+            currentSlide.play();
+        }
     }, [activeSlideIndex, isOpen]);
 
     const handleHide = (): void => {
@@ -41,7 +49,12 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
         const currentSlide = videoRefs.current[activeSlide];
 
         if (mediaFiles[activeSlide].type === "video" && currentSlide) {
-            turnOffFullscreenVideo(currentSlide?.src);
+            // turnOffFullscreenVideo(currentSlide?.src);
+            currentSlide.pause();
+            currentSlide.muted = true;
+
+            // Reset time to 0
+            currentSlide.currentTime = 0;
         }
 
         // set active slide to 0
@@ -120,6 +133,7 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
                                     }}
                                     className="max-w-full w-fit h-full rounded-none"
                                     src={file?.url}
+                                    autoPlay={index === activeSlideIndex}
                                 />
                             )}
                         </SwiperSlide>

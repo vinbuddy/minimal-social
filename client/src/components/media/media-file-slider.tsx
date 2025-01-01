@@ -91,7 +91,7 @@ function MediaFileSlider({
                                             <VideoPlayer
                                                 src={file.url}
                                                 timeline={videoPreview && false}
-                                                playOrPause={videoPreview && true}
+                                                playOrPause={videoPreview && false}
                                                 className="w-full h-full block rounded-xl"
                                             />
                                         </>

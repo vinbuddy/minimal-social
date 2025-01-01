@@ -181,7 +181,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
     if (storageType) {
         return (
             <div id="conversation-storage" className="h-screen overflow-auto bg-content1 border-divider px-4 scrollbar">
-                <header className="min-h-[40px] flex items-center gap-2 pb-5 sticky pt-4 top-0 bg-content1">
+                <header className="min-h-[40px] flex items-center gap-2 pb-5 sticky pt-4 top-0 bg-content1 z-10">
                     <Button onClick={() => setStorageType(null)} title="Back" isIconOnly radius="full" variant="light">
                         <ArrowLeftIcon size={20} />
                     </Button>

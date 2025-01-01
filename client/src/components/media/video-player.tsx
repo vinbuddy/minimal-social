@@ -3,8 +3,6 @@ import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "re
 import { Slider, SliderValue } from "@nextui-org/react";
 import { PlayIcon, Volume1Icon, VolumeXIcon } from "lucide-react";
 
-import { useVideoStore } from "@/hooks/store";
-
 interface IProps {
     src: string;
     className?: string;
@@ -13,6 +11,7 @@ interface IProps {
     autoPlay?: boolean;
     playOrPause?: boolean;
     showVolume?: boolean;
+    isThumbnail?: boolean;
     inViewOptions?: IntersectionObserverInit;
 }
 
@@ -24,31 +23,20 @@ function VideoPlayer(
         timeline = true,
         playOrPause = true,
         showVolume = true,
+        isThumbnail = false,
         className = "w-full h-auto rounded-xl",
         inViewOptions = { root: null, rootMargin: "0px", threshold: 0.5 },
         ...props
     }: IProps,
     ref: React.ForwardedRef<HTMLVideoElement>
 ) {
-    const { setVideoTime, getVideo } = useVideoStore();
+    const [playing, setPlaying] = useState<boolean>(false);
+    const [muted, setMuted] = useState<boolean>(true);
 
-    const [playing, setPlaying] = useState<boolean>(true);
-    const [muted, setMuted] = useState<boolean>(() => {
-        return getVideo(src)?.muted ?? true;
-    });
-
-    const [currentTime, setCurrentTime] = useState<[number, number]>(() => {
-        return getVideo(src)?.time.currentTime || [0, 0];
-    });
-    const [duration, setDuration] = useState<[number, number]>(() => {
-        return getVideo(src)?.time.duration || [0, 0];
-    });
-    const [durationSec, setDurationSec] = useState<number>(() => {
-        return getVideo(src)?.time.durationSec || 0;
-    });
-    const [currentTimeSec, setCurrentTimeSec] = useState<number>(() => {
-        return getVideo(src)?.time.currentTimeSec || 0;
-    });
+    const [currentTime, setCurrentTime] = useState<[number, number]>([0, 0]);
+    const [duration, setDuration] = useState<[number, number]>([0, 0]);
+    const [durationSec, setDurationSec] = useState<number>(0);
+    const [currentTimeSec, setCurrentTimeSec] = useState<number>(0);
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -63,19 +51,10 @@ function VideoPlayer(
     };
 
     useEffect(() => {
-        const videoKept = getVideo(src);
-
-        if (videoRef.current && !videoKept) {
+        if (videoRef.current) {
             const { min, sec } = sec2Min(videoRef.current.duration);
 
             setDurationSec(videoRef.current.duration);
-            setDuration([min, sec]);
-        }
-
-        if (videoRef.current && videoKept) {
-            const { min, sec } = sec2Min(videoKept.time.durationSec);
-
-            setDurationSec(videoKept.time.durationSec);
             setDuration([min, sec]);
         }
     }, [currentTimeSec, durationSec]);
@@ -98,26 +77,25 @@ function VideoPlayer(
         };
     }, []);
 
-    useEffect(() => {
-        const videoKept = getVideo(src);
-
-        // Pass previous time to videoRef
-        if (videoKept && videoRef.current) {
-            videoRef.current.currentTime = videoKept.time.currentTimeSec;
-        }
-    }, []);
-
     // Handle play - pause video in - out viewport
     useEffect(() => {
         const handleVideoInViewport: IntersectionObserverCallback = (entries) => {
             entries.forEach((entry) => {
-                if (videoRef.current) {
-                    if (entry.isIntersecting) {
-                        videoRef.current?.play();
+                if (!videoRef.current) {
+                    return;
+                }
+
+                if (entry.isIntersecting) {
+                    if (autoPlay) {
+                        videoRef.current.play();
+                        setPlaying(true);
                     } else {
-                        videoRef.current?.pause();
-                        videoRef.current.autoplay = false;
+                        videoRef.current.pause();
+                        setPlaying(false);
                     }
+                } else {
+                    videoRef.current.pause();
+                    setPlaying(false);
                 }
             });
         };
@@ -132,21 +110,7 @@ function VideoPlayer(
                 observer.unobserve(videoRef.current);
             }
         };
-    }, []);
-
-    useEffect(() => {
-        const isFullscreen = getVideo(src)?.isFullscreen;
-        const prevMuted = getVideo(src)?.muted;
-
-        if (!videoRef.current) {
-            return;
-        }
-
-        if (!isFullscreen && prevMuted != undefined) {
-            videoRef.current.muted = prevMuted;
-            setMuted(prevMuted);
-        }
-    }, [getVideo(src)?.isFullscreen ?? false]);
+    }, [autoPlay]);
 
     const handlePlay = (): void => {
         if (playing) {
@@ -161,8 +125,6 @@ function VideoPlayer(
     const handleToggleMute = (e?: React.MouseEvent<HTMLButtonElement>): void => {
         if (e) e.stopPropagation();
 
-        console.log(123);
-
         if (videoRef.current) {
             videoRef.current.muted = !muted;
             setMuted(!muted);
@@ -170,6 +132,8 @@ function VideoPlayer(
     };
 
     const handleTimeUpdate = (): void => {
+        if (!playing) return;
+
         if (videoRef.current) {
             const { min, sec } = sec2Min(videoRef.current.currentTime);
             setCurrentTimeSec(videoRef.current?.currentTime);
@@ -185,16 +149,38 @@ function VideoPlayer(
     };
 
     const handleKeepCurrentTime = (): void => {
-        setVideoTime(src, muted, {
-            currentTime,
-            currentTimeSec,
-            duration,
-            durationSec,
-        });
+        // if (videoRef.current) {
+        //     videoRef.current.muted = true;
+        //     setMuted(true);
+        // }
+    };
 
-        if (videoRef.current && !muted && !playOrPause && !timeline) {
-            videoRef.current.muted = true;
-            setMuted(true);
+    const renderPlayPauseButton = () => {
+        if (playOrPause && isThumbnail) {
+            return (
+                <div className="absolute flex items-center justify-center cursor-pointer top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <button className={`rounded-full p-5 bg-[rgba(0,0,0,0.5)] scale-100 visible transition-all`}>
+                        <PlayIcon fill="#fff" className="text-white text-xl" />
+                    </button>
+                </div>
+            );
+        }
+
+        if (playOrPause && !isThumbnail) {
+            return (
+                <div
+                    onClick={handlePlay}
+                    className="absolute flex items-center justify-center cursor-pointer top-0 left-0 right-0 bottom-20"
+                >
+                    <button
+                        className={`rounded-full p-5 bg-[rgba(0,0,0,0.5)] scale-0 invisible transition-all ${
+                            !playing ? "!scale-100 !visible" : ""
+                        }`}
+                    >
+                        <PlayIcon fill="#fff" className="text-white text-xl" />
+                    </button>
+                </div>
+            );
         }
     };
 
@@ -218,20 +204,7 @@ function VideoPlayer(
             {/* Controls Overlay */}
             <div className="absolute top-0 left-0 w-full h-full bg-transparent">
                 {/* Pause - Play button */}
-                {playOrPause && (
-                    <div
-                        onClick={handlePlay}
-                        className="absolute flex items-center justify-center cursor-pointer top-0 left-0 right-0 bottom-20"
-                    >
-                        <button
-                            className={`rounded-full p-5 bg-[rgba(0,0,0,0.5)] scale-0 invisible transition-all ${
-                                !playing ? "!scale-100 !visible" : ""
-                            }`}
-                        >
-                            <PlayIcon fill="#fff" className="text-white text-xl" />
-                        </button>
-                    </div>
-                )}
+                {renderPlayPauseButton()}
 
                 {/* Muted Toggle button */}
                 {showVolume && (
