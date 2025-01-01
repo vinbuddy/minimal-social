@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const formatTimeStamp = (ISO8601String: string): string => {
     const dateTime = new Date(ISO8601String);
 
@@ -14,4 +16,12 @@ export const formatTimeStamp = (ISO8601String: string): string => {
     const formattedTime = `${hours}:${minutes}`;
 
     return `${formattedTime}, ${formattedDate}`;
+};
+
+export const formatDate = (ISO8601String: string): string => {
+    return dayjs(ISO8601String).format("DD-MM-YYYY");
+};
+
+export const formatTime = (ISO8601String: string): string => {
+    return dayjs(ISO8601String).format("HH:mm");
 };

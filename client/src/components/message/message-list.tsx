@@ -1,7 +1,8 @@
 "use client";
-import { Spinner } from "@nextui-org/react";
+import { Chip, Spinner } from "@nextui-org/react";
 import { Fragment, useEffect, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import dayjs from "dayjs";
 
 import MessageItem from "./message-item";
 
@@ -12,6 +13,7 @@ import { usePagination, useGlobalMutation } from "@/hooks";
 import { useAuthStore, useMessagesStore } from "@/hooks/store";
 import axiosInstance from "@/utils/httpRequest";
 import { showToast } from "@/utils/toast";
+import { formatDate } from "@/utils/datetime";
 
 interface IProps {
     conversation: IConversation;
@@ -20,6 +22,8 @@ interface IProps {
 interface GroupedMessage {
     messages: IMessage[];
     marginBottom: string;
+    date: string;
+    showDate: boolean;
 }
 
 export default function MessageList({ conversation }: IProps) {
@@ -46,6 +50,25 @@ export default function MessageList({ conversation }: IProps) {
         if (messages) {
             setMessageList(messages);
         }
+
+        const messageListEl = messageListRef.current;
+        if (!messageListEl) return;
+
+        // Lưu chiều cao hiện tại trước khi thêm tin nhắn mới
+        const previousScrollHeight = messageListEl.scrollHeight;
+
+        const observer = new MutationObserver(() => {
+            const currentScrollHeight = messageListEl.scrollHeight;
+
+            // Điều chỉnh scrollTop để giữ vị trí cũ
+            if (currentScrollHeight > previousScrollHeight) {
+                messageListEl.scrollTop += currentScrollHeight - previousScrollHeight;
+            }
+        });
+
+        observer.observe(messageListEl, { childList: true, subtree: true });
+
+        return () => observer.disconnect();
     }, [loadingMore]);
 
     useEffect(() => {
@@ -249,10 +272,33 @@ export default function MessageList({ conversation }: IProps) {
         let group: IMessage[] = [];
         let lastGroupTime = 0;
         let marginBottom = "mb-2"; // Default margin
+        let currentDate: string | null = null;
+        let lastShownDate: string | null = null;
 
         for (let i = 0; i < sortedMessages.length; i++) {
             const currentMessage = sortedMessages[i];
             const previousMessage = sortedMessages[i - 1];
+            const messageDate = dayjs(currentMessage.createdAt).startOf("day").toISOString();
+
+            if (!currentDate || !dayjs(messageDate).isSame(dayjs(currentDate), "day")) {
+                if (group.length > 0) {
+                    // Chỉ hiển thị date nếu khác với date cuối cùng đã hiển thị
+                    const showDate = !lastShownDate || !dayjs(currentDate).isSame(dayjs(lastShownDate), "day");
+
+                    groupedMessages.push({
+                        messages: group,
+                        marginBottom: marginBottom,
+                        date: currentDate || messageDate,
+                        showDate: showDate,
+                    });
+
+                    if (showDate) {
+                        lastShownDate = currentDate || messageDate;
+                    }
+                }
+                currentDate = messageDate;
+                group = [];
+            }
 
             const isSameSender = previousMessage ? currentMessage.sender._id === previousMessage.sender._id : false;
             const currentMessageTime = new Date(currentMessage.createdAt).getTime();
@@ -273,7 +319,18 @@ export default function MessageList({ conversation }: IProps) {
                 group.push(currentMessage);
             } else {
                 if (group.length > 0) {
-                    groupedMessages.push({ messages: group, marginBottom: marginBottom });
+                    const showDate = !lastShownDate || !dayjs(currentDate).isSame(dayjs(lastShownDate), "day");
+
+                    groupedMessages.push({
+                        messages: group,
+                        marginBottom: marginBottom,
+                        date: currentDate,
+                        showDate: showDate,
+                    });
+
+                    if (showDate) {
+                        lastShownDate = currentDate;
+                    }
                 }
                 group = [currentMessage];
             }
@@ -282,7 +339,14 @@ export default function MessageList({ conversation }: IProps) {
         }
 
         if (group.length > 0) {
-            groupedMessages.push({ messages: group, marginBottom });
+            const showDate = !lastShownDate || !dayjs(currentDate).isSame(dayjs(lastShownDate), "day");
+
+            groupedMessages.push({
+                messages: group,
+                marginBottom,
+                date: currentDate as string,
+                showDate: showDate,
+            });
         }
 
         return groupedMessages;
@@ -327,7 +391,12 @@ export default function MessageList({ conversation }: IProps) {
                         scrollableTarget="messageList"
                         inverse={true}
                         style={{ display: "flex", flexDirection: "column-reverse" }}
-                        next={() => setPage(size + 1)}
+                        next={() => {
+                            const messageListEl = messageListRef.current;
+                            if (messageListEl && messageListEl.scrollTop < 10) {
+                                setPage(size + 1);
+                            }
+                        }}
                         hasMore={!isReachedEnd}
                         loader={
                             <div className="flex justify-center items-start overflow-hidden">
@@ -342,6 +411,13 @@ export default function MessageList({ conversation }: IProps) {
                         <div>
                             {groupedMessages.map((group, index) => (
                                 <Fragment key={index}>
+                                    {group.showDate && (
+                                        <div className="flex justify-center my-4">
+                                            <Chip color="default" size="sm" variant="flat">
+                                                {formatDate(group.date)}
+                                            </Chip>
+                                        </div>
+                                    )}
                                     <MessageItem
                                         originalMessages={messageList}
                                         messages={group.messages}

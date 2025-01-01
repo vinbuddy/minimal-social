@@ -8,7 +8,7 @@ import cn from "classnames";
 
 import { IMessage } from "@/types/message";
 import GalleryMediaFiles from "../media/gallery-media-files";
-import { formatTimeStamp } from "@/utils/datetime";
+import { formatTime, formatTimeStamp } from "@/utils/datetime";
 import { IConversation } from "@/types/conversation";
 
 interface IProps {
@@ -127,7 +127,7 @@ export default function MessageContent({ message, isOwnMessage, conversation }: 
                 <GalleryMediaFiles mediaFiles={message.mediaFiles} />
                 <div className={cn("flex mt-1", { "justify-end": isOwnMessage, "justify-start": !isOwnMessage })}>
                     <Chip size="sm" variant="flat" className="px-1 text-default-500 text-tiny">
-                        {formatTimeStamp(message.createdAt)}
+                        {formatTime(message.createdAt)}
                     </Chip>
                 </div>
             </section>

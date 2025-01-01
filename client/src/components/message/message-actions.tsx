@@ -1,13 +1,12 @@
 "use client";
-import { Button, Chip, useDisclosure } from "@nextui-org/react";
-import { toast } from "sonner";
+import { Button, Chip } from "@nextui-org/react";
 import { EllipsisVerticalIcon, ReplyIcon, SmileIcon } from "lucide-react";
 
 import MessageEmojiReaction from "./message-emoji-reaction";
 import MessageMenuDropdown from "./message-menu-dropdown";
 
 import { IMessage } from "@/types/message";
-import { formatTimeStamp } from "@/utils/datetime";
+import { formatTime } from "@/utils/datetime";
 import axiosInstance from "@/utils/httpRequest";
 import { showToast } from "@/utils/toast";
 import { useAuthStore, useReplyStore } from "@/hooks/store";
@@ -61,7 +60,7 @@ export default function MessageActions({ message, isOwnMessage }: IProps) {
             </MessageMenuDropdown>
             {!message?.mediaFiles?.length && (
                 <Chip size="sm" variant="flat" className={`px-1 text-default-500 text-tiny`}>
-                    {formatTimeStamp(message?.createdAt)}
+                    {formatTime(message?.createdAt)}
                 </Chip>
             )}
         </section>
