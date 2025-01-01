@@ -36,6 +36,18 @@ export default function PostDetail({ post }: IProps) {
         setOpenEditModal(!openEditModal);
     };
 
+    const convertLinksToAnchors = (content: string) => {
+        // Regex URL
+        const urlRegex = /(https?:\/\/(?:www\.)?[^\s/$.?#].[^\s]*)/gi;
+
+        // Replace URL -> `<a>`
+        return content.replace(
+            urlRegex,
+            (url) =>
+                `<a class="text-link hover:underline font-medium" href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+        );
+    };
+
     // Convert <a> to <Link> tag
     const parserOptions: HTMLReactParserOptions = {
         replace({ attribs, children }: any) {
@@ -103,7 +115,7 @@ export default function PostDetail({ post }: IProps) {
                 </div>
             </section>
             <section className="mt-4">
-                <div className="block">{parse(post?.caption ?? "", parserOptions)}</div>
+                <div className="block">{parse(convertLinksToAnchors(post?.caption) ?? "", parserOptions)}</div>
                 <MediaFileSlider
                     onMediaFileClick={handleMediaFileClick}
                     mediaFiles={post?.mediaFiles ?? []}
