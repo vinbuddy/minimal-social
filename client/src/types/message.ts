@@ -24,3 +24,8 @@ export interface IMessage {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface IMessageLink {
+    createdAt: string;
+    links: string[];
+}

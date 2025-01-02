@@ -279,3 +279,54 @@ export async function changeThemeConversationHandler(req: Request, res: Response
         next(error);
     }
 }
+
+export async function getConversationLinksHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const conversationId = req.query.conversationId as string;
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+
+        if (!conversationId) return res.status(400).json({ message: "Conversation ID is required" });
+
+        const skip = (Number(page) - 1) * limit;
+
+        const urlRegex = /(https?:\/\/(?:www\.)?[^\s/$.?#].[^\s]*)/i;
+
+        const condition = {
+            links: { $ne: [] },
+            conversation: new mongoose.Types.ObjectId(conversationId),
+            isRetracted: false,
+            content: { $regex: urlRegex },
+        };
+
+        const messagesWithLinks = await MessageModel.find(condition)
+            .select("content createdAt")
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const totalLinks = await MessageModel.countDocuments(condition);
+        const totalPages = Math.ceil(totalLinks / limit);
+
+        const messageLinks = messagesWithLinks.map((message) => {
+            const links = (message.content.match(urlRegex) || []).map((link) => link.trim());
+
+            return {
+                createdAt: message.createdAt,
+                links: Array.from(new Set(links)), // Using Set to remove duplicate links and convert back to array
+            };
+        });
+
+        return res.status(200).json({
+            message: "Get links successfully",
+            data: messageLinks,
+            totalLinks,
+            totalPages,
+            page,
+            limit,
+        });
+    } catch (error) {
+        next(error);
+    }
+}

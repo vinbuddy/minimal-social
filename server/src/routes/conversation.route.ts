@@ -5,6 +5,7 @@ import {
     changeThemeConversationHandler,
     createPrivateConversationHandler,
     getConversationDetailHandler,
+    getConversationLinksHandler,
     getConversationMediaFilesHandler,
     getConversationsHandler,
     searchConversationsByNameHandler,
@@ -16,6 +17,7 @@ router.get("/", verifyToken, getConversationsHandler);
 router.get("/search", verifyToken, searchConversationsByNameHandler);
 
 router.get("/storage/media-file", verifyToken, getConversationMediaFilesHandler);
+router.get("/storage/link", verifyToken, getConversationLinksHandler);
 
 router.get("/:id", verifyToken, getConversationDetailHandler);
 

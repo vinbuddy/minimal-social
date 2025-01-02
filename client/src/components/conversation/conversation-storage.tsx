@@ -9,6 +9,9 @@ import FullScreenMediaSlider from "../media/fullscreen-media-slider";
 import { usePagination, useVisibility } from "@/hooks";
 import { IMediaFile } from "@/types/post";
 import VideoPlayer from "../media/video-player";
+import { IMessageLink } from "@/types/message";
+import { formatDate } from "@/utils/datetime";
+import { LinkIcon } from "lucide-react";
 
 interface IProps {
     conversationId: string;
@@ -23,6 +26,15 @@ export default function ConversationStorage({ conversationId }: IProps) {
         isLoading,
         setSize: setPage,
     } = usePagination<IMediaFile>(`/conversation/storage/media-file?conversationId=${conversationId}`);
+
+    const {
+        data: messageLinks,
+        error: linkError,
+        isReachedEnd: linkIsReachedEnd,
+        size: linkPageSize,
+        isLoading: linkIsLoading,
+        setSize: setLinkPage,
+    } = usePagination<IMessageLink>(`/conversation/storage/link?conversationId=${conversationId}`);
 
     const { isVisible: open, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
     const [activeIndex, setActiveIndex] = useState<number>(0);
@@ -97,6 +109,66 @@ export default function ConversationStorage({ conversationId }: IProps) {
         );
     };
 
+    const renderLinks = () => {
+        if (linkError && !linkIsLoading) {
+            return <p className="text-center text-danger">{linkError?.message}</p>;
+        }
+
+        if (messageLinks.length === 0 && !linkIsLoading && !linkError) {
+            return <p className="text-center">No links yet</p>;
+        }
+
+        return (
+            <>
+                <div>
+                    {messageLinks.length > 0 && (
+                        <InfiniteScroll
+                            scrollableTarget="conversation-list"
+                            next={() => setLinkPage(linkPageSize + 1)}
+                            hasMore={!linkIsReachedEnd}
+                            loader={
+                                <div className="flex justify-center items-center overflow-hidden h-[70px]">
+                                    <Spinner size="md" />
+                                </div>
+                            }
+                            dataLength={messageLinks?.length ?? 0}
+                        >
+                            {messageLinks.map((msgLink) => (
+                                <div
+                                    className="last:mb-0 py-4 border-b-2 border-dashed border-default last:border-none first:pt-0"
+                                    key={msgLink?.createdAt}
+                                >
+                                    <h4 className="mb-3">{formatDate(msgLink?.createdAt)}</h4>
+                                    <ul>
+                                        {msgLink?.links.map((link, index) => (
+                                            <li className="flex items-center" key={index}>
+                                                <LinkIcon size={16} className="mr-2" />
+                                                <a
+                                                    className="text-link underline"
+                                                    href={link}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                >
+                                                    {link}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </InfiniteScroll>
+                    )}
+                </div>
+
+                {linkIsLoading && (
+                    <div className="flex justify-center items-center overflow-hidden h-[70px]">
+                        <Spinner size="md" />
+                    </div>
+                )}
+            </>
+        );
+    };
+
     return (
         <div>
             <FullScreenMediaSlider
@@ -111,7 +183,9 @@ export default function ConversationStorage({ conversationId }: IProps) {
                         <div>{renderMediaFiles()}</div>
                     </Tab>
                     <Tab key="file" title="Files" />
-                    <Tab key="link" title="Links" />
+                    <Tab key="link" title="Links">
+                        <div>{renderLinks()}</div>
+                    </Tab>
                 </Tabs>
             </div>
         </div>
