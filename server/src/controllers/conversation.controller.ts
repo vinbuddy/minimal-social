@@ -204,6 +204,7 @@ export async function getConversationMediaFilesHandler(req: Request, res: Respon
         const condition = {
             mediaFiles: { $ne: [] },
             conversation: new mongoose.Types.ObjectId(conversationId),
+            isRetracted: false,
         };
 
         const messagesWithMediaFile = await MessageModel.find(condition)

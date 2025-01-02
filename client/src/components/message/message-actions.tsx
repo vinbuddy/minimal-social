@@ -39,6 +39,10 @@ export default function MessageActions({ message, isOwnMessage }: IProps) {
         }
     };
 
+    if (message?.isRetracted) {
+        return null;
+    }
+
     return (
         <section
             className={`flex items-center flex-wrap invisible group-hover:visible ${
