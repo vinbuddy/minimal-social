@@ -423,3 +423,89 @@ export async function markMessageAsSeenHandler(_req: Request, res: Response, nex
         next(error);
     }
 }
+
+export async function searchMessagesHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+        const { search, conversationId } = req.query;
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const userId = req.user._id?.toString();
+
+        if (!search || !conversationId) {
+            return res.status(400).json({ message: "Search query is required" });
+        }
+
+        const conversation = await ConversationModel.findById(conversationId);
+
+        if (!conversation) {
+            return res.status(404).json({ message: "Conversation not found" });
+        }
+
+        const isMember = conversation.participants.some((participant) => participant._id.toString() === userId);
+        if (!isMember) {
+            return res.status(403).json({ message: "You are not a member of this conversation" });
+        }
+
+        const condition = {
+            conversation: new mongoose.Types.ObjectId(conversation._id),
+            excludedFor: { $nin: new mongoose.Types.ObjectId(userId) },
+            content: {
+                $ne: null,
+                $nin: ["", " "],
+                $regex: search.toString().trim(),
+                $options: "i",
+            },
+        };
+
+        const allMatchingMessages = await MessageModel.find(condition).sort({ createdAt: -1 });
+
+        const totalMessages = allMatchingMessages.length;
+        const totalPages = Math.ceil(totalMessages / limit);
+
+        const skip = (page - 1) * limit;
+
+        const messages = await MessageModel.find(condition)
+            .skip(skip)
+            .limit(limit)
+            .sort({ createdAt: -1 })
+            .populate({
+                path: "sender",
+                select: USER_MODEL_HIDDEN_FIELDS,
+            })
+            .populate({
+                path: "seenBy",
+                select: USER_MODEL_HIDDEN_FIELDS,
+            })
+            .populate({
+                path: "replyTo",
+            })
+            .populate({
+                path: "conversation",
+            })
+            .populate({
+                path: "reactions.user",
+            });
+
+        const currentMessages = messages.slice(skip, skip + limit);
+
+        const messagesWithPageInfo = currentMessages.map((message, index) => {
+            const actualIndex = allMatchingMessages.findIndex((m) => m._id.equals(message._id));
+            return {
+                ...message.toObject(),
+                page: Math.floor(actualIndex / limit) + 1,
+            };
+        });
+
+        return res.status(200).json({
+            message: "Search messages successfully",
+            data: messagesWithPageInfo,
+            totalMessages,
+            totalPages,
+            page,
+            limit,
+        });
+    } catch (error) {
+        next(error);
+    }
+}

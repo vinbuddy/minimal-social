@@ -14,7 +14,8 @@ export default function usePagination<T>(url: string | null) {
 
     // Extract the data from the response structure
     const paginatedData: T[] = data ? data.flatMap((page) => page.data) : [];
-    const isReachedEnd = data && data[data.length - 1]?.data?.length < LIMIT;
+    // const isReachedEnd = data && data[data.length - 1]?.data?.length < LIMIT;
+    const isReachedEnd = data && data.length > 0 ? data[data.length - 1]?.data?.length < LIMIT : false;
     const loadingMore = data && typeof data[size - 1] === "undefined";
 
     return {

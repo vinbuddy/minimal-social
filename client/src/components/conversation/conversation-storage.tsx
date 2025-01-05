@@ -1,7 +1,7 @@
 "use client";
 
 import InfiniteScroll from "react-infinite-scroll-component";
-import { Spinner, Tab, Tabs } from "@nextui-org/react";
+import { Chip, Spinner, Tab, Tabs } from "@nextui-org/react";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -15,9 +15,12 @@ import { LinkIcon } from "lucide-react";
 
 interface IProps {
     conversationId: string;
+    tab: string;
 }
 
-export default function ConversationStorage({ conversationId }: IProps) {
+export default function ConversationStorage({ conversationId, tab }: IProps) {
+    const [storageTab, setStorageTab] = useState<string>(tab);
+
     const {
         data: mediaFiles,
         error,
@@ -135,10 +138,12 @@ export default function ConversationStorage({ conversationId }: IProps) {
                         >
                             {messageLinks.map((msgLink) => (
                                 <div
-                                    className="last:mb-0 py-4 border-b-2 border-dashed border-default last:border-none first:pt-0"
+                                    className="last:mb-0 py-4 border-b-2 border-default last:border-none first:pt-0"
                                     key={msgLink?.createdAt}
                                 >
-                                    <h4 className="mb-3">{formatDate(msgLink?.createdAt)}</h4>
+                                    <Chip className="mb-3" variant="bordered">
+                                        {formatDate(msgLink?.createdAt)}
+                                    </Chip>
                                     <ul>
                                         {msgLink?.links.map((link, index) => (
                                             <li className="flex items-center" key={index}>
@@ -178,7 +183,13 @@ export default function ConversationStorage({ conversationId }: IProps) {
                 mediaFiles={mediaFiles}
             />
             <div>
-                <Tabs className="sticky top-[76px] bg-content1 pb-4 z-10" fullWidth size="md">
+                <Tabs
+                    className="sticky top-[76px] bg-content1 pb-4 z-10"
+                    fullWidth
+                    size="md"
+                    selectedKey={storageTab}
+                    onSelectionChange={(key) => setStorageTab(key.toString() as typeof storageTab)}
+                >
                     <Tab key="media" title="Media files">
                         <div>{renderMediaFiles()}</div>
                     </Tab>

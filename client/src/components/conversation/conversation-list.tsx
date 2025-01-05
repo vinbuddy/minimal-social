@@ -179,7 +179,6 @@ export default function ConversationList({ onConversationClick }: IProps) {
                     placeholder="Search..."
                     size="md"
                     variant="faded"
-                    radius="full"
                     startContent={<SearchIcon className="text-default-400 me-1" size={18} />}
                     endContent={isSearchLoading && <LoaderIcon size={18} className="animate-spin" />}
                     type="text"

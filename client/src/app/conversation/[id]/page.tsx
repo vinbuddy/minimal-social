@@ -143,32 +143,28 @@ function ConversationDetailPage() {
                                         <Video size={18} />
                                     </Button>
                                 </Tooltip>
-                                <Tooltip content="Chat info">
-                                    <div className="lg:block hidden">
-                                        <Button
-                                            onPress={() => setIsOpenConversationInfo(!isOpenConversationInfo)}
-                                            size="sm"
-                                            isIconOnly
-                                            color="default"
-                                            variant={isOpenConversationInfo ? "flat" : "light"}
-                                        >
-                                            <InfoIcon size={18} />
-                                        </Button>
-                                    </div>
-                                </Tooltip>
-                                <Tooltip content="Chat info">
-                                    <div className="lg:hidden block">
-                                        <Button
-                                            onPress={onOpen}
-                                            size="sm"
-                                            isIconOnly
-                                            color="default"
-                                            variant={isOpenConversationInfo ? "flat" : "light"}
-                                        >
-                                            <InfoIcon size={18} />
-                                        </Button>
-                                    </div>
-                                </Tooltip>
+                                <div className="lg:block hidden">
+                                    <Button
+                                        onPress={() => setIsOpenConversationInfo(!isOpenConversationInfo)}
+                                        size="sm"
+                                        isIconOnly
+                                        color="default"
+                                        variant={isOpenConversationInfo ? "flat" : "light"}
+                                    >
+                                        <InfoIcon size={18} />
+                                    </Button>
+                                </div>
+                                <div className="lg:hidden block">
+                                    <Button
+                                        onPress={onOpen}
+                                        size="sm"
+                                        isIconOnly
+                                        color="default"
+                                        variant={isOpenConversationInfo ? "flat" : "light"}
+                                    >
+                                        <InfoIcon size={18} />
+                                    </Button>
+                                </div>
                             </div>
                         </header>
 

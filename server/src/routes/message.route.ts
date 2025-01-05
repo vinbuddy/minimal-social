@@ -8,6 +8,7 @@ import {
     markMessageAsSeenHandler,
     reactMessageHandler,
     retractMessageHandler,
+    searchMessagesHandler,
     unreactMessageHandler,
 } from "../controllers/message.controller";
 import multer from "multer";
@@ -24,5 +25,6 @@ router.post("/unreaction/:id", verifyToken, unreactMessageHandler);
 router.delete("/delete/:id", verifyToken, deleteMessageHandler);
 router.delete("/retract/:id", verifyToken, retractMessageHandler);
 router.post("/mark-seen", verifyToken, markMessageAsSeenHandler);
+router.get("/search", verifyToken, searchMessagesHandler);
 
 export default router;
