@@ -1,11 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
-import { createMessageSchema } from "../schemas/message.schema";
+import {
+    createMessageSchema,
+    getMessagesQuerySchema,
+    getMessagesWithCursorQuerySchema,
+    getUsersReactedMessageQuerySchema,
+} from "../schemas/message.schema";
 import ConversationModel, { LastMessage } from "../models/conversation.model";
 import { MediaFile } from "../models/post.model";
 import { uploadToCloudinary } from "../helpers/cloudinary";
-import MessageModel from "../models/message.model";
+import MessageModel, { Message } from "../models/message.model";
 import { Server } from "socket.io";
 import { RequestWithUser, RequestWithFiles } from "../helpers/types/request";
 
@@ -105,12 +110,10 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
 export async function getConversationMessagesHandler(_req: Request, res: Response, next: NextFunction) {
     try {
         const req = _req as RequestWithUser;
-        const conversationId = req.query.conversationId as string;
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
-        const userId = req.user._id?.toString();
 
-        if (!conversationId) return res.status(400).json({ message: "Conversation ID is required" });
+        const { conversationId, page, limit } = getMessagesQuerySchema.parse(req.query);
+
+        const userId = req.user._id?.toString();
 
         const conversation = await ConversationModel.findById(conversationId);
         if (!conversation) {
@@ -156,6 +159,144 @@ export async function getConversationMessagesHandler(_req: Request, res: Respons
         return res
             .status(200)
             .json({ message: "Get messages successfully", data: messages, totalMessages, totalPages, page, limit });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Cursor-based pagination
+export async function getMessagesWithCursorHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+
+        const { conversationId, direction, messageId, limit } = getMessagesWithCursorQuerySchema.parse(req.query);
+
+        const userId = req.user._id?.toString();
+
+        const conversation = await ConversationModel.findById(conversationId);
+        if (!conversation) {
+            return res.status(404).json({ message: "Conversation not found" });
+        }
+
+        const isMember = conversation.participants.some((participant) => participant._id.toString() === userId);
+        if (!isMember) {
+            return res.status(403).json({ message: "You are not a member of this conversation" });
+        }
+
+        const message = await MessageModel.findById(messageId)
+            .populate({
+                path: "sender",
+                select: USER_MODEL_HIDDEN_FIELDS,
+            })
+            .populate({
+                path: "seenBy",
+                select: USER_MODEL_HIDDEN_FIELDS,
+            })
+            .populate({
+                path: "replyTo",
+            })
+            .populate({
+                path: "conversation",
+            })
+            .populate({
+                path: "reactions.user",
+                select: USER_MODEL_HIDDEN_FIELDS,
+            });
+
+        if (!message) {
+            return res.status(404).json({ message: "Message not found" });
+        }
+
+        const condition: any = {
+            conversation: new mongoose.Types.ObjectId(conversationId),
+            excludedFor: { $nin: new mongoose.Types.ObjectId(userId) },
+        };
+
+        if (direction === "next" && message?.createdAt) {
+            condition.createdAt = { $gt: new Date(message.createdAt) };
+        }
+
+        if (direction === "prev" && message?.createdAt) {
+            condition.createdAt = { $lt: new Date(message.createdAt) };
+        }
+        let messages: Message[] = [];
+
+        // if both -> get message around (4 prev) and (4 next) of cursor;
+        if (direction === "both" && message?.createdAt) {
+            const prevMessages = await MessageModel.find({
+                createdAt: { $lt: new Date(message.createdAt) },
+            })
+                .limit(9)
+                .sort({ createdAt: -1 })
+                .populate({
+                    path: "sender",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                })
+                .populate({
+                    path: "seenBy",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                })
+                .populate({
+                    path: "replyTo",
+                })
+                .populate({
+                    path: "conversation",
+                })
+                .populate({
+                    path: "reactions.user",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                });
+
+            const nextMessages = await MessageModel.find({
+                createdAt: { $gt: new Date(message.createdAt) },
+            })
+                .limit(9)
+                .sort({ createdAt: 1 })
+                .populate({
+                    path: "sender",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                })
+                .populate({
+                    path: "seenBy",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                })
+                .populate({
+                    path: "replyTo",
+                })
+                .populate({
+                    path: "conversation",
+                })
+                .populate({
+                    path: "reactions.user",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                });
+
+            messages = [...nextMessages, message, ...prevMessages];
+        } else {
+            messages = await MessageModel.find(condition)
+                .limit(limit)
+                .sort({ createdAt: -1 })
+                .populate({
+                    path: "seenBy",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                })
+                .populate({ path: "sender", select: USER_MODEL_HIDDEN_FIELDS })
+                .populate({ path: "replyTo" })
+                .populate({ path: "conversation" })
+                .populate({ path: "reactions.user", select: USER_MODEL_HIDDEN_FIELDS });
+        }
+        let prevCursor = null;
+        let nextCursor = null;
+
+        if (messages.length > 0) {
+            prevCursor = messages[messages.length - 1]._id;
+        }
+
+        if (messages.length > 0) {
+            nextCursor = messages[0]._id;
+        }
+
+        return res.status(200).json({ message: "Get messages successfully", data: messages, prevCursor, nextCursor });
     } catch (error) {
         next(error);
     }
@@ -262,10 +403,7 @@ function getEmojiFromClientInput(clientInput: string): string {
 
 export async function getUsersReactedMessageHandler(req: Request, res: Response, next: NextFunction) {
     try {
-        const { emoji, messageId } = req.query;
-        if (!emoji || !messageId) {
-            return res.status(400).json({ message: "Emoji is required" });
-        }
+        const { emoji, messageId } = getUsersReactedMessageQuerySchema.parse(req.query);
 
         let emojiIcon;
         try {

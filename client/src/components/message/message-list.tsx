@@ -33,7 +33,7 @@ export default function MessageList({ conversation }: IProps) {
     const { currentUser } = useAuthStore();
     const mutation = useGlobalMutation();
 
-    const { messageList, setMessageList } = useMessagesStore();
+    const { messageList, messageIdReferenced, setMessageIdReferenced, setMessageList } = useMessagesStore();
 
     const {
         data: messages,
@@ -44,17 +44,16 @@ export default function MessageList({ conversation }: IProps) {
         isLoading,
         setSize: setPage,
         mutate,
-    } = usePagination<IMessage>(`/message?conversationId=${conversation._id}`);
+    } = usePagination<IMessage>(messageIdReferenced ? null : `/message?conversationId=${conversation._id}`);
 
     useEffect(() => {
-        if (messages) {
+        if (messages && !messageIdReferenced) {
             setMessageList(messages);
         }
 
         const messageListEl = messageListRef.current;
         if (!messageListEl) return;
 
-        // Lưu chiều cao hiện tại trước khi thêm tin nhắn mới
         const previousScrollHeight = messageListEl.scrollHeight;
 
         const observer = new MutationObserver(() => {
@@ -78,6 +77,8 @@ export default function MessageList({ conversation }: IProps) {
         }
 
         const handleNewMessage = async (newMessage: IMessage) => {
+            if (newMessage?.conversation?._id !== conversation._id) return;
+
             // Update message in the store
             useMessagesStore.setState((state) => {
                 const updatedMessageIndex = state.messageList.findIndex((message) => message._id === newMessage._id);
@@ -118,7 +119,7 @@ export default function MessageList({ conversation }: IProps) {
                 const sound = new Audio(
                     "https://res.cloudinary.com/dtbhvc4p4/video/upload/v1723186867/audios/message-sound_eoo8ei.mp3"
                 );
-                sound.play().catch((error) => console.log("Error playing sound:", error));
+                // sound.play().catch((error) => console.log("Error playing sound:", error));
             }
 
             // Mark the new message as seen if the user is in the current conversation
@@ -142,6 +143,7 @@ export default function MessageList({ conversation }: IProps) {
         };
 
         const handleReactMessage = (updatedMessage: IMessage) => {
+            if (updatedMessage?.conversation?._id !== conversation._id) return;
             // Update message in the store
             useMessagesStore.setState((state) => {
                 const updatedMessageIndex = state.messageList.findIndex(
@@ -168,6 +170,8 @@ export default function MessageList({ conversation }: IProps) {
         };
 
         const handleRetractMessage = (updatedMessage: IMessage) => {
+            if (updatedMessage?.conversation?._id !== conversation._id) return;
+
             // Update message in the store
             useMessagesStore.setState((state) => {
                 const updatedMessageIndex = state.messageList.findIndex(
@@ -194,30 +198,34 @@ export default function MessageList({ conversation }: IProps) {
         };
 
         const handleMarkMessageAsSeen = (lastMessageSeen: IMessage) => {
-            // Update message in the store using filter
-            useMessagesStore.setState((state) => {
-                const updatedMessageList = state.messageList.map((message) => {
-                    if (message._id === lastMessageSeen._id) {
-                        return { ...message, ...lastMessageSeen };
-                    }
-                    return message;
+            if (lastMessageSeen.conversation?._id !== conversation._id) return;
+
+            setTimeout(() => {
+                // Update message in the store using filter
+                useMessagesStore.setState((state) => {
+                    const updatedMessageList = state.messageList.map((message) => {
+                        if (message._id === lastMessageSeen._id) {
+                            return { ...message, ...lastMessageSeen };
+                        }
+                        return message;
+                    });
+
+                    return { messageList: updatedMessageList };
                 });
 
-                return { messageList: updatedMessageList };
-            });
+                mutate((currentData) => {
+                    if (!currentData) return;
 
-            mutate((currentData) => {
-                if (!currentData) return;
+                    const updatedData = currentData.map((page) => ({
+                        ...page,
+                        data: page.data.map((message: IMessage) =>
+                            message._id === lastMessageSeen._id ? lastMessageSeen : message
+                        ),
+                    }));
 
-                const updatedData = currentData.map((page) => ({
-                    ...page,
-                    data: page.data.map((message: IMessage) =>
-                        message._id === lastMessageSeen._id ? lastMessageSeen : message
-                    ),
-                }));
-
-                return updatedData;
-            }, false);
+                    return updatedData;
+                }, false);
+            }, 1000);
         };
 
         socket.on("reactMessage", handleReactMessage);
@@ -234,6 +242,12 @@ export default function MessageList({ conversation }: IProps) {
             socket.off("markMessageAsSeen", handleMarkMessageAsSeen);
         };
     }, [socket, currentUser]);
+
+    useEffect(() => {
+        return () => {
+            setMessageIdReferenced("");
+        };
+    }, []);
 
     // Mark seen after mounting
     useEffect(() => {
@@ -261,6 +275,31 @@ export default function MessageList({ conversation }: IProps) {
             }
         })();
     }, [conversation, messageList, currentUser, mutation]);
+
+    useEffect(() => {
+        if (!messageIdReferenced || !conversation) return;
+
+        (async () => {
+            try {
+                const res = await axiosInstance.get("/message/cursor-pagination", {
+                    params: {
+                        conversationId: conversation._id,
+                        messageId: messageIdReferenced,
+                        direction: "both",
+                    },
+                });
+
+                const messages = res.data.data;
+
+                // Set message list
+                setMessageList(messages);
+
+                console.log("res: ", res);
+            } catch (error: any) {
+                showToast(error.message, "error");
+            }
+        })();
+    }, [messageIdReferenced, conversation, setMessageList]);
 
     const sortMessagesByTime = (messages: IMessage[]): IMessage[] => {
         return messages.slice().sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
@@ -366,6 +405,43 @@ export default function MessageList({ conversation }: IProps) {
         return <div className="text-center text-red-500">An unexpected error occurred.</div>;
     }
 
+    if (messageIdReferenced) {
+        return (
+            <>
+                <div
+                    ref={messageListRef}
+                    style={{
+                        height: "100%",
+                        overflowY: "auto",
+                        display: "flex",
+                        flexDirection: "column-reverse",
+                    }}
+                    className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col px-4 pt-4 scrollbar"
+                >
+                    <div>
+                        {groupedMessages.map((group, index) => (
+                            <Fragment key={index}>
+                                {group.showDate && (
+                                    <div className="flex justify-center my-4">
+                                        <Chip color="default" size="sm" variant="flat">
+                                            {formatDate(group.date)}
+                                        </Chip>
+                                    </div>
+                                )}
+                                <MessageItem
+                                    originalMessages={messageList}
+                                    messages={group.messages}
+                                    className={`${group.marginBottom}`}
+                                    conversation={conversation}
+                                />
+                            </Fragment>
+                        ))}
+                    </div>
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
             <div
@@ -377,7 +453,7 @@ export default function MessageList({ conversation }: IProps) {
                     display: "flex",
                     flexDirection: "column-reverse",
                 }}
-                className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col p-4 scrollbar"
+                className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col px-4 pt-4 scrollbar"
             >
                 {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
                 {isLoading && (

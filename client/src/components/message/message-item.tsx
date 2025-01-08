@@ -1,9 +1,10 @@
 import { Avatar } from "@nextui-org/react";
 
 import MessageItemGroup from "./message-item-group";
-import { useAuthStore } from "@/hooks/store";
+import { useAuthStore, useMessagesStore } from "@/hooks/store";
 import { IMessage } from "@/types/message";
 import { IConversation } from "@/types/conversation";
+import { forwardRef, Ref, useEffect, useRef } from "react";
 
 interface IProps {
     className?: string;
@@ -12,8 +13,26 @@ interface IProps {
     conversation: IConversation;
 }
 
-export default function MessageItem({ className = "", messages, originalMessages, conversation }: IProps) {
+function MessageItem({ className = "", messages, originalMessages, conversation }: IProps, ref: Ref<HTMLDivElement>) {
     const { currentUser } = useAuthStore();
+    const { messageIdReferenced } = useMessagesStore();
+    const messageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+    useEffect(() => {
+        if (!messageIdReferenced && !messageRefs.current[messageIdReferenced]) {
+            return;
+        }
+
+        // Delay scrolling to allow the message to be rendered first
+        setTimeout(() => {
+            messageRefs.current[messageIdReferenced]?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+                inline: "nearest",
+            });
+        }, 700);
+    }, [messageIdReferenced]);
+
     const isOwnMessage = messages[0]?.sender?._id === currentUser?._id;
 
     const lastSeenMessage = [...originalMessages].reverse().find((message) => {
@@ -34,6 +53,9 @@ export default function MessageItem({ className = "", messages, originalMessages
                     messages?.map((message, index) => (
                         <>
                             <MessageItemGroup
+                                ref={(el) => {
+                                    messageRefs.current[message._id] = el;
+                                }}
                                 key={message?._id}
                                 message={message}
                                 isOwnMessage={isOwnMessage}
@@ -63,3 +85,5 @@ export default function MessageItem({ className = "", messages, originalMessages
         </div>
     );
 }
+
+export default forwardRef<HTMLDivElement, IProps>(MessageItem);

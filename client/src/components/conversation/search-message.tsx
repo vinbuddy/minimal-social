@@ -3,12 +3,14 @@
 import { Avatar, Button, Input } from "@nextui-org/react";
 import { LoaderIcon, SearchIcon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
+import cn from "classnames";
 
 import UserName from "../user/user-name";
 import TimeAgo from "../time-ago";
 import { useDebounce, usePagination } from "@/hooks";
 import { IMessage } from "@/types/message";
 import { IConversation } from "@/types/conversation";
+import { useMessagesStore } from "@/hooks/store";
 
 interface IProps {
     conversation: IConversation;
@@ -17,6 +19,7 @@ interface IProps {
 export default function SearchMessage({ conversation }: IProps) {
     const [searchValue, setSearchValue] = useState<string>("");
     const debouncedSearch = useDebounce(searchValue, 800);
+    const { messageIdReferenced, setMessageIdReferenced, setIsReference } = useMessagesStore();
 
     const {
         data: messages,
@@ -59,8 +62,18 @@ export default function SearchMessage({ conversation }: IProps) {
             const highlightedContent = getMatchedContent(message.content, debouncedSearch);
             return (
                 <li
+                    className={cn(
+                        "flex items-center justify-between py-4 px-2 cursor-pointer rounded-xl hover:bg-content2 border",
+                        {
+                            "!border-default": message._id === messageIdReferenced,
+                            "border-transparent": message._id !== messageIdReferenced,
+                        }
+                    )}
                     key={message._id}
-                    className="flex items-center justify-between py-4 px-2 cursor-pointer rounded-xl hover:bg-content2"
+                    onClick={() => {
+                        setIsReference(true);
+                        setMessageIdReferenced(message._id);
+                    }}
                 >
                     <section className="flex items-center gap-3 overflow-hidden">
                         <Avatar size="md" src={message?.sender?.photo} />
@@ -81,7 +94,7 @@ export default function SearchMessage({ conversation }: IProps) {
                 </li>
             );
         });
-    }, [debouncedSearch]);
+    }, [debouncedSearch, messages, getMatchedContent]);
 
     return (
         <div>
@@ -98,7 +111,7 @@ export default function SearchMessage({ conversation }: IProps) {
                 onChange={(e) => setSearchValue(e.target.value)}
                 onClear={() => setSearchValue("")}
             />
-            <div className="mt-5">
+            <div className="py-5">
                 {messages.length === 0 && !isLoading && !error && (
                     <p className="text-center text-default-500">No result found</p>
                 )}
@@ -106,8 +119,13 @@ export default function SearchMessage({ conversation }: IProps) {
                     {messageList}
 
                     {!isReachedEnd && messages.length > 0 && (
-                        <li>
-                            <Button isLoading={loadingMore} onClick={() => setPage(size + 1)}>
+                        <li className="flex justify-center">
+                            <Button
+                                variant="flat"
+                                radius="full"
+                                isLoading={loadingMore}
+                                onClick={() => setPage(size + 1)}
+                            >
                                 Load more
                             </Button>
                         </li>

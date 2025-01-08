@@ -6,6 +6,7 @@ import MessageContent from "./message-content";
 import MessageActions from "./message-actions";
 import { IMessage } from "@/types/message";
 import { IConversation } from "@/types/conversation";
+import { forwardRef, Ref } from "react";
 
 interface IProps {
     message: IMessage;
@@ -13,7 +14,7 @@ interface IProps {
     conversation: IConversation;
 }
 
-export default function MessageItemGroup({ message, isOwnMessage, conversation }: IProps) {
+function MessageItemGroup({ message, isOwnMessage, conversation }: IProps, ref: Ref<HTMLDivElement>) {
     const isReaction = message?.reactions?.length > 0;
     return (
         <motion.div
@@ -29,6 +30,7 @@ export default function MessageItemGroup({ message, isOwnMessage, conversation }
                 },
             }}
             key={message?._id}
+            ref={ref}
         >
             {message?.replyTo ? (
                 <div
@@ -71,3 +73,5 @@ export default function MessageItemGroup({ message, isOwnMessage, conversation }
         </motion.div>
     );
 }
+
+export default forwardRef<HTMLDivElement, IProps>(MessageItemGroup);

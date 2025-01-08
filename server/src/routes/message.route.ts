@@ -4,6 +4,7 @@ import {
     createMessageHandler,
     deleteMessageHandler,
     getConversationMessagesHandler,
+    getMessagesWithCursorHandler,
     getUsersReactedMessageHandler,
     markMessageAsSeenHandler,
     reactMessageHandler,
@@ -18,6 +19,7 @@ const router: Router = express.Router();
 
 router.post("/", verifyToken, uploadFile.array("mediaFiles"), createMessageHandler);
 router.get("/", verifyToken, getConversationMessagesHandler);
+router.get("/cursor-pagination", verifyToken, getMessagesWithCursorHandler);
 router.get("/reaction", verifyToken, getUsersReactedMessageHandler);
 
 router.post("/reaction/:id", verifyToken, reactMessageHandler);

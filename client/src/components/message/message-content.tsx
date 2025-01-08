@@ -10,6 +10,7 @@ import { IMessage } from "@/types/message";
 import GalleryMediaFiles from "../media/gallery-media-files";
 import { formatTime, formatTimeStamp } from "@/utils/datetime";
 import { IConversation } from "@/types/conversation";
+import { useMessagesStore } from "@/hooks/store";
 
 interface IProps {
     message: IMessage;
@@ -18,6 +19,8 @@ interface IProps {
 }
 
 export default function MessageContent({ message, isOwnMessage, conversation }: IProps) {
+    const { messageIdReferenced } = useMessagesStore();
+
     const isEmojiMessageOnly = (content: string): boolean => {
         const regex = emojiRegex();
         const match = content && content.match(regex);
@@ -57,12 +60,18 @@ export default function MessageContent({ message, isOwnMessage, conversation }: 
 
     const getMessageStyle = (): string => {
         if (isEmojiMessageOnly(message?.content || "")) {
-            return `text-2xl rounded-[18px] ${isOwnMessage ? "order-2" : "order-1"}`;
+            return cn("text-2xl rounded-[18px]", {
+                "order-2": isOwnMessage,
+                "order-1": !isOwnMessage,
+                "border-4 border-default-400": messageIdReferenced === message._id,
+            });
         }
 
-        return `min-w text-[15px] rounded-[18px] px-3 py-2 ${
-            isOwnMessage ? "order-2 bg-primary text-primary-foreground" : "order-1 bg-content2"
-        }`;
+        return cn("min-w text-[15px] rounded-[18px] px-3 py-2", {
+            "order-2 bg-primary text-primary-foreground": isOwnMessage,
+            "order-1 bg-content2": !isOwnMessage,
+            "border-4 border-default-400": messageIdReferenced === message._id,
+        });
     };
 
     const getThemeStyle = (): CSSProperties | undefined => {
