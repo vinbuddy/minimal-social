@@ -65,15 +65,12 @@ export default function SearchMessage({ conversation }: IProps) {
                     className={cn(
                         "flex items-center justify-between py-4 px-2 cursor-pointer rounded-xl hover:bg-content2 border",
                         {
-                            "!border-default": message._id === messageIdReferenced,
+                            "!border-default": messageIdReferenced && message._id === messageIdReferenced,
                             "border-transparent": message._id !== messageIdReferenced,
                         }
                     )}
                     key={message._id}
-                    onClick={() => {
-                        setIsReference(true);
-                        setMessageIdReferenced(message._id);
-                    }}
+                    onClick={() => setMessageIdReferenced(message._id)}
                 >
                     <section className="flex items-center gap-3 overflow-hidden">
                         <Avatar size="md" src={message?.sender?.photo} />
@@ -94,7 +91,7 @@ export default function SearchMessage({ conversation }: IProps) {
                 </li>
             );
         });
-    }, [debouncedSearch, messages, getMatchedContent]);
+    }, [debouncedSearch, messages, getMatchedContent, messageIdReferenced, setMessageIdReferenced, setIsReference]);
 
     return (
         <div>
@@ -119,7 +116,7 @@ export default function SearchMessage({ conversation }: IProps) {
                     {messageList}
 
                     {!isReachedEnd && messages.length > 0 && (
-                        <li className="flex justify-center">
+                        <li className="flex justify-center mt-5">
                             <Button
                                 variant="flat"
                                 radius="full"

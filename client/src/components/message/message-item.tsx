@@ -30,7 +30,7 @@ function MessageItem({ className = "", messages, originalMessages, conversation 
                 block: "center",
                 inline: "nearest",
             });
-        }, 700);
+        }, 200);
     }, [messageIdReferenced]);
 
     const isOwnMessage = messages[0]?.sender?._id === currentUser?._id;

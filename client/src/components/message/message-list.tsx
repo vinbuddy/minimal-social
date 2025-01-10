@@ -1,15 +1,15 @@
 "use client";
 import { Chip, Spinner } from "@nextui-org/react";
-import { Fragment, useEffect, useRef } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
+import { Fragment, useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
+import useSWR from "swr";
 
 import MessageItem from "./message-item";
 
 import { IConversation } from "@/types/conversation";
 import { IMessage } from "@/types/message";
 import { useSocketContext } from "@/contexts/socket-context";
-import { usePagination, useGlobalMutation } from "@/hooks";
+import { useGlobalMutation, useLoading } from "@/hooks";
 import { useAuthStore, useMessagesStore } from "@/hooks/store";
 import axiosInstance from "@/utils/httpRequest";
 import { showToast } from "@/utils/toast";
@@ -27,36 +27,45 @@ interface GroupedMessage {
 }
 
 export default function MessageList({ conversation }: IProps) {
+    let timeoutId: NodeJS.Timeout;
     const messageListRef = useRef<HTMLDivElement>(null);
     const { socket } = useSocketContext();
     const swrMutate = useGlobalMutation();
     const { currentUser } = useAuthStore();
     const mutation = useGlobalMutation();
 
+    const [direction, setDirection] = useState<"next" | "prev" | "both" | "init">("init");
+    const [messageCursorId, setMessageCursorId] = useState<string | null>(null);
+
+    const { loading: bothLoading, startLoading, stopLoading } = useLoading();
+
     const { messageList, messageIdReferenced, setMessageIdReferenced, setMessageList } = useMessagesStore();
 
-    const {
-        data: messages,
-        loadingMore,
-        error,
-        isReachedEnd,
-        size,
-        isLoading,
-        setSize: setPage,
-        mutate,
-    } = usePagination<IMessage>(messageIdReferenced ? null : `/message?conversationId=${conversation._id}`);
+    const { data, error, isLoading } = useSWR<{ data: IMessage[]; nextCursor: string; prevCursor: string }>(
+        `/message/cursor-pagination?conversationId=${conversation._id}&direction=${direction}&messageId=${messageCursorId}`
+    );
 
     useEffect(() => {
-        if (messages && !messageIdReferenced) {
-            setMessageList(messages);
-        }
+        if (!data) return;
+
+        const messages = data?.data || [];
+        const sortedMessages = [...messageList, ...messages].sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
 
         const messageListEl = messageListRef.current;
         if (!messageListEl) return;
 
-        const previousScrollHeight = messageListEl.scrollHeight;
+        if (direction === "init") {
+            setMessageList(messages);
+        }
+
+        if (direction === "next" || direction === "prev") {
+            setMessageList(sortedMessages);
+        }
 
         const observer = new MutationObserver(() => {
+            const previousScrollHeight = messageListEl.scrollHeight;
             const currentScrollHeight = messageListEl.scrollHeight;
 
             // Điều chỉnh scrollTop để giữ vị trí cũ
@@ -67,8 +76,10 @@ export default function MessageList({ conversation }: IProps) {
 
         observer.observe(messageListEl, { childList: true, subtree: true });
 
-        return () => observer.disconnect();
-    }, [loadingMore]);
+        return () => {
+            observer.disconnect();
+        };
+    }, [data, direction, setMessageList]);
 
     useEffect(() => {
         if (!socket) {
@@ -92,24 +103,6 @@ export default function MessageList({ conversation }: IProps) {
             if (messageListRef.current) {
                 messageListRef.current.scrollTo({ top: 0, behavior: "smooth" });
             }
-
-            mutate((currentData) => {
-                if (!currentData) return [{ data: [newMessage] }];
-
-                // remove duplicate message
-                const isDuplicate = currentData.some((page) =>
-                    page.data.some((message: any) => message._id === newMessage._id)
-                );
-
-                if (isDuplicate) return currentData;
-
-                const updatedData = currentData.map((page) => ({
-                    ...page,
-                    data: [newMessage, ...page.data],
-                }));
-
-                return updatedData;
-            }, false);
 
             swrMutate((key) => typeof key === "string" && key.includes("/conversation"));
 
@@ -154,19 +147,6 @@ export default function MessageList({ conversation }: IProps) {
                 state.messageList[updatedMessageIndex] = updatedMessage;
                 return { ...state };
             });
-
-            mutate((currentData) => {
-                if (!currentData) return;
-
-                const updatedData = currentData.map((page) => ({
-                    ...page,
-                    data: page.data.map((message: IMessage) =>
-                        message._id === updatedMessage._id ? updatedMessage : message
-                    ),
-                }));
-
-                return updatedData;
-            }, false);
         };
 
         const handleRetractMessage = (updatedMessage: IMessage) => {
@@ -182,19 +162,6 @@ export default function MessageList({ conversation }: IProps) {
                 state.messageList[updatedMessageIndex] = updatedMessage;
                 return { ...state };
             });
-
-            mutate((currentData) => {
-                if (!currentData) return;
-
-                const updatedData = currentData.map((page) => ({
-                    ...page,
-                    data: page.data.map((message: IMessage) =>
-                        message._id === updatedMessage._id ? updatedMessage : message
-                    ),
-                }));
-
-                return updatedData;
-            }, false);
         };
 
         const handleMarkMessageAsSeen = (lastMessageSeen: IMessage) => {
@@ -212,19 +179,6 @@ export default function MessageList({ conversation }: IProps) {
 
                     return { messageList: updatedMessageList };
                 });
-
-                mutate((currentData) => {
-                    if (!currentData) return;
-
-                    const updatedData = currentData.map((page) => ({
-                        ...page,
-                        data: page.data.map((message: IMessage) =>
-                            message._id === lastMessageSeen._id ? lastMessageSeen : message
-                        ),
-                    }));
-
-                    return updatedData;
-                }, false);
             }, 1000);
         };
 
@@ -242,12 +196,6 @@ export default function MessageList({ conversation }: IProps) {
             socket.off("markMessageAsSeen", handleMarkMessageAsSeen);
         };
     }, [socket, currentUser]);
-
-    useEffect(() => {
-        return () => {
-            setMessageIdReferenced("");
-        };
-    }, []);
 
     // Mark seen after mounting
     useEffect(() => {
@@ -279,6 +227,8 @@ export default function MessageList({ conversation }: IProps) {
     useEffect(() => {
         if (!messageIdReferenced || !conversation) return;
 
+        startLoading();
+
         (async () => {
             try {
                 const res = await axiosInstance.get("/message/cursor-pagination", {
@@ -288,25 +238,118 @@ export default function MessageList({ conversation }: IProps) {
                         direction: "both",
                     },
                 });
-
                 const messages = res.data.data;
-
-                // Set message list
                 setMessageList(messages);
 
-                console.log("res: ", res);
+                // setDirection("both");
+                // requestAnimationFrame(() => {
+                //     requestAnimationFrame(() => {
+                //         const messageListEl = messageListRef.current;
+                //         if (!messageListEl) return;
+                //         // Với column-reverse, scrollHeight đã bao gồm padding
+                //         const scrollHeight = messageListEl.scrollHeight;
+                //         const clientHeight = messageListEl.clientHeight;
+                //         // Đặt scrollTop để tin nhắn nằm ở khoảng 40% từ dưới lên
+                //         messageListEl.scrollTop = scrollHeight - clientHeight * 1.4;
+                //     });
+                // });
             } catch (error: any) {
-                showToast(error.message, "error");
+                showToast(error.message + " --- ", "error");
+            } finally {
+                stopLoading();
             }
         })();
-    }, [messageIdReferenced, conversation, setMessageList]);
+
+        return () => {
+            // setMessageIdReferenced("");
+        };
+    }, [messageIdReferenced, conversation, setMessageList, setMessageIdReferenced]);
 
     const sortMessagesByTime = (messages: IMessage[]): IMessage[] => {
         return messages.slice().sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     };
 
-    const groupMessages = (messages: IMessage[]): GroupedMessage[] => {
-        const sortedMessages = sortMessagesByTime(messages);
+    const loadMoreMessages = async () => {
+        try {
+            if (!messageListRef.current) return;
+            if (isLoading) return;
+
+            const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
+
+            const isReachTop = scrollTop < 50;
+            const isReachBottom = scrollHeight - scrollTop - clientHeight < 50;
+
+            const previousScrollTop = messageListRef.current.scrollTop;
+            const previousScrollHeight = messageListRef.current.scrollHeight;
+
+            if (isReachBottom) {
+                setDirection("next");
+                setMessageCursorId(messageList[0]._id);
+            }
+
+            if (isReachTop) {
+                setDirection("prev");
+                setMessageCursorId(messageList[messageList.length - 1]._id);
+            }
+
+            requestAnimationFrame(() => {
+                if (!messageListRef.current) return;
+
+                const newScrollHeight = messageListRef.current.scrollHeight;
+                if (direction === "next") {
+                    // Giữ nguyên vị trí scroll khi load next
+                    messageListRef.current.scrollTop = previousScrollTop;
+                } else {
+                    // Điều chỉnh vị trí scroll khi load previous để giữ nguyên vị trí tương đối
+                    const scrollDiff = newScrollHeight - previousScrollHeight;
+                    messageListRef.current.scrollTop = previousScrollTop + scrollDiff;
+                }
+            });
+
+            // const newMessages = res.data.data;
+
+            // Lưu lại vị trí scroll và chiều cao trước khi update
+
+            // if (direction === "next") {
+            //     console.log("Set-3");
+
+            //     setMessageList([...newMessages, ...messageList]);
+            // } else {
+            //     console.log("Set-4");
+            //     setMessageList([...messageList, ...newMessages]);
+            // }
+
+            // Khôi phục vị trí scroll sau khi update
+            // requestAnimationFrame(() => {
+            //     if (!messageListRef.current) return;
+
+            //     const newScrollHeight = messageListRef.current.scrollHeight;
+            //     if (direction === "next") {
+            //         // Giữ nguyên vị trí scroll khi load next
+            //         messageListRef.current.scrollTop = previousScrollTop;
+            //     } else {
+            //         // Điều chỉnh vị trí scroll khi load previous để giữ nguyên vị trí tương đối
+            //         const scrollDiff = newScrollHeight - previousScrollHeight;
+            //         messageListRef.current.scrollTop = previousScrollTop + scrollDiff;
+            //     }
+            // });
+        } catch (error: any) {
+            showToast(error.message, "error");
+        }
+    };
+
+    const handleScroll = () => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+
+        timeoutId = setTimeout(() => {
+            loadMoreMessages();
+        }, 500);
+    };
+
+    const groupMessages = (): GroupedMessage[] => {
+        const sortedMessages = sortMessagesByTime(messageList);
         const groupedMessages: GroupedMessage[] = [];
         let group: IMessage[] = [];
         let lastGroupTime = 0;
@@ -391,7 +434,7 @@ export default function MessageList({ conversation }: IProps) {
         return groupedMessages;
     };
 
-    const groupedMessages = groupMessages(messageList);
+    const groupedMessages = groupMessages();
 
     if (error) {
         if (error.response.status === 403) {
@@ -405,107 +448,59 @@ export default function MessageList({ conversation }: IProps) {
         return <div className="text-center text-red-500">An unexpected error occurred.</div>;
     }
 
-    if (messageIdReferenced) {
-        return (
-            <>
-                <div
-                    ref={messageListRef}
-                    style={{
-                        height: "100%",
-                        overflowY: "auto",
-                        display: "flex",
-                        flexDirection: "column-reverse",
-                    }}
-                    className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col px-4 pt-4 scrollbar"
-                >
-                    <div>
-                        {groupedMessages.map((group, index) => (
-                            <Fragment key={index}>
-                                {group.showDate && (
-                                    <div className="flex justify-center my-4">
-                                        <Chip color="default" size="sm" variant="flat">
-                                            {formatDate(group.date)}
-                                        </Chip>
-                                    </div>
-                                )}
-                                <MessageItem
-                                    originalMessages={messageList}
-                                    messages={group.messages}
-                                    className={`${group.marginBottom}`}
-                                    conversation={conversation}
-                                />
-                            </Fragment>
-                        ))}
-                    </div>
-                </div>
-            </>
-        );
-    }
-
     return (
         <>
             <div
                 ref={messageListRef}
-                id="messageList"
-                style={{
-                    height: "100%",
-                    overflowY: "auto",
-                    display: "flex",
-                    flexDirection: "column-reverse",
-                }}
-                className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col px-4 pt-4 scrollbar"
+                onScroll={handleScroll}
+                className="w-full overflow-y-auto overflow-x-hidden h-full  px-4 pt-4 scrollbar"
             >
-                {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
-                {isLoading && (
+                {isLoading && direction === "init" && (
                     <div className="h-full flex justify-center items-center">
                         <Spinner size="md" />
                     </div>
                 )}
-                {!error && messageList.length > 0 && (
-                    <InfiniteScroll
-                        scrollThreshold={0.7}
-                        scrollableTarget="messageList"
-                        inverse={true}
-                        style={{ display: "flex", flexDirection: "column-reverse" }}
-                        next={() => {
-                            const messageListEl = messageListRef.current;
-                            if (messageListEl && messageListEl.scrollTop < 10) {
-                                setPage(size + 1);
-                            }
-                        }}
-                        hasMore={!isReachedEnd}
-                        loader={
+                {bothLoading && (
+                    <div className="h-full flex justify-center items-center">
+                        <Spinner size="md" />
+                    </div>
+                )}
+
+                <div>
+                    {isLoading && direction == "prev" && (
+                        <>
                             <div className="flex justify-center items-start overflow-hidden">
                                 <Spinner size="md" />
                             </div>
-                        }
-                        endMessage={<p className="text-center text-default-500">You have seen it all</p>}
-                        dataLength={messageList?.length ?? 0}
-                    >
-                        {/*  Add h-[100px] to avoid being hidden scrollbar */}
+                        </>
+                    )}
 
-                        <div>
-                            {groupedMessages.map((group, index) => (
-                                <Fragment key={index}>
-                                    {group.showDate && (
-                                        <div className="flex justify-center my-4">
-                                            <Chip color="default" size="sm" variant="flat">
-                                                {formatDate(group.date)}
-                                            </Chip>
-                                        </div>
-                                    )}
-                                    <MessageItem
-                                        originalMessages={messageList}
-                                        messages={group.messages}
-                                        className={`${group.marginBottom}`}
-                                        conversation={conversation}
-                                    />
-                                </Fragment>
-                            ))}
-                        </div>
-                        <div className="h-[100px]"></div>
-                    </InfiniteScroll>
-                )}
+                    {groupedMessages.map((group, index) => (
+                        <Fragment key={index}>
+                            {group.showDate && (
+                                <div className="flex justify-center my-4">
+                                    <Chip color="default" size="sm" variant="flat">
+                                        {formatDate(group.date)}
+                                    </Chip>
+                                </div>
+                            )}
+                            <MessageItem
+                                originalMessages={messageList}
+                                messages={group.messages}
+                                className={`${group.marginBottom}`}
+                                conversation={conversation}
+                            />
+                        </Fragment>
+                    ))}
+
+                    {isLoading && direction == "next" && (
+                        <>
+                            <div className="flex justify-center items-start overflow-hidden">
+                                <Spinner size="md" />
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
         </>
     );

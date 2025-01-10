@@ -183,6 +183,22 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
             return res.status(403).json({ message: "You are not a member of this conversation" });
         }
 
+        if (direction === "init") {
+            const messages = await MessageModel.find({ conversation: new mongoose.Types.ObjectId(conversationId) })
+                .limit(limit)
+                .sort({ createdAt: -1 })
+                .populate({
+                    path: "seenBy",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                })
+                .populate({ path: "sender", select: USER_MODEL_HIDDEN_FIELDS })
+                .populate({ path: "replyTo" })
+                .populate({ path: "conversation" })
+                .populate({ path: "reactions.user", select: USER_MODEL_HIDDEN_FIELDS });
+
+            return res.status(200).json({ message: "Get messages successfully", data: messages });
+        }
+
         const message = await MessageModel.findById(messageId)
             .populate({
                 path: "sender",
@@ -203,10 +219,6 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
                 select: USER_MODEL_HIDDEN_FIELDS,
             });
 
-        if (!message) {
-            return res.status(404).json({ message: "Message not found" });
-        }
-
         const condition: any = {
             conversation: new mongoose.Types.ObjectId(conversationId),
             excludedFor: { $nin: new mongoose.Types.ObjectId(userId) },
@@ -219,14 +231,16 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
         if (direction === "prev" && message?.createdAt) {
             condition.createdAt = { $lt: new Date(message.createdAt) };
         }
+
         let messages: Message[] = [];
 
         // if both -> get message around (4 prev) and (4 next) of cursor;
         if (direction === "both" && message?.createdAt) {
             const prevMessages = await MessageModel.find({
+                ...condition,
                 createdAt: { $lt: new Date(message.createdAt) },
             })
-                .limit(9)
+                .limit(5)
                 .sort({ createdAt: -1 })
                 .populate({
                     path: "sender",
@@ -245,12 +259,14 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
                 .populate({
                     path: "reactions.user",
                     select: USER_MODEL_HIDDEN_FIELDS,
-                });
+                })
+                .lean();
 
             const nextMessages = await MessageModel.find({
+                ...condition,
                 createdAt: { $gt: new Date(message.createdAt) },
             })
-                .limit(9)
+                .limit(5)
                 .sort({ createdAt: 1 })
                 .populate({
                     path: "sender",
@@ -269,13 +285,19 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
                 .populate({
                     path: "reactions.user",
                     select: USER_MODEL_HIDDEN_FIELDS,
-                });
+                })
+                .lean();
 
-            messages = [...nextMessages, message, ...prevMessages];
-        } else {
+            messages = [...nextMessages, message, ...prevMessages].sort((a, b) => {
+                if (!a.createdAt || !b.createdAt) return 0;
+                return b.createdAt.getTime() - a.createdAt.getTime();
+            });
+        }
+
+        if (direction === "next" || direction === "prev") {
             messages = await MessageModel.find(condition)
                 .limit(limit)
-                .sort({ createdAt: -1 })
+                .sort({ createdAt: direction == "next" ? 1 : -1 })
                 .populate({
                     path: "seenBy",
                     select: USER_MODEL_HIDDEN_FIELDS,
@@ -285,18 +307,8 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
                 .populate({ path: "conversation" })
                 .populate({ path: "reactions.user", select: USER_MODEL_HIDDEN_FIELDS });
         }
-        let prevCursor = null;
-        let nextCursor = null;
 
-        if (messages.length > 0) {
-            prevCursor = messages[messages.length - 1]._id;
-        }
-
-        if (messages.length > 0) {
-            nextCursor = messages[0]._id;
-        }
-
-        return res.status(200).json({ message: "Get messages successfully", data: messages, prevCursor, nextCursor });
+        return res.status(200).json({ message: "Get messages successfully", data: messages });
     } catch (error) {
         next(error);
     }

@@ -23,7 +23,7 @@ export const getUsersReactedMessageQuerySchema = z.object({
 export const getMessagesWithCursorQuerySchema = paginationQuerySchema.extend({
     messageId: z.string().optional(),
     conversationId: z.string(),
-    direction: z.enum(["next", "prev", "both"]),
+    direction: z.enum(["next", "prev", "both", "init"]),
 });
 
 export type CreateMessageInput = z.infer<typeof createMessageSchema>;
