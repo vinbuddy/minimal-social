@@ -310,6 +310,7 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
 
         return res.status(200).json({ message: "Get messages successfully", data: messages });
     } catch (error) {
+        console.log("error: ", error);
         next(error);
     }
 }
