@@ -101,6 +101,11 @@
 ![image](https://github.com/user-attachments/assets/4298786a-3378-4efe-b4d7-14d597b5384b)
 ![image](https://github.com/user-attachments/assets/c60ded47-ce4f-43eb-a260-078b30a95e0b)
 
+-  Change theme and emoji
+
+![image](https://github.com/user-attachments/assets/7ad86866-b2f1-4b9c-9270-79047394527d)
+![image](https://github.com/user-attachments/assets/69898dac-65b6-4384-afc9-34a7d613fa88)
+
 
 ### User
 
