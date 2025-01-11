@@ -42,7 +42,7 @@ export default function MessageList({ conversation }: IProps) {
 
     const { messageList, messageIdReferenced, setMessageIdReferenced, setMessageList } = useMessagesStore();
 
-    const { data, error, isLoading } = useSWR<{ data: IMessage[]; nextCursor: string; prevCursor: string }>(
+    const { data, error, isLoading } = useSWR<{ data: IMessage[]; hasNextPage: boolean; hasPrevPage: boolean }>(
         `/message/cursor-pagination?conversationId=${conversation._id}&direction=${direction}&messageId=${messageCursorId}`
     );
 
@@ -283,12 +283,12 @@ export default function MessageList({ conversation }: IProps) {
             const previousScrollTop = messageListRef.current.scrollTop;
             const previousScrollHeight = messageListRef.current.scrollHeight;
 
-            if (isReachBottom) {
+            if (isReachBottom && data?.hasNextPage) {
                 setDirection("next");
                 setMessageCursorId(messageList[0]._id);
             }
 
-            if (isReachTop) {
+            if (isReachTop && data?.hasPrevPage) {
                 setDirection("prev");
                 setMessageCursorId(messageList[messageList.length - 1]._id);
             }
@@ -296,44 +296,10 @@ export default function MessageList({ conversation }: IProps) {
             requestAnimationFrame(() => {
                 if (!messageListRef.current) return;
 
-                const newScrollHeight = messageListRef.current.scrollHeight;
                 if (direction === "next") {
-                    // Giữ nguyên vị trí scroll khi load next
                     messageListRef.current.scrollTop = previousScrollTop;
-                } else {
-                    // Điều chỉnh vị trí scroll khi load previous để giữ nguyên vị trí tương đối
-                    const scrollDiff = newScrollHeight - previousScrollHeight;
-                    messageListRef.current.scrollTop = previousScrollTop + scrollDiff;
                 }
             });
-
-            // const newMessages = res.data.data;
-
-            // Lưu lại vị trí scroll và chiều cao trước khi update
-
-            // if (direction === "next") {
-            //     console.log("Set-3");
-
-            //     setMessageList([...newMessages, ...messageList]);
-            // } else {
-            //     console.log("Set-4");
-            //     setMessageList([...messageList, ...newMessages]);
-            // }
-
-            // Khôi phục vị trí scroll sau khi update
-            // requestAnimationFrame(() => {
-            //     if (!messageListRef.current) return;
-
-            //     const newScrollHeight = messageListRef.current.scrollHeight;
-            //     if (direction === "next") {
-            //         // Giữ nguyên vị trí scroll khi load next
-            //         messageListRef.current.scrollTop = previousScrollTop;
-            //     } else {
-            //         // Điều chỉnh vị trí scroll khi load previous để giữ nguyên vị trí tương đối
-            //         const scrollDiff = newScrollHeight - previousScrollHeight;
-            //         messageListRef.current.scrollTop = previousScrollTop + scrollDiff;
-            //     }
-            // });
         } catch (error: any) {
             showToast(error.message, "error");
         }

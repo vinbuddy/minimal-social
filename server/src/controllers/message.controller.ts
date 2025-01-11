@@ -183,6 +183,10 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
             return res.status(403).json({ message: "You are not a member of this conversation" });
         }
 
+        let messages: Message[] = [];
+        let hasNextPage = false;
+        let hasPrevPage = false;
+
         if (direction === "init") {
             const messages = await MessageModel.find({ conversation: new mongoose.Types.ObjectId(conversationId) })
                 .limit(limit)
@@ -196,7 +200,21 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
                 .populate({ path: "conversation" })
                 .populate({ path: "reactions.user", select: USER_MODEL_HIDDEN_FIELDS });
 
-            return res.status(200).json({ message: "Get messages successfully", data: messages });
+            // Check hasPrevPage
+            if (messages.length === limit) {
+                const lastMessage = messages[messages.length - 1];
+
+                const prevMessages = await MessageModel.find({
+                    conversation: new mongoose.Types.ObjectId(conversationId),
+                    createdAt: { $lt: lastMessage.createdAt },
+                }).limit(1);
+
+                hasPrevPage = prevMessages.length > 0;
+            }
+
+            return res
+                .status(200)
+                .json({ message: "Get messages successfully", data: messages, hasNextPage, hasPrevPage });
         }
 
         const message = await MessageModel.findById(messageId)
@@ -231,8 +249,6 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
         if (direction === "prev" && message?.createdAt) {
             condition.createdAt = { $lt: new Date(message.createdAt) };
         }
-
-        let messages: Message[] = [];
 
         // if both -> get message around (4 prev) and (4 next) of cursor;
         if (direction === "both" && message?.createdAt) {
@@ -306,9 +322,19 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
                 .populate({ path: "replyTo" })
                 .populate({ path: "conversation" })
                 .populate({ path: "reactions.user", select: USER_MODEL_HIDDEN_FIELDS });
+
+            const _message = direction === "prev" ? messages[messages.length - 1] : messages[0];
+
+            const _messages = await MessageModel.find({
+                conversation: new mongoose.Types.ObjectId(conversationId),
+                createdAt: direction === "prev" ? { $lt: _message.createdAt } : { $gt: _message.createdAt },
+            }).limit(1);
+
+            hasNextPage = direction === "next" ? _messages.length > 0 : false;
+            hasPrevPage = direction === "prev" ? _messages.length > 0 : false;
         }
 
-        return res.status(200).json({ message: "Get messages successfully", data: messages });
+        return res.status(200).json({ message: "Get messages successfully", data: messages, hasNextPage, hasPrevPage });
     } catch (error) {
         console.log("error: ", error);
         next(error);
