@@ -16,6 +16,7 @@ import UserSuggestionList from "@/components/user/user-suggetion-list";
 import { usePagination, useDebounce } from "@/hooks";
 import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
+import ErrorMessage from "@/components/error-message";
 
 export default function SearchPage() {
     const [searchValue, setSearchValue] = useState("");
@@ -100,7 +101,7 @@ export default function SearchPage() {
                             <section>
                                 {!autocompleteResults && !searchValue && <UserSuggestionList />}
 
-                                {showError && <div className="text-center text-danger-500">{error?.message}</div>}
+                                {showError && <ErrorMessage error={error} className="text-center" />}
 
                                 {searchValue && (
                                     <div>

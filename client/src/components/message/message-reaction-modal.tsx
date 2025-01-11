@@ -20,6 +20,7 @@ import { TRANSITION_EASINGS } from "@nextui-org/framer-utils";
 import UserItem from "../user/user-item";
 import UserSkeletons from "../user/user-skeletons";
 import { IMessage } from "@/types/message";
+import ErrorMessage from "../error-message";
 
 interface IProps {
     children: React.ReactNode;
@@ -114,9 +115,7 @@ export default function MessageReactionModal({ children, messageId }: IProps) {
                                         />
                                     </Tabs>
                                     <div className="mt-5">
-                                        {error && !isLoading && (
-                                            <p className="text-center text-danger">{error?.message}</p>
-                                        )}
+                                        {error && !isLoading && <ErrorMessage error={error} className="text-center" />}
 
                                         {reactionData?.data?.reactions?.length === 0 && !isLoading && !error && (
                                             <p className="text-center">This message has not reaction yet</p>

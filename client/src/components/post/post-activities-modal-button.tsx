@@ -26,6 +26,7 @@ import UserSkeletons from "../user/user-skeletons";
 import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
 import { usePagination } from "@/hooks";
+import ErrorMessage from "../error-message";
 
 interface IProps {
     buttonProps: ButtonProps;
@@ -137,7 +138,7 @@ export default function PostActivitiesModalButton({ buttonProps, post }: IProps)
                             </ModalHeader>
                             <ModalBody id="post-activity" className="py-0 px-6 scrollbar">
                                 <div>
-                                    {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
+                                    {error && !isLoading && <ErrorMessage error={error} className="text-center" />}
                                     {users.length === 0 && !isLoading && !error && (
                                         <p className="text-center">This post has not activated yet</p>
                                     )}

@@ -12,6 +12,7 @@ import VideoPlayer from "../media/video-player";
 import { IMessageLink } from "@/types/message";
 import { formatDate } from "@/utils/datetime";
 import { LinkIcon } from "lucide-react";
+import ErrorMessage from "../error-message";
 
 interface IProps {
     conversationId: string;
@@ -49,7 +50,7 @@ export default function ConversationStorage({ conversationId, tab }: IProps) {
 
     const renderMediaFiles = () => {
         if (error && !isLoading) {
-            return <p className="text-center text-danger">{error?.message}</p>;
+            return <ErrorMessage error={error} className="text-center" />;
         }
 
         if (mediaFiles.length === 0 && !isLoading && !error) {

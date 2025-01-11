@@ -18,6 +18,7 @@ import UserSkeletons from "./user-skeletons";
 
 import { IUser } from "@/types/user";
 import { usePagination, useDebounce } from "@/hooks";
+import ErrorMessage from "../error-message";
 
 interface IProps {
     children: React.ReactNode;
@@ -89,7 +90,7 @@ export default function UserFollowInfoModal({ children, type = "follower", user 
                                 className="py-0 px-6 scrollbar"
                             >
                                 <div>
-                                    {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
+                                    {error && !isLoading && <ErrorMessage error={error} className="text-center" />}
                                     {users.length === 0 && !isLoading && !error && (
                                         <p className="text-center mt-2">
                                             {type === "follower" ? "No followers" : "Not following anyone"}

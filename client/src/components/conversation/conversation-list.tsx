@@ -17,6 +17,7 @@ import { usePagination, useDebounce } from "@/hooks";
 import { IConversation, IPrivateConversationResult } from "@/types/conversation";
 import axiosInstance from "@/utils/httpRequest";
 import { showToast } from "@/utils/toast";
+import ErrorMessage from "../error-message";
 
 type ConversationResponse = {
     data: {
@@ -138,7 +139,7 @@ export default function ConversationList({ onConversationClick }: IProps) {
 
     const renderConversations = useMemo(() => {
         if (isLoading) return <ConversationSkeletons length={5} />;
-        if (error) return <p className="text-center text-danger">{error?.message}</p>;
+        if (error) return <ErrorMessage error={error} className="text-center" />;
         if (conversations.length === 0) return <p className="text-center">No conversations yet</p>;
 
         return (

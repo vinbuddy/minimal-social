@@ -12,6 +12,7 @@ import { useAuthStore } from "@/hooks/store";
 import { usePagination } from "@/hooks";
 import { IPost } from "@/types/post";
 import { useSocketContext } from "@/contexts/socket-context";
+import ErrorMessage from "@/components/error-message";
 
 function Home() {
     const [postType, setPostType] = useState<"feed" | "following" | "liked">("feed");
@@ -60,7 +61,7 @@ function Home() {
                     </header>
 
                     <main className="px-4 pb-4">
-                        {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
+                        {error && !isLoading && <ErrorMessage error={error} className="text-center" />}
                         {posts.length === 0 && !isLoading && !error && <p className="text-center">Post not found</p>}
                         {!error && posts.length > 0 && (
                             <InfiniteScroll

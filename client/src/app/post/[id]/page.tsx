@@ -13,6 +13,7 @@ import PostDetail from "@/components/post/post-detail";
 import { usePagination } from "@/hooks";
 import { IComment } from "@/types/comment";
 import { IPost } from "@/types/post";
+import ErrorMessage from "@/components/error-message";
 
 export default function PostPage({ params }: { params: { id: string } }) {
     const { data, error } = useSWR(`/post/${params.id}`);
@@ -35,7 +36,7 @@ export default function PostPage({ params }: { params: { id: string } }) {
                     <Spinner />
                 </div>
             )}
-            {!isLoading && error && <div className="flex justify-center">{error?.message}</div>}
+            {!isLoading && error && <ErrorMessage error={error} className="flex justify-center" />}
             {!isLoading && !error && post && (
                 <div className="flex justify-center w-full">
                     <div className="w-[calc(100vw_-_80px)] md:w-[630px]">

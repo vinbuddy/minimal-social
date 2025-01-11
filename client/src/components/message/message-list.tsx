@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import useSWR from "swr";
 
 import MessageItem from "./message-item";
+import ErrorMessage from "../error-message";
 
 import { IConversation } from "@/types/conversation";
 import { IMessage } from "@/types/message";
@@ -437,15 +438,7 @@ export default function MessageList({ conversation }: IProps) {
     const groupedMessages = groupMessages();
 
     if (error) {
-        if (error.response.status === 403) {
-            return <div className="text-center text-red-500">You are not allowed to access this conversation.</div>;
-        }
-
-        if (error.response.status === 404) {
-            return <div className="text-center text-red-500">Conversation not found.</div>;
-        }
-
-        return <div className="text-center text-red-500">An unexpected error occurred.</div>;
+        return <ErrorMessage error={error} className="text-center" />;
     }
 
     return (

@@ -14,6 +14,7 @@ import { usePagination } from "@/hooks";
 import { INotification } from "@/types/notification";
 import { IUser } from "@/types/user";
 import axiosInstance from "@/utils/httpRequest";
+import ErrorMessage from "@/components/error-message";
 
 type NotificationActionType = "all" | "like" | "follow" | "comment" | "mention" | "repost";
 
@@ -120,7 +121,7 @@ export default function NotificationPage() {
                     </header>
 
                     <main className="px-4 pb-4">
-                        {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
+                        {error && !isLoading && <ErrorMessage error={error} className="text-center" />}
                         {showNoResults && <p className="text-center">No notifications yet</p>}
                         {!error && notifications.length > 0 && (
                             <InfiniteScroll

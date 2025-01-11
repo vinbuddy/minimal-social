@@ -10,6 +10,7 @@ import UserSkeletons from "./user-skeletons";
 import { useAuthStore } from "@/hooks/store";
 import { usePagination } from "@/hooks";
 import { IUser } from "@/types/user";
+import ErrorMessage from "../error-message";
 
 export default function UserSuggestionList() {
     const { currentUser } = useAuthStore();
@@ -27,7 +28,7 @@ export default function UserSuggestionList() {
 
     return (
         <div>
-            {error && !isLoading && <p className="text-center text-danger">{error?.message}</p>}
+            {error && !isLoading && <ErrorMessage error={error} className="text-center" />}
             {users.length === 0 && !isLoading && !error && <p className="text-center"></p>}
             {!error && users.length > 0 && (
                 <InfiniteScroll
