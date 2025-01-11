@@ -15,6 +15,7 @@ import { useAuthStore, useMessagesStore } from "@/hooks/store";
 import axiosInstance from "@/utils/httpRequest";
 import { showToast } from "@/utils/toast";
 import { formatDate } from "@/utils/datetime";
+import ScrollToBottom from "../scroll-to-bottom";
 
 interface IProps {
     conversation: IConversation;
@@ -61,25 +62,20 @@ export default function MessageList({ conversation }: IProps) {
             setMessageList(messages);
         }
 
-        if (direction === "next" || direction === "prev") {
+        if (direction === "next") {
             setMessageList(sortedMessages);
         }
 
-        const observer = new MutationObserver(() => {
-            const previousScrollHeight = messageListEl.scrollHeight;
-            const currentScrollHeight = messageListEl.scrollHeight;
+        if (direction === "prev") {
+            const previousHeight = messageListEl.scrollHeight;
 
-            // Điều chỉnh scrollTop để giữ vị trí cũ
-            if (currentScrollHeight > previousScrollHeight) {
-                messageListEl.scrollTop += currentScrollHeight - previousScrollHeight;
-            }
-        });
+            setMessageList(sortedMessages);
 
-        observer.observe(messageListEl, { childList: true, subtree: true });
-
-        return () => {
-            observer.disconnect();
-        };
+            requestAnimationFrame(() => {
+                const newHeight = messageListEl.scrollHeight;
+                messageListEl.scrollTop += newHeight - previousHeight;
+            });
+        }
     }, [data, direction, setMessageList]);
 
     useEffect(() => {
@@ -241,19 +237,6 @@ export default function MessageList({ conversation }: IProps) {
                 });
                 const messages = res.data.data;
                 setMessageList(messages);
-
-                // setDirection("both");
-                // requestAnimationFrame(() => {
-                //     requestAnimationFrame(() => {
-                //         const messageListEl = messageListRef.current;
-                //         if (!messageListEl) return;
-                //         // Với column-reverse, scrollHeight đã bao gồm padding
-                //         const scrollHeight = messageListEl.scrollHeight;
-                //         const clientHeight = messageListEl.clientHeight;
-                //         // Đặt scrollTop để tin nhắn nằm ở khoảng 40% từ dưới lên
-                //         messageListEl.scrollTop = scrollHeight - clientHeight * 1.4;
-                //     });
-                // });
             } catch (error: any) {
                 showToast(error.message + " --- ", "error");
             } finally {
@@ -459,6 +442,8 @@ export default function MessageList({ conversation }: IProps) {
                             </div>
                         </>
                     )}
+
+                    {direction === "init" && <ScrollToBottom />}
                 </div>
             </div>
         </>
