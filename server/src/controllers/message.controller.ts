@@ -664,19 +664,9 @@ export async function searchMessagesHandler(_req: Request, res: Response, next: 
                 path: "reactions.user",
             });
 
-        const currentMessages = messages.slice(skip, skip + limit);
-
-        const messagesWithPageInfo = currentMessages.map((message, index) => {
-            const actualIndex = allMatchingMessages.findIndex((m) => m._id.equals(message._id));
-            return {
-                ...message.toObject(),
-                page: Math.floor(actualIndex / limit) + 1,
-            };
-        });
-
         return res.status(200).json({
             message: "Search messages successfully",
-            data: messagesWithPageInfo,
+            data: messages,
             totalMessages,
             totalPages,
             page,
