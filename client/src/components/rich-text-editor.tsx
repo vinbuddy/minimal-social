@@ -16,6 +16,7 @@ interface IProps {
     placeholder?: string;
     handleInputChange: (value: string) => void;
     onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+    onPaste?: (e: React.ClipboardEvent<HTMLInputElement>) => void;
 }
 
 function RichTextEditor(
@@ -27,6 +28,7 @@ function RichTextEditor(
         className,
         handleInputChange,
         onKeyDown,
+        onPaste,
     }: IProps,
     ref: React.ForwardedRef<HTMLDivElement>
 ) {
@@ -251,6 +253,7 @@ function RichTextEditor(
                             contentEditable={true}
                             onKeyUp={handleInput}
                             onKeyDown={onKeyDown && onKeyDown}
+                            onPaste={onPaste && onPaste}
                         >
                             {parse(value)}
                         </div>
@@ -271,6 +274,8 @@ function RichTextEditor(
                     aria-placeholder={placeholder}
                     contentEditable={true}
                     onKeyUp={handleInput}
+                    onKeyDown={onKeyDown && onKeyDown}
+                    onPaste={onPaste && onPaste}
                 >
                     {parse(value)}
                 </div>

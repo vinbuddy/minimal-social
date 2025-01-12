@@ -103,6 +103,46 @@ export default function PostModalButton({ type = "create", post, children, open,
         setMediaFiles((prev) => [...prev, ...fileInfos]);
     };
 
+    const handlePasteMediaFiles = async (event: React.ClipboardEvent<HTMLInputElement>) => {
+        event.preventDefault();
+
+        // Get images from clipboard
+        const items = event.clipboardData.items;
+        const files: any = [];
+
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf("image") !== -1) {
+                files.push(items[i].getAsFile());
+            }
+        }
+
+        if (files.length > 0) {
+            const fileInfos: IMediaFile[] = [];
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+
+                if (!checkLimitSize(file)) {
+                    alert("LIMIT");
+                    return;
+                }
+
+                const localURL = URL.createObjectURL(file);
+                const dimension: any = await getFileDimension(file);
+
+                fileInfos.push({
+                    url: localURL,
+                    file: file,
+                    width: dimension.width,
+                    height: dimension.height,
+                    type: getFileFormat(file.type),
+                });
+            }
+
+            // Preview
+            setMediaFiles((prev) => [...prev, ...fileInfos]);
+        }
+    };
+
     const removeMediaFiles = (index: number) => {
         // Remove from FileList
         if (fileInputRef.current) {
@@ -273,6 +313,7 @@ export default function PostModalButton({ type = "create", post, children, open,
                             handleInputChange={(value) => {
                                 setCaption(value);
                             }}
+                            onPaste={handlePasteMediaFiles}
                             className="w-full"
                         />
                         <div className="mt-2">
