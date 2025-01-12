@@ -112,9 +112,6 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                 <DropdownTrigger>{children}</DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
                     <DropdownSection showDivider={isOwnMessage && !message?.isRetracted}>
-                        <DropdownItem textValue="" startContent={<InfoIcon size={16} />} key="view">
-                            View detail
-                        </DropdownItem>
                         <DropdownItem
                             textValue=""
                             startContent={<CopyIcon size={16} />}

@@ -9,7 +9,7 @@ export default function ScrollToBottom() {
         if (elementRef.current) {
             elementRef.current.scrollIntoView();
         }
-    });
+    }, []);
 
     return <div ref={elementRef} />;
 }

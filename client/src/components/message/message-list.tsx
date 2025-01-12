@@ -1,8 +1,9 @@
 "use client";
-import { Chip, Spinner } from "@nextui-org/react";
+import { Button, Chip, Spinner } from "@nextui-org/react";
 import { Fragment, useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import useSWR from "swr";
+import cn from "classnames";
 
 import MessageItem from "./message-item";
 import ErrorMessage from "../error-message";
@@ -16,6 +17,7 @@ import axiosInstance from "@/utils/httpRequest";
 import { showToast } from "@/utils/toast";
 import { formatDate } from "@/utils/datetime";
 import ScrollToBottom from "../scroll-to-bottom";
+import { ArrowDownIcon } from "lucide-react";
 
 interface IProps {
     conversation: IConversation;
@@ -38,6 +40,7 @@ export default function MessageList({ conversation }: IProps) {
 
     const [direction, setDirection] = useState<"next" | "prev" | "both" | "init">("init");
     const [messageCursorId, setMessageCursorId] = useState<string | null>(null);
+    const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
 
     const { loading: bothLoading, startLoading, stopLoading } = useLoading();
 
@@ -295,6 +298,11 @@ export default function MessageList({ conversation }: IProps) {
 
         timeoutId = setTimeout(() => {
             loadMoreMessages();
+
+            if (messageListRef.current && direction !== "init") {
+                const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
+                setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 100 || scrollHeight < clientHeight);
+            }
         }, 500);
     };
 
@@ -384,6 +392,12 @@ export default function MessageList({ conversation }: IProps) {
         return groupedMessages;
     };
 
+    const handleBackToBottom = () => {
+        setDirection("init");
+        setMessageCursorId(null);
+        setIsAtBottom(true);
+    };
+
     const groupedMessages = groupMessages();
 
     if (error) {
@@ -395,7 +409,7 @@ export default function MessageList({ conversation }: IProps) {
             <div
                 ref={messageListRef}
                 onScroll={handleScroll}
-                className="w-full overflow-y-auto overflow-x-hidden h-full  px-4 pt-4 scrollbar"
+                className="w-full overflow-y-auto overflow-x-hidden h-full px-4 pt-4 scrollbar"
             >
                 {isLoading && direction === "init" && (
                     <div className="h-full flex justify-center items-center">
@@ -443,7 +457,23 @@ export default function MessageList({ conversation }: IProps) {
                         </>
                     )}
 
-                    {direction === "init" && <ScrollToBottom />}
+                    {direction === "init" && messageList.length > 0 && <ScrollToBottom />}
+                </div>
+            </div>
+            {/* Float button - Scroll to bottom */}
+            <div className="relative">
+                <div
+                    className={cn(
+                        "absolute -top-12 left-1/2 transform -translate-x-1/2 animate-[fadeIn_0.2s_ease-in] fade",
+                        {
+                            "invisible pointer-events-none": isAtBottom && direction === "init",
+                            "visible pointer-events-auto show": !isAtBottom,
+                        }
+                    )}
+                >
+                    <Button isIconOnly variant="flat" radius="full" onClick={handleBackToBottom}>
+                        <ArrowDownIcon />
+                    </Button>
                 </div>
             </div>
         </>
