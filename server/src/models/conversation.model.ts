@@ -47,6 +47,9 @@ export class Conversation {
 
     @prop({ default: null })
     public emoji: string;
+
+    @prop({ default: [], ref: () => User })
+    public hiddenBy: Ref<User>[];
 }
 
 const ConversationModel = getModelForClass(Conversation);

@@ -21,6 +21,7 @@ export interface IConversation {
     theme: ITheme | null;
     emoji: string | null;
     unreadCount: number;
+    hiddenBy: string[];
     createdAt: string;
     updatedAt: string;
 }

@@ -13,8 +13,10 @@ interface IProps {
 }
 
 export default function UserItem({ user, href, isShowedFollowButton = true, avatarProps = {} }: IProps) {
+    const Wrapper = href ? Link : "div";
+
     return (
-        <Link
+        <Wrapper
             href={href ?? "#"}
             className="flex items-center justify-between py-3 border-b border-divider last:border-none ps-1"
         >
@@ -37,6 +39,6 @@ export default function UserItem({ user, href, isShowedFollowButton = true, avat
                     />
                 </section>
             )}
-        </Link>
+        </Wrapper>
     );
 }

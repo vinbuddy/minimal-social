@@ -1,8 +1,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Avatar, Badge, Button } from "@nextui-org/react";
+import { Avatar, Badge } from "@nextui-org/react";
 import { ReactNode, useMemo } from "react";
-import { EllipsisIcon } from "lucide-react";
 
 import { useAuthStore } from "@/hooks/store";
 import { IConversation } from "@/types/conversation";
@@ -30,12 +29,6 @@ export default function ConversationItem({ conversation }: IProps): ReactNode {
     const otherUser = useMemo(() => {
         return currentUser && conversation.participants.find((p) => p._id !== currentUser._id);
     }, [currentUser, conversation.participants]);
-
-    const handleMenuButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        // Handle your button click logic here
-    };
 
     return (
         <Link
@@ -70,29 +63,10 @@ export default function ConversationItem({ conversation }: IProps): ReactNode {
                             )}
                         </div>
                     </div>
-                    {/* <div className="flex items-center  mt-1">
-                        <AvatarGroup
-                            max={3}
-                            total={4}
-                            renderCount={(count) => {
-                                if (count <= 2) return null;
-                                return <p className="text-tiny text-default-400 font-medium ms-1"></p>;
-                            }}
-                        >
-                            <Avatar
-                                src="https://res.cloudinary.com/dtbhvc4p4/image/upload/v1722315011/avatar/mh7gflqx767v1vg4tn4q.png"
-                                classNames={{ base: "!w-4 !h-4" }}
-                            />
-                            <Avatar
-                                src="https://res.cloudinary.com/dtbhvc4p4/image/upload/v1720978549/profile/344060599-e8733bc3-ac77-42c6-b036-b9f1fb31b21c_hlh6by.png"
-                                classNames={{ base: "!w-4 !h-4" }}
-                            />
-                        </AvatarGroup>
-                    </div> */}
                 </div>
             </div>
 
-            <Button
+            {/* <Button
                 className="absolute top-1 right-2 group-hover:flex hidden bg-transparent"
                 isIconOnly
                 radius="full"
@@ -100,7 +74,7 @@ export default function ConversationItem({ conversation }: IProps): ReactNode {
                 onClick={handleMenuButtonClick}
             >
                 <EllipsisIcon className="!text-default-500" size={18} />
-            </Button>
+            </Button> */}
         </Link>
     );
 }

@@ -4,7 +4,7 @@ import { Button, Input, Spinner } from "@nextui-org/react";
 import { LoaderIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import useSWR from "swr";
 import InfiniteScroll from "react-infinite-scroll-component";
 
@@ -64,6 +64,10 @@ export default function ConversationList({ onConversationClick }: IProps) {
             : null
     );
 
+    useEffect(() => {
+        mutate();
+    }, [mutate]);
+
     // Derived states
     const isSearchResultEmpty = useMemo(
         () =>
@@ -97,7 +101,7 @@ export default function ConversationList({ onConversationClick }: IProps) {
         if (!debouncedSearch) return null;
 
         if (isSearchResultEmpty) return <p className="text-center">No search results</p>;
-        if (searchError) return <p className="text-center text-danger">{searchError?.message}</p>;
+        if (searchError) return <ErrorMessage error={searchError} className="text-center" />;
 
         return (
             <div>
@@ -105,7 +109,16 @@ export default function ConversationList({ onConversationClick }: IProps) {
                     if (privateCon?.conversation && privateCon?.user) {
                         return (
                             <Link
-                                onClick={() => onConversationClick?.(privateCon.conversation)}
+                                onClick={(e) => {
+                                    onConversationClick?.(privateCon.conversation);
+
+                                    // Check if currentUser._id is in hiddenBy
+                                    const hiddenBy = privateCon.conversation.hiddenBy;
+                                    if (currentUser && hiddenBy.includes(currentUser._id)) {
+                                        e.preventDefault();
+                                        handleNavigateToConversation(privateCon.user._id);
+                                    }
+                                }}
                                 href={`/conversation/${privateCon.conversation._id}`}
                                 key={privateCon.conversation._id}
                                 className="hover:bg-content2 block rounded-xl px-2"
@@ -114,6 +127,7 @@ export default function ConversationList({ onConversationClick }: IProps) {
                                     avatarProps={{ size: "lg", isBordered: false }}
                                     isShowedFollowButton={false}
                                     user={privateCon.user}
+                                    href=""
                                 />
                             </Link>
                         );

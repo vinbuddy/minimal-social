@@ -4,6 +4,7 @@ import {
     changeConversationEmojiHandler,
     changeThemeConversationHandler,
     createPrivateConversationHandler,
+    deleteConversationHandler,
     getConversationDetailHandler,
     getConversationLinksHandler,
     getConversationMediaFilesHandler,
@@ -24,5 +25,7 @@ router.get("/:id", verifyToken, getConversationDetailHandler);
 router.post("/", verifyToken, createPrivateConversationHandler);
 router.put("/change-emoji/:id", verifyToken, changeConversationEmojiHandler);
 router.put("/change-theme/:id", verifyToken, changeThemeConversationHandler);
+
+router.delete("/:id", verifyToken, deleteConversationHandler);
 
 export default router;

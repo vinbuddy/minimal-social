@@ -53,14 +53,13 @@ export default function ConfirmationModal({
                                 </div>
                             </ModalBody>
                             <ModalFooter className="flex justify-between">
-                                <Button fullWidth color="default" radius="full" variant="light" onPress={onClose}>
+                                <Button fullWidth color="default" variant="light" onPress={onClose}>
                                     Cancel
                                 </Button>
                                 <Button
                                     isLoading={loading}
                                     fullWidth
                                     color="danger"
-                                    radius="full"
                                     onPress={async () => {
                                         startLoading();
                                         await onOk();

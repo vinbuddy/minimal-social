@@ -188,7 +188,10 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
         let hasPrevPage = false;
 
         if (direction === "init") {
-            const messages = await MessageModel.find({ conversation: new mongoose.Types.ObjectId(conversationId) })
+            const messages = await MessageModel.find({
+                conversation: new mongoose.Types.ObjectId(conversationId),
+                excludedFor: { $nin: new mongoose.Types.ObjectId(userId) },
+            })
                 .limit(limit)
                 .sort({ createdAt: -1 })
                 .populate({

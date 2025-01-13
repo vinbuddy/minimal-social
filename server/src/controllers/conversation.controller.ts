@@ -5,19 +5,29 @@ import mongoose from "mongoose";
 import MessageModel from "../models/message.model";
 import { RequestWithUser } from "../helpers/types/request";
 
-export async function createPrivateConversationHandler(req: Request, res: Response, next: NextFunction) {
+export async function createPrivateConversationHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const participants = req.body.participants as string[];
+        const userId = req.user._id?.toString();
 
         const participantIds = participants.map((participant) => new mongoose.Types.ObjectId(participant));
 
-        // Check if the conversation already existvs
+        // Check if the conversation already exists
         const conversation = await ConversationModel.findOne({
             isGroup: false,
             participants: {
                 $all: participantIds,
             },
         }).populate({ path: "participants.user", select: USER_MODEL_HIDDEN_FIELDS });
+
+        // Check if userId is in hiddenBy of the conversation -> pull userId out of hiddenBy
+        const isHidden = conversation?.hiddenBy.includes(new mongoose.Types.ObjectId(userId));
+        if (isHidden && conversation) {
+            await ConversationModel.findByIdAndUpdate(conversation._id, {
+                $pull: { hiddenBy: new mongoose.Types.ObjectId(userId) },
+            });
+        }
 
         if (conversation) {
             return res.status(200).json({
@@ -58,6 +68,7 @@ export async function getConversationsHandler(_req: Request, res: Response, next
             participants: {
                 $in: [userId],
             },
+            hiddenBy: { $ne: new mongoose.Types.ObjectId(userId) },
         };
 
         const skip = (Number(page) - 1) * limit;
@@ -325,6 +336,30 @@ export async function getConversationLinksHandler(req: Request, res: Response, n
             totalPages,
             page,
             limit,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function deleteConversationHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+        const conversationId = req.params.id;
+        const userId = req.user._id?.toString();
+
+        // Push userId to excluded
+        await MessageModel.updateMany(
+            { conversation: conversationId },
+            { $addToSet: { excludedFor: new mongoose.Types.ObjectId(userId) } }
+        );
+
+        await ConversationModel.findByIdAndUpdate(conversationId, {
+            $addToSet: { hiddenBy: new mongoose.Types.ObjectId(userId) },
+        });
+
+        return res.status(200).json({
+            message: "Delete conversation successfully",
         });
     } catch (error) {
         next(error);

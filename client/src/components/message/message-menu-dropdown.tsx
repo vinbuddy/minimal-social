@@ -108,21 +108,26 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                 onOk={handleRetractMessage}
                 onClose={onCloseRetract}
             />
-            <Dropdown placement="bottom">
+            <Dropdown placement="bottom" disableAnimation={true}>
                 <DropdownTrigger>{children}</DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                    <DropdownSection showDivider={isOwnMessage && !message?.isRetracted}>
+                    <DropdownSection aria-label="info" showDivider={isOwnMessage && !message?.isRetracted}>
                         <DropdownItem
                             textValue=""
                             startContent={<CopyIcon size={16} />}
                             key="copy"
-                            onClick={handleCopy}
+                            onPress={handleCopy}
                         >
                             Copy message
                         </DropdownItem>
                         <>
                             {!message?.isRetracted && (
-                                <DropdownItem textValue="" startContent={<PinIcon size={16} />} key="copy">
+                                <DropdownItem
+                                    aria-label="pin"
+                                    textValue=""
+                                    startContent={<PinIcon size={16} />}
+                                    key="pin"
+                                >
                                     Pin message
                                 </DropdownItem>
                             )}
@@ -131,22 +136,24 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                     {isOwnMessage && !message?.isRetracted ? (
                         <>
                             <DropdownItem
+                                aria-label="delete"
                                 textValue=""
                                 startContent={<Trash2Icon size={16} />}
                                 key="delete"
                                 color="danger"
                                 className="text-danger"
-                                onClick={onOpenChangeDelete}
+                                onPress={onOpenChangeDelete}
                             >
                                 Delete message
                             </DropdownItem>
                             <DropdownItem
+                                aria-label="retract"
                                 textValue=""
                                 startContent={<RotateCcwIcon size={16} />}
-                                key="delete"
+                                key="retract"
                                 color="danger"
                                 className="text-danger"
-                                onClick={onOpenChangeRetract}
+                                onPress={onOpenChangeRetract}
                             >
                                 Retract message
                             </DropdownItem>

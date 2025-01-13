@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Accordion, AccordionItem, Avatar, Button, Listbox, ListboxItem } from "@nextui-org/react";
+import { Accordion, AccordionItem, Avatar, Button, Listbox, ListboxItem, useDisclosure } from "@nextui-org/react";
 import {
     TrashIcon,
     PaletteIcon,
@@ -10,18 +10,23 @@ import {
     FileIcon,
     LinkIcon,
     ArrowLeftIcon,
+    Trash2Icon,
 } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import ConversationStorage from "./conversation-storage";
-
-import UserName from "../user/user-name";
-import { IUser } from "@/types/user";
-import { IConversation } from "@/types/conversation";
 import ChangeEmojiConversationModal from "./change-emoji-conversation-modal";
 import ChangeThemeConversationModal from "./change-theme-conversation-modal";
+import ConfirmationModal from "../confirmation-modal";
 import SearchMessage from "./search-message";
+import UserName from "../user/user-name";
+
+import { IUser } from "@/types/user";
+import { IConversation } from "@/types/conversation";
 import { ImageIcon } from "@/assets/icons";
+import { showToast } from "@/utils/toast";
+import axiosInstance from "@/utils/httpRequest";
 
 interface IProps {
     partner?: IUser | null;
@@ -31,6 +36,31 @@ interface IProps {
 export default function ConversationInfo({ partner, conversation }: IProps) {
     const [storageType, setStorageType] = useState<"media" | "link" | "file" | null>(null);
     const [isSearchMode, setIsSearchMode] = useState<boolean>(false);
+    const router = useRouter();
+    const {
+        isOpen: isOpenDelete,
+        onOpen: onOpenDelete,
+        onOpenChange: onOpenChangeDelete,
+        onClose: onCloseDelete,
+    } = useDisclosure();
+
+    const handleDeleteConversation = async (): Promise<void> => {
+        try {
+            if (!conversation?._id) throw new Error("Conversation id is required");
+
+            const res = await axiosInstance.delete(`/conversation/${conversation._id}`);
+
+            if (res.status !== 200) {
+                throw new Error("Delete conversation failed");
+            }
+
+            showToast("Deleted conversation", "success");
+
+            router.replace("/conversation");
+        } catch (err: any) {
+            showToast(err.message, "error");
+        }
+    };
 
     if (!conversation || !partner) {
         return null;
@@ -76,6 +106,16 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
 
     return (
         <div id="conversation-info" className="h-screen overflow-auto border-divider bg-content1 p-4 scrollbar">
+            <ConfirmationModal
+                title="Delete this conversation ?"
+                description="This conversation will be deleted for you"
+                icon={<Trash2Icon size={24} />}
+                isOpen={isOpenDelete}
+                onOpenChange={onOpenDelete}
+                onOk={handleDeleteConversation}
+                onClose={onCloseDelete}
+            />
+
             <section className="flex flex-col items-center">
                 <div>
                     <Avatar
@@ -204,6 +244,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                         className="text-danger"
                                         key="delete"
                                         startContent={<TrashIcon size={18} />}
+                                        onPress={onOpenChangeDelete}
                                     >
                                         Delete conversation
                                     </ListboxItem>
