@@ -1,6 +1,6 @@
 "use client";
-import { Avatar, Spinner, Tab, Tabs } from "@nextui-org/react";
-import { useParams } from "next/navigation";
+import { Avatar, Button, Spinner, Tab, Tabs, Tooltip } from "@nextui-org/react";
+import { useParams, useRouter } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import useSWR from "swr";
@@ -13,17 +13,22 @@ import FollowButton from "@/components/user/follow-button";
 import UserFollowInfoModal from "@/components/user/user-follow-info-modal";
 import UserName from "@/components/user/user-name";
 import { useAuthStore } from "@/hooks/store";
-import { usePagination } from "@/hooks";
+import { useLoading, usePagination } from "@/hooks";
 import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
+import { SendIcon } from "lucide-react";
+import axiosInstance from "@/utils/httpRequest";
+import { showToast } from "@/utils/toast";
 
 export default function ProfilePage() {
     const params = useParams() as { id: string };
+    const router = useRouter();
     const { currentUser } = useAuthStore();
     const [postType, setPostType] = useState<"post" | "repost" | "liked">("post");
 
     const { data: user, isLoading, error } = useSWR<{ data: IUser }>(`/user/${params.id}`);
     const [followerCount, setFollowerCount] = useState(user?.data?.followers?.length ?? 0);
+    const { loading, startLoading, stopLoading } = useLoading();
 
     useEffect(() => {
         if (user) {
@@ -53,6 +58,26 @@ export default function ProfilePage() {
         mutate,
     } = usePagination<IPost>(getURL());
 
+    const handleNavigateToConversation = async () => {
+        try {
+            if (!currentUser || !user?.data._id) return;
+
+            startLoading();
+
+            const res = await axiosInstance.post("/conversation", {
+                participants: [currentUser._id, user?.data._id],
+            });
+
+            const conversationId = res.data.data._id;
+
+            router.push(`/conversation/${conversationId}`);
+        } catch (error: any) {
+            showToast(error?.response?.data?.message || "An error occurred", "error");
+        } finally {
+            stopLoading();
+        }
+    };
+
     return (
         <MainLayout>
             <div className="flex justify-center w-full">
@@ -72,12 +97,24 @@ export default function ProfilePage() {
                                 <div className="flex flex-wrap items-center justify-between gap-4">
                                     <UserName className="text-2xl justify-center" user={user?.data} />
                                     {user && user?.data?._id !== currentUser?._id ? (
-                                        <FollowButton
-                                            buttonProps={{ size: "md", radius: "md", fullWidth: false }}
-                                            user={user?.data}
-                                            onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
-                                            onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
-                                        />
+                                        <div className="flex items-center gap-2">
+                                            <FollowButton
+                                                buttonProps={{ size: "md", radius: "md", fullWidth: false }}
+                                                user={user?.data}
+                                                onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
+                                                onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
+                                            />
+                                            <Tooltip content="Send message" placement="bottom" closeDelay={0}>
+                                                <Button
+                                                    isIconOnly
+                                                    variant="light"
+                                                    isLoading={loading}
+                                                    onClick={handleNavigateToConversation}
+                                                >
+                                                    <SendIcon size={16} />
+                                                </Button>
+                                            </Tooltip>
+                                        </div>
                                     ) : (
                                         // <Button variant="flat">Edit profile</Button>
                                         <EditProfileModalButton
