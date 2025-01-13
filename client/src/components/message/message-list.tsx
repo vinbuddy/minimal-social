@@ -90,13 +90,20 @@ export default function MessageList({ conversation }: IProps) {
         const handleNewMessage = async (newMessage: IMessage) => {
             if (newMessage?.conversation?._id !== conversation._id) return;
 
-            // Update message in the store
             useMessagesStore.setState((state) => {
                 const updatedMessageIndex = state.messageList.findIndex((message) => message._id === newMessage._id);
+
                 if (updatedMessageIndex === -1) {
                     state.messageList.push(newMessage);
+                } else {
+                    state.messageList[updatedMessageIndex] = newMessage;
                 }
-                return { ...state };
+
+                const sortedMessageList = [...state.messageList].sort(
+                    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+
+                return { messageList: sortedMessageList };
             });
 
             // Scroll to bottom when a new message is added
