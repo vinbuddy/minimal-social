@@ -100,9 +100,11 @@ export default function MessageList({ conversation }: IProps) {
             });
 
             // Scroll to bottom when a new message is added
-            if (messageListRef.current) {
-                messageListRef.current.scrollTo({ top: 0, behavior: "smooth" });
-            }
+            requestAnimationFrame(() => {
+                if (messageListRef.current) {
+                    messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+                }
+            });
 
             swrMutate((key) => typeof key === "string" && key.includes("/conversation"));
 
