@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import { FollowUserInput, followUserSchema } from "../schemas/user.schema";
-import cloudinary from "../configs/cloudinary";
+import cloudinary from "../shared/configs/cloudinary";
 
-import { uploadToCloudinary } from "../helpers/cloudinary";
+import { uploadToCloudinary } from "../shared/helpers/cloudinary";
 import { MediaFile } from "../models/post.model";
 
 interface RequestWithFile extends Request {

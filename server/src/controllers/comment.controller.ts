@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { CreateCommentInput, createCommentSchema } from "../schemas/comment.schema";
-import { extractMentionsAndTags, replaceHrefs } from "../helpers/text-parser";
+import { extractMentionsAndTags, replaceHrefs } from "../shared/helpers/text-parser";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
 import CommentModel from "../models/comment.model";

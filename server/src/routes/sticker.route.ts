@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { verifyToken } from "../middlewares/verifyToken";
+import { verifyToken } from "../middlewares/verify-token.middleware";
 import { getStickersHandler } from "../controllers/sticker.controller";
 
 const router: Router = express.Router();

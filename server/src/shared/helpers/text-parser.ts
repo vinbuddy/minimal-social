@@ -1,4 +1,4 @@
-import UserModel from "../models/user.model";
+import UserModel from "../../models/user.model";
 
 export const extractMentionsAndTags = (html: string) => {
     const mentionRegex = /@(\w+)/g;

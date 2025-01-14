@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import { autocompleteHandler, searchPostsHandler } from "../controllers/search.controller";
-import { verifyToken } from "../middlewares/verifyToken";
+import { verifyToken } from "../middlewares/verify-token.middleware";
 
 const router: Router = express.Router();
 

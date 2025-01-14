@@ -2,7 +2,7 @@ import express, { Application } from "express";
 import env from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { errorHandler } from "./middlewares/errorHandler";
+import { errorHandler } from "./middlewares/error-handler.middleware";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import session from "express-session";

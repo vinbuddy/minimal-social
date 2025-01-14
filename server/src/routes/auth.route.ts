@@ -13,7 +13,7 @@ import {
     verifyForgotPasswordOTPHandler,
     googleAuthCallbackHandler,
 } from "../controllers/auth.controller";
-import { verifyToken } from "../middlewares/verifyToken";
+import { verifyToken } from "../middlewares/verify-token.middleware";
 
 env.config();
 

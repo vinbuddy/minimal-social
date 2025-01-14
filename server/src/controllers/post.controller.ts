@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import PostModel, { MediaFile } from "../models/post.model";
-import { extractMentionsAndTags, replaceHrefs } from "../helpers/text-parser";
+import { extractMentionsAndTags, replaceHrefs } from "../shared/helpers/text-parser";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose, { Model } from "mongoose";
 import { createPostInput, createPostSchema, editPostInput, editPostSchema } from "../schemas/post.schema";
-import { uploadToCloudinary } from "../helpers/cloudinary";
-import cloudinary from "../configs/cloudinary";
+import { uploadToCloudinary } from "../shared/helpers/cloudinary";
+import cloudinary from "../shared/configs/cloudinary";
 import CommentModel from "../models/comment.model";
 import { getPostQueryHelper } from "../services/post.service";
-import { moderateImage } from "../helpers/media-moderation";
+import { moderateImage } from "../shared/helpers/media-moderation";
 
 interface RequestWithFiles extends Request {
     files: Express.Multer.File[];

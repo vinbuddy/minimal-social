@@ -15,7 +15,7 @@ import {
     unlikePostHandler,
     unRepostHandler,
 } from "../controllers/post.controller";
-import { verifyAdminToken, verifyToken } from "../middlewares/verifyToken";
+import { verifyAdminToken, verifyToken } from "../middlewares/verify-token.middleware";
 import multer from "multer";
 const uploadFile = multer();
 

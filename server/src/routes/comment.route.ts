@@ -7,7 +7,7 @@ import {
     likeCommentHandler,
     unlikeCommentHandler,
 } from "../controllers/comment.controller";
-import { verifyToken } from "../middlewares/verifyToken";
+import { verifyToken } from "../middlewares/verify-token.middleware";
 
 const router: Router = express.Router();
 
