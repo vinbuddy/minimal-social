@@ -108,7 +108,7 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                 onOk={handleRetractMessage}
                 onClose={onCloseRetract}
             />
-            <Dropdown placement="bottom" disableAnimation={true}>
+            <Dropdown placement="bottom">
                 <DropdownTrigger>{children}</DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
                     <DropdownSection aria-label="info" showDivider={isOwnMessage && !message?.isRetracted}>

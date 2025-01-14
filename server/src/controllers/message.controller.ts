@@ -94,6 +94,8 @@ export async function createMessageHandler(_req: Request, res: Response, next: N
         };
 
         conversation.lastMessage = lastMessage;
+        conversation.hiddenBy = [];
+
         await conversation.save();
 
         // Send real time message in room
