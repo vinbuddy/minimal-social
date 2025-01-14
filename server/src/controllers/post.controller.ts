@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import PostModel, { MediaFile } from "../models/post.model";
-import { extractMentionsAndTags, replaceHrefs } from "../helpers/textParser";
+import { extractMentionsAndTags, replaceHrefs } from "../helpers/text-parser";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose, { Model } from "mongoose";
 import { createPostInput, createPostSchema, editPostInput, editPostSchema } from "../schemas/post.schema";
@@ -8,7 +8,7 @@ import { uploadToCloudinary } from "../helpers/cloudinary";
 import cloudinary from "../configs/cloudinary";
 import CommentModel from "../models/comment.model";
 import { getPostQueryHelper } from "../services/post.service";
-import { RequestWithUser } from "../helpers/types/request";
+import { moderateImage } from "../helpers/media-moderation";
 
 interface RequestWithFiles extends Request {
     files: Express.Multer.File[];
@@ -28,6 +28,21 @@ export async function createPostHandler(_req: Request, res: Response, next: Next
                 return uploadPromise;
             });
             uploadedFiles = await Promise.all(uploadPromises);
+        }
+
+        if (uploadedFiles.length > 0) {
+            // Check image moderation, check if has any image that is not safe -> delete all uploaded files
+            const imageModerationPromises = uploadedFiles.map((file) => moderateImage(file.url));
+            const imageModerationResults = await Promise.all(imageModerationPromises);
+
+            const isNotSafe = imageModerationResults.some((result) => result === false);
+
+            if (isNotSafe) {
+                const promises = uploadedFiles.map((file) => cloudinary.uploader.destroy(file.publicId));
+                await Promise.all(promises);
+
+                return res.status(400).json({ message: "Image contains nudity, please upload another image" });
+            }
         }
 
         const { mentions: mentionUsernames, tags } = extractMentionsAndTags(caption);

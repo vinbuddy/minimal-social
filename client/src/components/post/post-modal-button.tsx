@@ -24,6 +24,7 @@ import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFi
 import axiosInstance from "@/utils/httpRequest";
 import { useAuthStore } from "@/hooks/store";
 import { useBreakpoint, useGlobalMutation, useLoading } from "@/hooks";
+import { showToast } from "@/utils/toast";
 
 interface IProps {
     type?: "create" | "edit";
@@ -224,12 +225,11 @@ export default function PostModalButton({ type = "create", post, children, open,
                 withCredentials: true,
             });
 
-            console.log(response.data);
             const postResponse = response.data.data as IPost;
 
             // Notification
             if (postResponse.mentions.length > 0) {
-                const notificationResponse = await axiosInstance.post("/notification", {
+                await axiosInstance.post("/notification", {
                     target: postResponse?._id,
                     targetType: "Post",
                     action: "mention",
@@ -247,12 +247,9 @@ export default function PostModalButton({ type = "create", post, children, open,
             setIsOpen(false);
             setOpen && setOpen(false);
 
-            toast.success("Post created successfully.", { position: "bottom-center" });
+            showToast("Post created successfully.", "success");
         } catch (error: any) {
-            toast.error("Failed to create post.", { position: "bottom-center" });
-            toast.error(error.response.data.message, { position: "bottom-center" });
-
-            console.log(error);
+            showToast(error.response.data.message, "error");
         } finally {
             stopLoading();
         }

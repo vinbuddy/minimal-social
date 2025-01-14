@@ -12,7 +12,7 @@ import { MediaFile } from "../models/post.model";
 import { uploadToCloudinary } from "../helpers/cloudinary";
 import MessageModel, { Message } from "../models/message.model";
 import { Server } from "socket.io";
-import { RequestWithUser, RequestWithFiles } from "../helpers/types/request";
+import { RequestWithUser, RequestWithFiles } from "../types/request";
 
 enum E_EMOJI {
     HEART = "❤️",

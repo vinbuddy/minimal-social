@@ -3,7 +3,7 @@ import ConversationModel from "../models/conversation.model";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import mongoose from "mongoose";
 import MessageModel from "../models/message.model";
-import { RequestWithUser } from "../helpers/types/request";
+import { RequestWithUser } from "../types/request";
 
 export async function createPrivateConversationHandler(_req: Request, res: Response, next: NextFunction) {
     try {

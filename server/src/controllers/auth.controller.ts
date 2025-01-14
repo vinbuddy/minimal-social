@@ -13,7 +13,7 @@ import {
 } from "../schemas/auth.schema";
 import { generateToken } from "../helpers/jwt";
 import bcrypt from "bcrypt";
-import { sendEmail } from "../helpers/sendEmail";
+import { sendEmail } from "../helpers/email-sender";
 import otpGenerator from "otp-generator";
 import { OTPModel } from "../models/otp.model";
 import jwt from "jsonwebtoken";
