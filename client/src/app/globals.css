@@ -28,8 +28,13 @@ body {
 }
 
 /* Scroll bar dark mode if html has class dark  */
-html.dark .scrollbar::-webkit-scrollbar-thumb {
+html.dark .scrollbar::-webkit-scrollbar-thumb,
+html.dark.scrollbar::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.25);
+}
+
+html.scrollbar::-webkit-scrollbar {
+    width: 8px;
 }
 
 [contenteditable="true"] {

@@ -13,12 +13,13 @@ import FollowButton from "@/components/user/follow-button";
 import UserFollowInfoModal from "@/components/user/user-follow-info-modal";
 import UserName from "@/components/user/user-name";
 import { useAuthStore } from "@/hooks/store";
-import { useLoading, usePagination } from "@/hooks";
+import { useIsOwner, useLoading, usePagination } from "@/hooks";
 import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
-import { SendIcon } from "lucide-react";
-import axiosInstance from "@/utils/httpRequest";
+import { EllipsisIcon, SendIcon } from "lucide-react";
+import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
+import ProfileMenuDropdown from "@/components/user/profile-menu-dropdown";
 
 export default function ProfilePage() {
     const params = useParams() as { id: string };
@@ -29,6 +30,7 @@ export default function ProfilePage() {
     const { data: user, isLoading, error } = useSWR<{ data: IUser }>(`/user/${params.id}`);
     const [followerCount, setFollowerCount] = useState(user?.data?.followers?.length ?? 0);
     const { loading, startLoading, stopLoading } = useLoading();
+    const isOwner = useIsOwner(user?.data?._id);
 
     useEffect(() => {
         if (user) {
@@ -96,34 +98,44 @@ export default function ProfilePage() {
                             <div className="flex-1">
                                 <div className="flex flex-wrap items-center justify-between gap-4">
                                     <UserName className="text-2xl justify-center" user={user?.data} />
-                                    {user && user?.data?._id !== currentUser?._id ? (
-                                        <div className="flex items-center gap-2">
-                                            <FollowButton
-                                                buttonProps={{ size: "md", radius: "md", fullWidth: false }}
-                                                user={user?.data}
-                                                onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
-                                                onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
+
+                                    <div className="flex items-center gap-2">
+                                        {user && !isOwner ? (
+                                            <>
+                                                <FollowButton
+                                                    buttonProps={{ size: "md", radius: "md", fullWidth: false }}
+                                                    user={user?.data}
+                                                    onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
+                                                    onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
+                                                />
+                                                <Tooltip content="Send message" placement="bottom" closeDelay={0}>
+                                                    <Button
+                                                        isIconOnly
+                                                        variant="light"
+                                                        isLoading={loading}
+                                                        onClick={handleNavigateToConversation}
+                                                    >
+                                                        <SendIcon size={16} />
+                                                    </Button>
+                                                </Tooltip>
+                                            </>
+                                        ) : (
+                                            <EditProfileModalButton
+                                                buttonProps={{
+                                                    variant: "flat",
+                                                    children: "Edit profile",
+                                                }}
                                             />
-                                            <Tooltip content="Send message" placement="bottom" closeDelay={0}>
-                                                <Button
-                                                    isIconOnly
-                                                    variant="light"
-                                                    isLoading={loading}
-                                                    onClick={handleNavigateToConversation}
-                                                >
-                                                    <SendIcon size={16} />
+                                        )}
+
+                                        {user && (
+                                            <ProfileMenuDropdown user={user?.data}>
+                                                <Button isIconOnly variant="light">
+                                                    <EllipsisIcon size={16} />
                                                 </Button>
-                                            </Tooltip>
-                                        </div>
-                                    ) : (
-                                        // <Button variant="flat">Edit profile</Button>
-                                        <EditProfileModalButton
-                                            buttonProps={{
-                                                variant: "flat",
-                                                children: "Edit profile",
-                                            }}
-                                        />
-                                    )}
+                                            </ProfileMenuDropdown>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="flex gap-4 my-4">

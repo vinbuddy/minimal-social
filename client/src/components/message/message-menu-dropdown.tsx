@@ -8,10 +8,11 @@ import {
     DropdownTrigger,
     useDisclosure,
 } from "@nextui-org/react";
-import { CopyIcon, InfoIcon, PinIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
+import { CopyIcon, PinIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import ConfirmationModal from "../confirmation-modal";
-import { useAuthStore, useMessagesStore } from "@/hooks/store";
-import axiosInstance from "@/utils/httpRequest";
+import { useMessagesStore } from "@/hooks/store";
+import axiosInstance from "@/utils/http-request";
+import { useCopyToClipboard } from "@/hooks";
 
 interface IProps {
     message: IMessage;
@@ -33,15 +34,7 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
         onClose: onCloseRetract,
     } = useDisclosure();
     const { messageList, setMessageList } = useMessagesStore();
-
-    const handleCopy = async (): Promise<void> => {
-        try {
-            await navigator.clipboard.writeText(message.content);
-            showToast("Copied message", "success");
-        } catch (err) {
-            showToast("Copy message failed", "error");
-        }
-    };
+    const copy = useCopyToClipboard();
 
     const handleDeleteMessage = async (): Promise<void> => {
         try {
@@ -116,7 +109,7 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                             textValue=""
                             startContent={<CopyIcon size={16} />}
                             key="copy"
-                            onPress={handleCopy}
+                            onPress={() => copy(message.content)}
                         >
                             Copy message
                         </DropdownItem>

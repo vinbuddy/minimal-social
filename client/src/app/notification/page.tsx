@@ -13,7 +13,7 @@ import { useAuthStore } from "@/hooks/store";
 import { usePagination } from "@/hooks";
 import { INotification } from "@/types/notification";
 import { IUser } from "@/types/user";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import ErrorMessage from "@/components/error-message";
 
 type NotificationActionType = "all" | "like" | "follow" | "comment" | "mention" | "repost";

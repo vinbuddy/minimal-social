@@ -12,7 +12,7 @@ import MediaFileSlider from "../media/media-file-slider";
 
 import { ImageIcon } from "@/assets/icons";
 import { IMediaFile } from "@/types/post";
-import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
+import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/media-file";
 import { IConversation } from "@/types/conversation";
 import { showToast } from "@/utils/toast";
 import { useAuthStore } from "@/hooks/store";

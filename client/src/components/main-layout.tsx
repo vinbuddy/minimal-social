@@ -10,7 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import useAuthStore from "@/hooks/store/use-auth-store";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { useLoading } from "@/hooks";
 import { HomeIcon, HeartIcon, ConversationIcon, SearchIcon } from "@/assets/icons";
 import { useSocketContext } from "@/contexts/socket-context";

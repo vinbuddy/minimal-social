@@ -12,7 +12,7 @@ import TimeAgo from "../time-ago";
 import UserProfileCard from "../user/user-profile-card";
 import CommentMenuDropdown from "./comment-menu-dropdown";
 
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { HeartIcon } from "@/assets/icons";
 import { IComment } from "@/types/comment";
 import { usePagination } from "@/hooks";

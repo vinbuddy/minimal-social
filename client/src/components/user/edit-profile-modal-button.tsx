@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 import AvatarCropper from "./avatar-cropper";
 
-import { getFileDimension } from "@/utils/mediaFile";
+import { getFileDimension } from "@/utils/media-file";
 import { showToast } from "@/utils/toast";
 import { IUser } from "@/types/user";
 import { useAuthStore } from "@/hooks/store";

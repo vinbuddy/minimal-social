@@ -8,7 +8,7 @@ import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
 import { useAuthStore } from "@/hooks/store";
 import { useGlobalMutation } from "@/hooks";
 import { IPost } from "@/types/post";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 
 interface IProps {
     post: IPost;

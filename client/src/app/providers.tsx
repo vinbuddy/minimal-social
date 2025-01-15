@@ -4,7 +4,7 @@ import { NextUIProvider } from "@nextui-org/react";
 import { SWRConfig } from "swr";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-import { fetcher } from "@/utils/httpRequest";
+import { fetcher } from "@/utils/http-request";
 
 export function SWRConfigProvider({ children }: { children: React.ReactNode }) {
     return (

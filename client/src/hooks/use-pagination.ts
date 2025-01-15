@@ -1,4 +1,4 @@
-import { fetcher } from "@/utils/httpRequest";
+import { fetcher } from "@/utils/http-request";
 import useSWRInfinite from "swr/infinite";
 
 export default function usePagination<T>(url: string | null) {

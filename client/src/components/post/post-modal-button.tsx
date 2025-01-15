@@ -20,8 +20,8 @@ import MediaFileUploaderButton from "../media/media-file-uploader-button";
 import RichTextEditor from "../rich-text-editor";
 
 import { IMediaFile, IPost } from "@/types/post";
-import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
-import axiosInstance from "@/utils/httpRequest";
+import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/media-file";
+import axiosInstance from "@/utils/http-request";
 import { useAuthStore } from "@/hooks/store";
 import { useBreakpoint, useGlobalMutation, useLoading } from "@/hooks";
 import { showToast } from "@/utils/toast";
@@ -188,7 +188,6 @@ export default function PostModalButton({ type = "create", post, children, open,
     };
 
     const handleOpenChange = (_open: boolean) => {
-        console.log("_open: ", _open);
         setIsOpen(_open);
         setOpen && setOpen(_open);
     };

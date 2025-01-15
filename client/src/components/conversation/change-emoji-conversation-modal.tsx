@@ -16,7 +16,7 @@ import { useTheme } from "next-themes";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import { useGlobalMutation, useLoading } from "@/hooks";
 

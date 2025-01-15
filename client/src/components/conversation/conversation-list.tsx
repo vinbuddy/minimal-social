@@ -15,7 +15,7 @@ import UserItem from "../user/user-item";
 import { useAuthStore } from "@/hooks/store";
 import { usePagination, useDebounce } from "@/hooks";
 import { IConversation, IPrivateConversationResult } from "@/types/conversation";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import ErrorMessage from "../error-message";
 

@@ -21,7 +21,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className="light" suppressHydrationWarning>
+        <html lang="en" className="light scrollbar" suppressHydrationWarning>
             <body className={inter.className}>
                 <AuthContextProvider>
                     <NextUIProvider>

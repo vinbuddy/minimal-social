@@ -9,7 +9,7 @@ import UserName from "../user/user-name";
 import ConfirmationModal from "../confirmation-modal";
 import UserBadgeAvatar from "../user/user-badge-avatar";
 
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import { useGlobalMutation, useLoading } from "@/hooks";
 

@@ -6,10 +6,9 @@ import { toast } from "sonner";
 
 import ConfirmationModal from "../confirmation-modal";
 
-import axiosInstance from "@/utils/httpRequest";
-import { useAuthStore } from "@/hooks/store";
+import axiosInstance from "@/utils/http-request";
 import { IPost } from "@/types/post";
-import { useGlobalMutation } from "@/hooks";
+import { useCopyToClipboard, useGlobalMutation, useIsOwner } from "@/hooks";
 
 interface IProps {
     children: React.ReactNode | React.JSX.Element | React.ReactElement;
@@ -28,19 +27,10 @@ type PostMenuItem = {
 };
 
 export default function PostMenuDropdown({ children, post, onOpenEditModal }: IProps) {
-    const { currentUser } = useAuthStore();
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const mutate = useGlobalMutation();
-
-    const handleCopyLink = async (): Promise<void> => {
-        try {
-            const pathName = `/post/${post._id}`;
-            await navigator.clipboard.writeText(window.location.origin + pathName);
-            toast.success("Copied link", { position: "bottom-center" });
-        } catch (err) {
-            toast.error("Copied error");
-        }
-    };
+    const isOwner = useIsOwner(post?.postBy?._id);
+    const copy = useCopyToClipboard();
 
     const handleDeletePost = async () => {
         try {
@@ -62,7 +52,7 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
             key: "copy",
             content: "Copy link",
             icon: <LinkIcon size={18} />,
-            onClick: handleCopyLink,
+            onClick: () => copy(`${window.location.origin}/post/${post._id}`),
         },
         {
             key: "detail",
@@ -96,7 +86,7 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
             <Dropdown placement="bottom-end">
                 <DropdownTrigger>{children}</DropdownTrigger>
                 <DropdownMenu variant="flat" aria-label="Static Actions">
-                    {post?.postBy?._id === currentUser?._id // Check if the post is created by the current user or not
+                    {isOwner // Check if the post is created by the current user or not
                         ? ownerItems.map((item) => (
                               <DropdownItem
                                   as={item?.href ? Link : undefined}

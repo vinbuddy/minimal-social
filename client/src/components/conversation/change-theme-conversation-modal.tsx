@@ -19,7 +19,7 @@ import useSWR from "swr";
 import { IConversation } from "@/types/conversation";
 import { ITheme } from "@/types/theme";
 import { useGlobalMutation, useLoading } from "@/hooks";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import { CheckIcon } from "lucide-react";
 

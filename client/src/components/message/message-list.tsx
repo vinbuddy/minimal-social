@@ -13,7 +13,7 @@ import { IMessage } from "@/types/message";
 import { useSocketContext } from "@/contexts/socket-context";
 import { useGlobalMutation, useLoading } from "@/hooks";
 import { useAuthStore, useMessagesStore } from "@/hooks/store";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import { formatDate } from "@/utils/datetime";
 import ScrollToBottom from "../scroll-to-bottom";

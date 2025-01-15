@@ -7,7 +7,7 @@ import MessageMenuDropdown from "./message-menu-dropdown";
 
 import { IMessage } from "@/types/message";
 import { formatTime } from "@/utils/datetime";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import { useAuthStore, useReplyStore } from "@/hooks/store";
 import { useGlobalMutation } from "@/hooks";

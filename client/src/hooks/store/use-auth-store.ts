@@ -1,5 +1,5 @@
 import { IUser } from "@/types/user";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { create } from "zustand";
 
 interface AuthState {

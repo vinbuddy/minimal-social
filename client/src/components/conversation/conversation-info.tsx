@@ -26,7 +26,7 @@ import { IUser } from "@/types/user";
 import { IConversation } from "@/types/conversation";
 import { ImageIcon } from "@/assets/icons";
 import { showToast } from "@/utils/toast";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 
 interface IProps {
     partner?: IUser | null;

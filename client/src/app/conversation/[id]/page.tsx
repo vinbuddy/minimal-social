@@ -24,7 +24,7 @@ import { useAuthStore } from "@/hooks/store";
 import { IConversation } from "@/types/conversation";
 import { useConversationContext } from "@/contexts/conversation-context";
 import { IMediaFile } from "@/types/post";
-import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/mediaFile";
+import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/media-file";
 import { showToast } from "@/utils/toast";
 
 function ConversationDetailPage() {

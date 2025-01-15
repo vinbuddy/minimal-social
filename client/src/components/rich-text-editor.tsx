@@ -5,7 +5,7 @@ import parse from "html-react-parser";
 
 import { IUser } from "@/types/user";
 import { setCaretAtTheEnd } from "@/utils/editor";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { useDebounce } from "@/hooks";
 
 interface IProps {

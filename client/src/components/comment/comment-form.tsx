@@ -8,7 +8,7 @@ import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 
 import RichTextEditor from "@/components/rich-text-editor";
 import EmojiPicker from "../emoji-picker";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { useAuthStore, useReplyStore } from "@/hooks/store";
 import { useGlobalMutation, useLoading } from "@/hooks";
 import { showToast } from "@/utils/toast";

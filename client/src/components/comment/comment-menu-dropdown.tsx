@@ -1,13 +1,10 @@
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from "@nextui-org/react";
 import { CopyIcon, TrashIcon } from "lucide-react";
-import { toast } from "sonner";
-
 import { IComment } from "@/types/comment";
 import { showToast } from "@/utils/toast";
 import ConfirmationModal from "../confirmation-modal";
-import axiosInstance from "@/utils/httpRequest";
-import { useAuthStore } from "@/hooks/store";
-import { useGlobalMutation } from "@/hooks";
+import axiosInstance from "@/utils/http-request";
+import { useCopyToClipboard, useGlobalMutation, useIsOwner } from "@/hooks";
 
 interface IProps {
     children: React.ReactNode | React.JSX.Element | React.ReactElement;
@@ -25,19 +22,10 @@ type CommentMenuItem = {
 };
 
 export default function CommentMenuDropdown({ children, comment }: IProps) {
-    const { currentUser } = useAuthStore();
-
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const mutate = useGlobalMutation();
-
-    const handleCopy = async (): Promise<void> => {
-        try {
-            await navigator.clipboard.writeText(comment.content);
-            showToast("Copied comment", "success");
-        } catch (err) {
-            showToast("Copy comment failed", "error");
-        }
-    };
+    const isOwner = useIsOwner(comment?.commentBy?._id);
+    const copy = useCopyToClipboard();
 
     const handleDeleteComment = async () => {
         if (!comment) return;
@@ -59,7 +47,7 @@ export default function CommentMenuDropdown({ children, comment }: IProps) {
             key: "copy",
             content: "Copy content",
             icon: <CopyIcon size={16} />,
-            onClick: handleCopy,
+            onClick: () => copy(comment.content),
         },
     ];
 
@@ -75,7 +63,7 @@ export default function CommentMenuDropdown({ children, comment }: IProps) {
         ...items,
     ];
 
-    const commentMenuItems = currentUser?._id === comment?.commentBy._id ? ownerItems : items;
+    const commentMenuItems = isOwner ? ownerItems : items;
 
     return (
         <>

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { useAuthStore } from "@/hooks/store";
 import { IUser } from "@/types/user";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 
 interface IProps {
     user: IUser;

@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import MessageReactionModal from "./message-reaction-modal";
 import { IMessage, IMessageReaction } from "@/types/message";
-import axiosInstance from "@/utils/httpRequest";
+import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import { useAuthStore } from "@/hooks/store";
 

@@ -1,4 +1,3 @@
-import { useAuthStore } from "@/hooks/store";
 import axios from "axios";
 
 export async function fetchData(url: string, options: RequestInit = {}) {
