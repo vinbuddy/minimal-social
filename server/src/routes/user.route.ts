@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import {
+    blockUserHandler,
     editProfileHandler,
     followUserHandler,
     getFollowersHandler,
@@ -8,6 +9,7 @@ import {
     getUserHandler,
     getUsersHandler,
     searchUserHandler,
+    unblockUserHandler,
     unfollowUserHandler,
 } from "../controllers/user.controller";
 import { verifyAdminToken, verifyToken } from "../middlewares/verify-token.middleware";
@@ -27,5 +29,8 @@ router.get("/:id", verifyToken, getUserHandler);
 
 router.put("/follow", verifyToken, followUserHandler);
 router.put("/unfollow", verifyToken, unfollowUserHandler);
+
+router.put("/block/:id", verifyToken, blockUserHandler);
+router.put("/unblock/:id", verifyToken, unblockUserHandler);
 
 export default router;

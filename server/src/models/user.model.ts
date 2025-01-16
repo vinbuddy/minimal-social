@@ -51,6 +51,9 @@ export class User {
     @prop({ required: true, default: "I am a new user" })
     public bio: string;
 
+    @prop({ required: false, default: [], ref: () => User })
+    public blockedUsers: Ref<User>[];
+
     @prop({ default: null })
     public googleId?: string;
 

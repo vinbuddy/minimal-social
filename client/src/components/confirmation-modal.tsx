@@ -1,14 +1,14 @@
 "use client";
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ButtonProps, ModalFooter } from "@nextui-org/react";
 import { TriangleAlertIcon } from "lucide-react";
-import React from "react";
+import React, { isValidElement } from "react";
 
 import { useLoading } from "@/hooks";
 
 interface IProps {
-    buttonProps?: ButtonProps;
+    okButtonProps?: ButtonProps;
     title?: string;
-    description?: string;
+    description?: string | React.ReactNode;
     okButtonContent?: string;
     modalBackdrop?: "transparent" | "opaque" | "blur";
     icon?: React.ReactNode;
@@ -29,6 +29,7 @@ export default function ConfirmationModal({
     iconColor = "#f31260",
     icon = <TriangleAlertIcon />,
     isOpen = false,
+    okButtonProps,
     onOk,
     onOpenChange,
     onClose,
@@ -49,7 +50,13 @@ export default function ConfirmationModal({
                                         </span>
                                     </div>
                                     <h4 className="text-center my-3 text-xl font-bold">{title}</h4>
-                                    <p className="text-center text-default-500">{description}</p>
+                                    {/* Check desc is ReactNode */}
+
+                                    {isValidElement(description) ? (
+                                        description
+                                    ) : (
+                                        <p className="text-center text-default-500">{description}</p>
+                                    )}
                                 </div>
                             </ModalBody>
                             <ModalFooter className="flex justify-between">
@@ -60,6 +67,7 @@ export default function ConfirmationModal({
                                     isLoading={loading}
                                     fullWidth
                                     color="danger"
+                                    {...okButtonProps}
                                     onPress={async () => {
                                         startLoading();
                                         await onOk();

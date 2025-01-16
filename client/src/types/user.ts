@@ -18,6 +18,8 @@ export interface IUser {
     isVerified: boolean;
 
     isNotification: boolean;
+
+    blockedUsers: IUser[];
 }
 
 export interface IUserBadgeTheme {

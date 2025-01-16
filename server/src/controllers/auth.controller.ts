@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import passport from "passport";
-import UserModel, { User } from "../models/user.model";
+import UserModel, { User, USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import {
     CreateUserInput,
     LoginUserInput,
@@ -344,7 +344,12 @@ export async function getMeHandler(_req: Request, res: Response, next: NextFunct
             return res.status(400).json({ statusCode: 400, message: "Id is required" });
         }
 
-        const user = await UserModel.findById(id).select("-password -refreshToken");
+        const user = await UserModel.findById(id)
+            .populate({
+                path: "blockedUsers",
+                select: USER_MODEL_HIDDEN_FIELDS,
+            })
+            .select(USER_MODEL_HIDDEN_FIELDS);
 
         return res.status(200).json({ statusCode: 200, data: user });
         res.status(200).json({ statusCode: 200, data: "me" });

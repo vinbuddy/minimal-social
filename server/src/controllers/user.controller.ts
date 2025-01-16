@@ -1,10 +1,13 @@
 import { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
+
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import { FollowUserInput, followUserSchema } from "../schemas/user.schema";
-import cloudinary from "../shared/configs/cloudinary";
-
-import { uploadToCloudinary } from "../shared/helpers/cloudinary";
 import { MediaFile } from "../models/post.model";
+
+import cloudinary from "../shared/configs/cloudinary";
+import { uploadToCloudinary } from "../shared/helpers/cloudinary";
+import { RequestWithUser } from "../shared/types/request";
 
 interface RequestWithFile extends Request {
     file: Express.Multer.File;
@@ -20,15 +23,26 @@ export async function getUsersHandler(req: Request, res: Response, next: NextFun
     }
 }
 
-export async function getUserHandler(req: Request, res: Response, next: NextFunction) {
+export async function getUserHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const id = req.params.id;
+        const currentUserId = req.user?._id?.toString();
 
         if (!id) {
             return res.status(400).json({ statusCode: 400, message: "Id is required" });
         }
 
+        const currentUser = await UserModel.findById(currentUserId);
+
         const user = await UserModel.findById(id).select(USER_MODEL_HIDDEN_FIELDS);
+
+        // Check if currentUser is blocked by user accessing
+        const isBlocked = user?.blockedUsers.includes(new mongoose.Types.ObjectId(currentUserId));
+
+        if (isBlocked) {
+            return res.status(403).json({ message: "You are blocked by this user" });
+        }
 
         return res.status(200).json({ statusCode: 200, data: user });
     } catch (error) {
@@ -271,6 +285,67 @@ export async function getFollowersHandler(req: Request, res: Response, next: Nex
         return res
             .status(200)
             .json({ message: "Get followers successfully", data: followerUsers, totalUsers, totalPages, page, limit });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Block and unblock user
+export async function blockUserHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+
+        const blockedUserId = req.params.id;
+        const userId = req.user?._id?.toString();
+
+        if (blockedUserId === userId) {
+            return res.status(400).json({ message: "You cannot block yourself" });
+        }
+
+        const user = await UserModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (user.blockedUsers.includes(new mongoose.Types.ObjectId(blockedUserId))) {
+            return res.status(400).json({ message: "User already blocked" });
+        }
+
+        user.blockedUsers.push(new mongoose.Types.ObjectId(blockedUserId));
+
+        // un-follow user
+        await UserModel.findByIdAndUpdate(blockedUserId, { $pull: { followings: userId } });
+        await UserModel.findByIdAndUpdate(userId, { $pull: { followers: blockedUserId } });
+
+        await user.save();
+
+        return res.status(200).json({ message: "User blocked successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function unblockUserHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+
+        const blockedUserId = req.params.id;
+        const currentUserId = req.user?._id?.toString();
+
+        const currentUser = await UserModel.findById(currentUserId);
+
+        if (!currentUserId) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (!currentUser?.blockedUsers.includes(new mongoose.Types.ObjectId(blockedUserId))) {
+            return res.status(400).json({ message: "User not blocked" });
+        }
+
+        await UserModel.findByIdAndUpdate(currentUserId, { $pull: { blockedUsers: blockedUserId } });
+
+        return res.status(200).json({ message: "User unblocked successfully" });
     } catch (error) {
         next(error);
     }
