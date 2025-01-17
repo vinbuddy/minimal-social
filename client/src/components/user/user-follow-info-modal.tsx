@@ -1,14 +1,5 @@
 "use client";
-import {
-    Input,
-    Modal,
-    ModalBody,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    Spinner,
-    useDisclosure,
-} from "@heroui/react";
+import { Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, useDisclosure } from "@heroui/react";
 import { useState } from "react";
 import { LoaderIcon, SearchIcon } from "lucide-react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -50,7 +41,7 @@ export default function UserFollowInfoModal({ children, type = "follower", user 
         isLoading,
         setSize: setPage,
         mutate,
-    } = usePagination<IUser>(getURL());
+    } = usePagination<IUser>(user ? getURL() : null);
 
     return (
         <>

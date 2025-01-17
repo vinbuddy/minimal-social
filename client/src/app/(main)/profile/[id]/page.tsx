@@ -1,5 +1,5 @@
 "use client";
-import { Avatar, Button, Spinner, Tab, Tabs, Tooltip } from "@heroui/react";
+import { Alert, Avatar, Button, Spinner, Tab, Tabs, Tooltip } from "@heroui/react";
 import { useParams, useRouter } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -20,6 +20,7 @@ import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import ProfileMenuDropdown from "@/components/user/profile-menu-dropdown";
 import ErrorMessage from "@/components/error-message";
+import ScreenCenterWrapper from "@/components/screen-center-wrapper";
 
 export default function ProfilePage() {
     const params = useParams() as { id: string };
@@ -28,6 +29,7 @@ export default function ProfilePage() {
     const [postType, setPostType] = useState<"post" | "repost" | "liked">("post");
 
     const { data: user, isLoading, error } = useSWR<{ data: IUser }>(`/user/${params.id}`);
+    console.log("user: ", user);
     const [followerCount, setFollowerCount] = useState(user?.data?.followers?.length ?? 0);
     const { loading, startLoading, stopLoading } = useLoading();
     const isOwner = useIsOwner(user?.data?._id);
@@ -82,81 +84,116 @@ export default function ProfilePage() {
         }
     };
 
+    if (isLoading) {
+        return (
+            <ScreenCenterWrapper>
+                <Spinner size="lg" />
+            </ScreenCenterWrapper>
+        );
+    }
+
+    if (error) {
+        return (
+            <ScreenCenterWrapper>
+                <ErrorMessage error={error} />
+            </ScreenCenterWrapper>
+        );
+    }
+
+    if (!user?.data) {
+        return (
+            <ScreenCenterWrapper>
+                <Alert color="danger" title="User not found" />
+            </ScreenCenterWrapper>
+        );
+    }
+
     return (
         <div className="flex justify-center w-full">
             <div className="w-[calc(100vw_-_80px)] md:w-[630px]">
-                {error ? (
-                    <ErrorMessage className="text-center" error={error} />
-                ) : (
-                    <main className="px-4 py-5">
-                        <section className="flex flex-wrap justify-center items-center gap-10">
-                            <Avatar
-                                isBordered
-                                src={user?.data?.photo}
-                                size="lg"
-                                classNames={{
-                                    base: "!size-36 !ring-offset-4",
-                                }}
-                            />
+                <main className="px-4 py-5">
+                    <section className="flex flex-wrap justify-center items-center gap-10">
+                        <Avatar
+                            classNames={{
+                                base: "h-36 w-36",
+                            }}
+                            isBordered
+                            color="default"
+                            size="lg"
+                            showFallback={false}
+                            src={
+                                user?.data.photo ??
+                                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTIlcun59hjzIIjphLcoczCdFuaSyOpwDpFyHtp1R9WTq-MfqlfCtP4jTjJf94buMJfHw&usqp=CAU"
+                            }
+                        />
 
-                            <div className="flex-1">
-                                <div className="flex flex-wrap items-center justify-between gap-4">
-                                    <UserName className="text-2xl justify-center" user={user?.data} />
+                        <div className="flex-1">
+                            <div className="flex flex-wrap items-center justify-between gap-4">
+                                <UserName className="text-2xl justify-center" user={user?.data} />
 
-                                    <div className="flex items-center gap-2">
-                                        {user && !isOwner && !isBlocked && (
-                                            <>
-                                                <FollowButton
-                                                    size="md"
-                                                    radius="md"
-                                                    fullWidth={false}
-                                                    user={user?.data}
-                                                    onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
-                                                    onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
-                                                />
-                                                <Tooltip content="Send message" placement="bottom" closeDelay={0}>
-                                                    <Button
-                                                        isIconOnly
-                                                        variant="light"
-                                                        isLoading={loading}
-                                                        onPress={handleNavigateToConversation}
-                                                    >
-                                                        <SendIcon size={16} />
-                                                    </Button>
-                                                </Tooltip>
-                                            </>
-                                        )}
-                                        {user && isOwner && (
-                                            <EditProfileModalButton variant="flat">Edit profile</EditProfileModalButton>
-                                        )}
-
-                                        {user && (
-                                            <ProfileMenuDropdown user={user?.data}>
-                                                <Button isIconOnly variant="light">
-                                                    <EllipsisIcon size={16} />
+                                <div className="flex items-center gap-2">
+                                    {!isOwner && !isBlocked && (
+                                        <>
+                                            <FollowButton
+                                                size="md"
+                                                radius="md"
+                                                fullWidth={false}
+                                                user={user?.data}
+                                                onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
+                                                onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
+                                            />
+                                            <Tooltip content="Send message" placement="bottom" closeDelay={0}>
+                                                <Button
+                                                    isIconOnly
+                                                    variant="light"
+                                                    isLoading={loading}
+                                                    onPress={handleNavigateToConversation}
+                                                >
+                                                    <SendIcon size={16} />
                                                 </Button>
-                                            </ProfileMenuDropdown>
-                                        )}
-                                    </div>
-                                </div>
+                                            </Tooltip>
+                                        </>
+                                    )}
+                                    {isOwner && (
+                                        <EditProfileModalButton variant="flat">Edit profile</EditProfileModalButton>
+                                    )}
 
-                                <div className="flex gap-4 my-4">
-                                    <UserFollowInfoModal type="follower" user={user?.data}>
-                                        <p>
-                                            {followerCount} <span className="text-default-500">followers</span>
-                                        </p>
-                                    </UserFollowInfoModal>
-                                    <UserFollowInfoModal type="following" user={user?.data}>
-                                        <p>
-                                            {user?.data?.followings.length}{" "}
-                                            <span className="text-default-500">following</span>
-                                        </p>
-                                    </UserFollowInfoModal>
+                                    <ProfileMenuDropdown user={user?.data}>
+                                        <Button isIconOnly variant="light">
+                                            <EllipsisIcon size={16} />
+                                        </Button>
+                                    </ProfileMenuDropdown>
                                 </div>
-
-                                <p className="text-default-500">{user?.data?.bio}</p>
                             </div>
-                        </section>
+
+                            {!isBlocked && (
+                                <>
+                                    <div className="flex gap-4 my-4">
+                                        <UserFollowInfoModal type="follower" user={user?.data}>
+                                            <p>
+                                                {followerCount} <span className="text-default-500">followers</span>
+                                            </p>
+                                        </UserFollowInfoModal>
+                                        <UserFollowInfoModal type="following" user={user?.data}>
+                                            <p>
+                                                {user?.data?.followings.length}{" "}
+                                                <span className="text-default-500">following</span>
+                                            </p>
+                                        </UserFollowInfoModal>
+                                    </div>
+
+                                    <p className="text-default-500">{user?.data?.bio}</p>
+                                </>
+                            )}
+                        </div>
+                    </section>
+
+                    {/* Posts */}
+                    {isBlocked ? (
+                        <div className="mt-10">
+                            <Alert color="warning" title="You blocked this user, you can not see their posts" />
+                        </div>
+                    ) : (
                         <section className="mt-10">
                             <Tabs
                                 onSelectionChange={(key) => setPostType(key.toString() as typeof postType)}
@@ -204,8 +241,8 @@ export default function ProfilePage() {
                                 {isPostLoading && <PostSkeletons length={3} />}
                             </div>
                         </section>
-                    </main>
-                )}
+                    )}
+                </main>
             </div>
         </div>
     );
