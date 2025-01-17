@@ -1,5 +1,6 @@
 import React from "react";
 import { Avatar, Card, CardBody, CardFooter, CardHeader } from "@nextui-org/react";
+
 import { IUser } from "@/types/user";
 import { VerifiedIcon } from "@/assets/icons";
 import FollowButton from "./follow-button";
@@ -20,7 +21,6 @@ export default function UserProfileCard({ user }: IProps) {
                             {user?.username}
                             {user?.isVerified && <VerifiedIcon size={14} className="text-verify ms-1.5" />}
                         </h4>
-                        {/* <h5 className="text-small tracking-tight text-default-500">{user?.email}</h5> */}
                     </div>
                 </div>
             </CardHeader>
@@ -42,7 +42,9 @@ export default function UserProfileCard({ user }: IProps) {
                     user={user}
                     onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
                     onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
-                    buttonProps={{ size: "sm", radius: "md", fullWidth: true }}
+                    size="sm"
+                    radius="md"
+                    fullWidth={true}
                 />
             </CardFooter>
         </Card>

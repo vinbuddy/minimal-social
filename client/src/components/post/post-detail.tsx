@@ -128,14 +128,13 @@ export default function PostDetail({ post }: IProps) {
 
                     <PostActivitiesModalButton
                         post={post}
-                        buttonProps={{
-                            size: "sm",
-                            variant: "light",
-                            radius: "full",
-                            className: "text-default-500 text-sm px-3 cursor-pointer",
-                            children: "See activities",
-                        }}
-                    />
+                        size="sm"
+                        variant="light"
+                        radius="full"
+                        className="text-default-500 text-sm px-3 cursor-pointer"
+                    >
+                        See activities
+                    </PostActivitiesModalButton>
                 </div>
             </section>
         </div>

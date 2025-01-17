@@ -13,16 +13,14 @@ import { IUser } from "@/types/user";
 import { useAuthStore } from "@/hooks/store";
 import { useGlobalMutation, useLoading } from "@/hooks";
 
-interface IProps {
-    buttonProps: ButtonProps;
-}
+interface IProps extends ButtonProps {}
 
 interface IUserEditProfile {
     username: string;
     bio: string;
 }
 
-export default function EditProfileModalButton({ buttonProps }: IProps) {
+export default function EditProfileModalButton({ ...rest }: IProps) {
     const { isOpen, onOpenChange, onOpen, onClose } = useDisclosure();
     const { startLoading, stopLoading, loading } = useLoading();
 
@@ -143,7 +141,9 @@ export default function EditProfileModalButton({ buttonProps }: IProps) {
 
     return (
         <>
-            <Button {...buttonProps} onClick={onOpen} />
+            <Button {...rest} onClick={onOpen}>
+                {rest.children}
+            </Button>
 
             <Modal hideCloseButton size={isCropped ? "sm" : "lg"} isOpen={isOpen} onOpenChange={handleOpenChange}>
                 <ModalContent>

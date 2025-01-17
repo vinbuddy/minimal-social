@@ -110,7 +110,9 @@ export default function ProfilePage() {
                                         {user && !isOwner && !isBlocked && (
                                             <>
                                                 <FollowButton
-                                                    buttonProps={{ size: "md", radius: "md", fullWidth: false }}
+                                                    size="md"
+                                                    radius="md"
+                                                    fullWidth={false}
                                                     user={user?.data}
                                                     onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
                                                     onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
@@ -128,12 +130,7 @@ export default function ProfilePage() {
                                             </>
                                         )}
                                         {user && isOwner && (
-                                            <EditProfileModalButton
-                                                buttonProps={{
-                                                    variant: "flat",
-                                                    children: "Edit profile",
-                                                }}
-                                            />
+                                            <EditProfileModalButton variant="flat">Edit profile</EditProfileModalButton>
                                         )}
 
                                         {user && (

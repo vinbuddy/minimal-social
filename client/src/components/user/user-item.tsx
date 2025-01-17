@@ -35,7 +35,9 @@ export default function UserItem({ user, href, isShowedFollowButton = true, avat
                         user={user}
                         onAfterFollowed={() => {}}
                         onAfterUnFollowed={() => {}}
-                        buttonProps={{ size: "sm", radius: "md", fullWidth: false }}
+                        size="sm"
+                        radius="md"
+                        fullWidth={false}
                     />
                 </section>
             )}

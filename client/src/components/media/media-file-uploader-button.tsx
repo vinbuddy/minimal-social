@@ -1,12 +1,11 @@
-import { Button, ButtonProps, InternalForwardRefRenderFunction } from "@nextui-org/react";
+import { Button, ButtonProps } from "@nextui-org/react";
 import { forwardRef } from "react";
 
-interface IProps {
+interface IProps extends ButtonProps {
     onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    buttonProps: ButtonProps;
 }
 
-function MediaFileUploader({ onUpload, buttonProps }: IProps, ref: React.ForwardedRef<HTMLInputElement>) {
+function MediaFileUploader({ onUpload, ...rest }: IProps, ref: React.ForwardedRef<HTMLInputElement>) {
     return (
         <>
             <input
@@ -20,7 +19,7 @@ function MediaFileUploader({ onUpload, buttonProps }: IProps, ref: React.Forward
                 accept="image/jpeg,image/png,video/mp4,video/quicktime"
             />
 
-            <Button {...buttonProps} />
+            <Button {...rest}>{rest.children}</Button>
         </>
     );
 }

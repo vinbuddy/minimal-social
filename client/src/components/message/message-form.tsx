@@ -348,26 +348,21 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
             >
                 <div>
                     <MediaFileUploaderButton
-                        buttonProps={{
-                            disableRipple: true,
-                            isIconOnly: true,
-                            radius: "full",
-                            color: "default",
-                            variant: "light",
-                            children: (
-                                <>
-                                    <label
-                                        htmlFor="file-input"
-                                        className="w-full h-full flex items-center justify-center cursor-pointer"
-                                    >
-                                        <ImageIcon size={20} className="text-default-600" />
-                                    </label>
-                                </>
-                            ),
-                        }}
+                        disableRipple
+                        isIconOnly
+                        radius="full"
+                        color="default"
+                        variant="light"
                         ref={fileInputRef}
                         onUpload={uploadMediaFiles}
-                    />
+                    >
+                        <label
+                            htmlFor="file-input"
+                            className="w-full h-full flex items-center justify-center cursor-pointer"
+                        >
+                            <ImageIcon size={20} className="text-default-600" />
+                        </label>
+                    </MediaFileUploaderButton>
                     <input type="file" name="media-file" id="media-file" hidden />
                     <StickerGifDropdown
                         popoverProps={{ placement: "top-start" }}

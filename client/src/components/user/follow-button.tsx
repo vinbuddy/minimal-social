@@ -8,14 +8,13 @@ import { useAuthStore } from "@/hooks/store";
 import { IUser } from "@/types/user";
 import axiosInstance from "@/utils/http-request";
 
-interface IProps {
+interface IProps extends ButtonProps {
     user: IUser;
-    buttonProps: ButtonProps;
     onAfterFollowed?: () => void;
     onAfterUnFollowed?: () => void;
 }
 
-export default function FollowButton({ user, buttonProps, onAfterFollowed, onAfterUnFollowed }: IProps) {
+export default function FollowButton({ user, onAfterFollowed, onAfterUnFollowed, ...rest }: IProps) {
     const { currentUser } = useAuthStore();
 
     const [isFollowed, setIsFollowed] = useState<boolean>(() => {
@@ -82,7 +81,7 @@ export default function FollowButton({ user, buttonProps, onAfterFollowed, onAft
             color={isFollowed ? "default" : "primary"}
             variant={isFollowed ? "ghost" : "solid"}
             className={`${currentUser && currentUser._id === user._id ? "hidden" : ""}`}
-            {...buttonProps}
+            {...rest}
         >
             {isFollowed ? "Unfollow" : "Follow"}
         </Button>

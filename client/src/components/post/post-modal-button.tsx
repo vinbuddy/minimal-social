@@ -335,23 +335,18 @@ export default function PostModalButton({ type = "create", post, children, open,
 
                             {type === "create" && (
                                 <MediaFileUploaderButton
-                                    buttonProps={{
-                                        disableRipple: true,
-                                        className: "bg-transparent p-0 gap-0 justify-start",
-                                        isIconOnly: true,
-                                        size: "sm",
-                                        color: "default",
-                                        children: (
-                                            <>
-                                                <label htmlFor="file-input" className="cursor-pointer w-full">
-                                                    <ImagePlusIcon size={20} className="text-default-500" />
-                                                </label>
-                                            </>
-                                        ),
-                                    }}
+                                    disableRipple
+                                    className="bg-transparent p-0 gap-0 justify-start"
+                                    isIconOnly
+                                    size="sm"
+                                    color="default"
                                     ref={fileInputRef}
                                     onUpload={uploadMediaFiles}
-                                />
+                                >
+                                    <label htmlFor="file-input" className="cursor-pointer w-full">
+                                        <ImagePlusIcon size={20} className="text-default-500" />
+                                    </label>
+                                </MediaFileUploaderButton>
                             )}
                         </div>
                         <div className="max-w-full overflow-hidden">

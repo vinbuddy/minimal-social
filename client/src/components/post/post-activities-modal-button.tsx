@@ -28,12 +28,11 @@ import { IUser } from "@/types/user";
 import { usePagination } from "@/hooks";
 import ErrorMessage from "../error-message";
 
-interface IProps {
-    buttonProps: ButtonProps;
+interface IProps extends ButtonProps {
     post: IPost;
 }
 
-export default function PostActivitiesModalButton({ buttonProps, post }: IProps) {
+export default function PostActivitiesModalButton({ post, ...rest }: IProps) {
     const [activity, setActivity] = useState<"like" | "repost">("like");
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
@@ -59,7 +58,8 @@ export default function PostActivitiesModalButton({ buttonProps, post }: IProps)
 
     return (
         <>
-            <Button {...buttonProps} onClick={onOpen} />
+            <Button onClick={onOpen}>{rest.children}</Button>
+
             <Modal
                 size="lg"
                 scrollBehavior="inside"
