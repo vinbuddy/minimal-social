@@ -1,5 +1,5 @@
 "use client";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input } from "@heroui/react";
 import axios from "axios";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";

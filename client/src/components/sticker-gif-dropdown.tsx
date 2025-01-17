@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Popover, PopoverContent, PopoverProps, PopoverTrigger, Spinner, Tab, Tabs } from "@nextui-org/react";
+import { Popover, PopoverContent, PopoverProps, PopoverTrigger, Spinner, Tab, Tabs } from "@heroui/react";
 import { GiphyFetch } from "@giphy/js-fetch-api";
 import { Grid } from "@giphy/react-components";
 import useSWR from "swr";

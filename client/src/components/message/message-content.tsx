@@ -1,6 +1,6 @@
 "use client";
 import emojiRegex from "emoji-regex";
-import { Chip } from "@nextui-org/react";
+import { Chip } from "@heroui/react";
 import Image from "next/image";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { CSSProperties } from "react";

@@ -1,5 +1,5 @@
 "use client";
-import { Spinner, User } from "@nextui-org/react";
+import { Spinner, User } from "@heroui/react";
 import { Fragment } from "react";
 import useSWR from "swr";
 import InfiniteScroll from "react-infinite-scroll-component";

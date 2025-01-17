@@ -1,4 +1,4 @@
-import { Button, Skeleton } from "@nextui-org/react";
+import { Button, Skeleton } from "@heroui/react";
 
 interface IProps {
     length: number;

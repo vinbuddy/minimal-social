@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 import { SocketProvider } from "@/contexts/socket-context";
-import { NextProvider as NextUIProvider, SWRConfigProvider } from "./providers";
+import { HeroProvider as NextUIProvider, SWRConfigProvider } from "./providers";
 import AuthContextProvider from "@/contexts/auth-context";
 
 const inter = Inter({ subsets: ["latin"] });

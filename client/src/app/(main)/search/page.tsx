@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Input, Spinner, User } from "@nextui-org/react";
+import { Avatar, Input, Spinner, User } from "@heroui/react";
 import { LoaderIcon, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";

@@ -1,4 +1,4 @@
-import { Avatar, AvatarProps, Tooltip } from "@nextui-org/react";
+import { Avatar, AvatarProps, Tooltip } from "@heroui/react";
 import UserName from "./user-name";
 import FollowButton from "./follow-button";
 import { IUser } from "@/types/user";

@@ -1,5 +1,5 @@
 "use client";
-import { Avatar, Button, Spinner } from "@nextui-org/react";
+import { Avatar, Button, Spinner } from "@heroui/react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { RedoIcon, SendHorizontalIcon, SmileIcon, XIcon } from "lucide-react";
@@ -123,7 +123,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
     }, []);
 
     return (
-        <div>
+        (<div>
             {replyTo && (
                 <div className="flex items-center justify-between mb-2 pe-4">
                     <div className="flex items-center justify-center w-[40px]">
@@ -198,6 +198,6 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                     {loading ? <Spinner size="sm" /> : <SendHorizontalIcon size={20} />}
                 </Button>
             </form>
-        </div>
+        </div>)
     );
 }

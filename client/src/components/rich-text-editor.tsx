@@ -1,5 +1,5 @@
 "use client";
-import { Avatar, Spinner } from "@nextui-org/react";
+import { Avatar, Spinner } from "@heroui/react";
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import parse from "html-react-parser";
 

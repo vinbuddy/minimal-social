@@ -1,5 +1,5 @@
 "use client";
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ButtonProps, ModalFooter } from "@nextui-org/react";
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ButtonProps, ModalFooter } from "@heroui/react";
 import { TriangleAlertIcon } from "lucide-react";
 import React, { isValidElement } from "react";
 

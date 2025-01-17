@@ -1,5 +1,5 @@
 "use client";
-import { Button, Chip, Spinner } from "@nextui-org/react";
+import { Button, Chip, Spinner } from "@heroui/react";
 import { Fragment, useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import useSWR from "swr";

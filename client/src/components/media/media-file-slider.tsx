@@ -12,7 +12,7 @@ import "swiper/css/scrollbar";
 import NextImage from "next/image";
 import { XIcon } from "lucide-react";
 import VideoPlayer from "./video-player";
-import { Image } from "@nextui-org/react";
+import { Image } from "@heroui/react";
 
 interface IProps {
     mediaFiles: IMediaFile[];

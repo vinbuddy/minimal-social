@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import axios from "axios";
 
 import { useAuthStore } from "@/hooks/store";

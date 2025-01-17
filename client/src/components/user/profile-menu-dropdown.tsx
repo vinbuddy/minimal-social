@@ -7,7 +7,7 @@ import {
     DropdownTrigger,
     DropdownSection,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { BanIcon, FlagTriangleRightIcon, HeartHandshakeIcon, LogOutIcon, SettingsIcon, ShareIcon } from "lucide-react";
 
 import { IUser } from "@/types/user";

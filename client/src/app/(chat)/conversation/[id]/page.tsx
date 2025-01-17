@@ -8,7 +8,7 @@ import {
     DrawerHeader,
     Tooltip,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { ArrowLeftIcon, InfoIcon, Phone, Video } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";

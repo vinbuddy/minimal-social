@@ -1,6 +1,6 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Avatar, Badge } from "@nextui-org/react";
+import { Avatar, Badge } from "@heroui/react";
 import { ReactNode, useMemo } from "react";
 
 import { useAuthStore } from "@/hooks/store";

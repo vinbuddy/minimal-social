@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Spinner } from "@nextui-org/react";
+import { Button, Input, Spinner } from "@heroui/react";
 import { LoaderIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

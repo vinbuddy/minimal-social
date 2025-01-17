@@ -8,7 +8,7 @@ import {
     ModalHeader,
     Spinner,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from "react";
 import { LoaderIcon, SearchIcon } from "lucide-react";
 import InfiniteScroll from "react-infinite-scroll-component";

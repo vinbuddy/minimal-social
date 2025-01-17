@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, ButtonProps } from "@nextui-org/react";
+import { Button, ButtonProps } from "@heroui/react";
 import { useState } from "react";
 import { toast } from "sonner";
 

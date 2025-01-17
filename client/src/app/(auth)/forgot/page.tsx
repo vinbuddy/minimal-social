@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input } from "@heroui/react";
 import axios from "axios";
 import Link from "next/link";
 
@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <div className="flex items-center justify-center py-12">
+        (<div className="flex items-center justify-center py-12">
             <div className="mx-auto grid w-[350px] gap-6">
                 <div className="grid gap-2 text-center">
                     <h1 className="text-3xl font-bold">Forgot password</h1>
@@ -87,6 +87,6 @@ export default function ForgotPasswordPage() {
                     </Link>
                 </div>
             </div>
-        </div>
+        </div>)
     );
 }

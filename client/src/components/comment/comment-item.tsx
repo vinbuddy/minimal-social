@@ -2,7 +2,7 @@
 import { useState } from "react";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { ChevronDownIcon, EllipsisIcon, LoaderIcon } from "lucide-react";
-import { Avatar, Button, Tooltip } from "@nextui-org/react";
+import { Avatar, Button, Tooltip } from "@heroui/react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";

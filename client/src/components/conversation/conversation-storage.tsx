@@ -1,7 +1,7 @@
 "use client";
 
 import InfiniteScroll from "react-infinite-scroll-component";
-import { Chip, Spinner, Tab, Tabs } from "@nextui-org/react";
+import { Chip, Spinner, Tab, Tabs } from "@heroui/react";
 import Image from "next/image";
 import { useState } from "react";
 

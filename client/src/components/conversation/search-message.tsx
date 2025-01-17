@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Button, Input } from "@nextui-org/react";
+import { Avatar, Button, Input } from "@heroui/react";
 import { LoaderIcon, SearchIcon } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import cn from "classnames";

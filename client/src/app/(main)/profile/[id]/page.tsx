@@ -1,11 +1,10 @@
 "use client";
-import { Avatar, Button, Spinner, Tab, Tabs, Tooltip } from "@nextui-org/react";
+import { Avatar, Button, Spinner, Tab, Tabs, Tooltip } from "@heroui/react";
 import { useParams, useRouter } from "next/navigation";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import useSWR from "swr";
 
-import MainLayout from "@/components/main-layout";
 import PostItem from "@/components/post/post-item";
 import PostSkeletons from "@/components/post/post-skeletons";
 import EditProfileModalButton from "@/components/user/edit-profile-modal-button";
@@ -13,7 +12,7 @@ import FollowButton from "@/components/user/follow-button";
 import UserFollowInfoModal from "@/components/user/user-follow-info-modal";
 import UserName from "@/components/user/user-name";
 import { useAuthStore } from "@/hooks/store";
-import { useIsOwner, useLoading, usePagination } from "@/hooks";
+import { useIsBlocked, useIsOwner, useLoading, usePagination } from "@/hooks";
 import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
 import { EllipsisIcon, SendIcon } from "lucide-react";
@@ -33,9 +32,7 @@ export default function ProfilePage() {
     const { loading, startLoading, stopLoading } = useLoading();
     const isOwner = useIsOwner(user?.data?._id);
 
-    const isBlocked = useMemo(() => {
-        return currentUser?.blockedUsers.some((blockedUser) => blockedUser._id === user?.data._id);
-    }, [currentUser, user]);
+    const isBlocked = useIsBlocked(user?.data?._id);
 
     useEffect(() => {
         if (user) {

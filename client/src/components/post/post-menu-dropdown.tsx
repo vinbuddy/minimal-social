@@ -1,5 +1,5 @@
 "use client";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure } from "@heroui/react";
 import { EyeIcon, LinkIcon, TrashIcon, WandSparkles } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";

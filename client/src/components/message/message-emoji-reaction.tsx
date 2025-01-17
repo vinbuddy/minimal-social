@@ -1,4 +1,4 @@
-import { Popover, PopoverTrigger, PopoverContent, Button, PopoverProps } from "@nextui-org/react";
+import { Popover, PopoverTrigger, PopoverContent, Button, PopoverProps } from "@heroui/react";
 import { useState } from "react";
 
 interface IProps {

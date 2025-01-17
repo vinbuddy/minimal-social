@@ -1,5 +1,5 @@
 "use client";
-import { Spinner, Tab, Tabs } from "@nextui-org/react";
+import { Spinner, Tab, Tabs } from "@heroui/react";
 import { AtSignIcon, UserIcon } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";

@@ -1,6 +1,6 @@
 import { INotification } from "@/types/notification";
 import Link from "next/link";
-import { Avatar, AvatarGroup, Button, useDisclosure } from "@nextui-org/react";
+import { Avatar, AvatarGroup, Button, useDisclosure } from "@heroui/react";
 import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 

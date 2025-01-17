@@ -7,7 +7,7 @@ import {
     DropdownSection,
     DropdownTrigger,
     useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { CopyIcon, PinIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import ConfirmationModal from "../confirmation-modal";
 import { useMessagesStore } from "@/hooks/store";

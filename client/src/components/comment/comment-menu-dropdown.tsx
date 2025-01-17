@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from "@nextui-org/react";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from "@heroui/react";
 import { CopyIcon, TrashIcon } from "lucide-react";
 import { IComment } from "@/types/comment";
 import { showToast } from "@/utils/toast";

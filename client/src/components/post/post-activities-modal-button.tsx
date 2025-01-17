@@ -15,8 +15,8 @@ import {
     Tab,
     Chip,
     Spinner,
-} from "@nextui-org/react";
-import { TRANSITION_EASINGS } from "@nextui-org/framer-utils";
+} from "@heroui/react";
+import { TRANSITION_EASINGS } from "@heroui/framer-utils";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Fragment, useState } from "react";
 

@@ -1,4 +1,4 @@
-import { Button, Slider, SliderValue } from "@nextui-org/react";
+import { Button, Slider, SliderValue } from "@heroui/react";
 import { useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 interface IProps {

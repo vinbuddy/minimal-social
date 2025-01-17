@@ -1,8 +1,8 @@
 "use client";
 
-import { NextUIProvider } from "@nextui-org/react";
+import { HeroUIProvider } from "@heroui/react";
 import { SWRConfig } from "swr";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeProvider as HeroUIThemesProvider } from "next-themes";
 
 import { fetcher } from "@/utils/http-request";
 
@@ -23,12 +23,12 @@ export function SWRConfigProvider({ children }: { children: React.ReactNode }) {
     );
 }
 
-export function NextProvider({ children }: { children: React.ReactNode }) {
+export function HeroProvider({ children }: { children: React.ReactNode }) {
     return (
-        <NextUIProvider className="h-full">
-            <NextThemesProvider attribute="class" defaultTheme="light">
+        <HeroUIProvider className="h-full">
+            <HeroUIThemesProvider attribute="class" defaultTheme="light">
                 {children}
-            </NextThemesProvider>
-        </NextUIProvider>
+            </HeroUIThemesProvider>
+        </HeroUIProvider>
     );
 }

@@ -2,7 +2,7 @@
 import * as React from "react";
 import { LogOut, MoonIcon, SunDim, User } from "lucide-react";
 import Link from "next/link";
-import { Avatar, Badge, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@nextui-org/react";
+import { Avatar, Badge, Button, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";

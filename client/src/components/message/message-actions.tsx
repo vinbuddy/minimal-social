@@ -1,5 +1,5 @@
 "use client";
-import { Button, Chip } from "@nextui-org/react";
+import { Button, Chip } from "@heroui/react";
 import { EllipsisVerticalIcon, ReplyIcon, SmileIcon } from "lucide-react";
 
 import MessageEmojiReaction from "./message-emoji-reaction";

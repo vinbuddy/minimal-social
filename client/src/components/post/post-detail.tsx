@@ -1,7 +1,7 @@
 "use client";
 
 import { IPost } from "@/types/post";
-import { Avatar, Tooltip } from "@nextui-org/react";
+import { Avatar, Tooltip } from "@heroui/react";
 import { useState } from "react";
 import Link from "next/link";
 import { EllipsisIcon, WandSparklesIcon } from "lucide-react";

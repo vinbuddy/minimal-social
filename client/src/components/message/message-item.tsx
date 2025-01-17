@@ -1,4 +1,4 @@
-import { Avatar } from "@nextui-org/react";
+import { Avatar } from "@heroui/react";
 
 import MessageItemGroup from "./message-item-group";
 import { useAuthStore, useMessagesStore } from "@/hooks/store";
@@ -37,7 +37,8 @@ function MessageItem({ className = "", messages, originalMessages, conversation 
 
     const lastSeenMessage = [...originalMessages].reverse().find((message) => {
         return (
-            message.seenBy.length > 0 && message.seenBy.some((user) => user._id !== currentUser?._id) // Người xem không phải currentUser
+            // Người xem không phải currentUser
+            (message.seenBy.length > 0 && message.seenBy.some((user) => user._id !== currentUser?._id))
         );
     });
 

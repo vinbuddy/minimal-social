@@ -1,4 +1,4 @@
-import { Avatar, Button, ButtonProps, Input, Modal, ModalBody, ModalContent, useDisclosure } from "@nextui-org/react";
+import { Avatar, Button, ButtonProps, Input, Modal, ModalBody, ModalContent, useDisclosure } from "@heroui/react";
 import { CropIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";

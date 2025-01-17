@@ -1,9 +1,12 @@
+"use client";
+
 import React from "react";
-import { Avatar, Card, CardBody, CardFooter, CardHeader } from "@nextui-org/react";
+import { Avatar, Card, CardBody, CardFooter, CardHeader, Alert } from "@heroui/react";
 
 import { IUser } from "@/types/user";
 import { VerifiedIcon } from "@/assets/icons";
 import FollowButton from "./follow-button";
+import { useIsBlocked } from "@/hooks";
 
 interface IProps {
     user: IUser;
@@ -11,6 +14,8 @@ interface IProps {
 
 export default function UserProfileCard({ user }: IProps) {
     const [followerCount, setFollowerCount] = React.useState(user?.followers?.length ?? 0);
+    const isBlocked = useIsBlocked(user?._id);
+
     return (
         <Card shadow="none" className="min-w-[300px] max-w-[350px] p-1 border-none bg-transparent">
             <CardHeader className="justify-between">
@@ -38,14 +43,18 @@ export default function UserProfileCard({ user }: IProps) {
                 </div>
             </CardBody>
             <CardFooter className="gap-3">
-                <FollowButton
-                    user={user}
-                    onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
-                    onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
-                    size="sm"
-                    radius="md"
-                    fullWidth={true}
-                />
+                {isBlocked ? (
+                    <Alert color="danger" title="You blocked this user" />
+                ) : (
+                    <FollowButton
+                        user={user}
+                        onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
+                        onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
+                        size="sm"
+                        radius="md"
+                        fullWidth={true}
+                    />
+                )}
             </CardFooter>
         </Card>
     );

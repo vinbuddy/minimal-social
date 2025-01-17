@@ -1,6 +1,6 @@
 "use client";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { SendHorizonalIcon, SmileIcon, StickerIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
@@ -323,7 +323,7 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
     };
 
     return (
-        <div>
+        (<div>
             {replyTo && (
                 <div className="border-t border-divider py-2 px-5 flex justify-between items-center gap-4 bg-content2 mb-4">
                     <div className="flex-1 overflow-hidden">
@@ -442,6 +442,6 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
                     </Button>
                 )}
             </form>
-        </div>
+        </div>)
     );
 }

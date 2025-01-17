@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
-import { Slider, SliderValue } from "@nextui-org/react";
+import { Slider, SliderValue } from "@heroui/react";
 import { PlayIcon, Volume1Icon, VolumeXIcon } from "lucide-react";
 
 interface IProps {

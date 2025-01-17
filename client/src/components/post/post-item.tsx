@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Avatar, Image, Tooltip } from "@nextui-org/react";
+import { Avatar, Image, Tooltip } from "@heroui/react";
 import { EllipsisIcon, WandSparklesIcon } from "lucide-react";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 import Link from "next/link";
@@ -98,7 +98,7 @@ export default function PostItem({ post: _post }: IProps) {
                             <div className="flex items-center text-default-600 text-sm gap-2">
                                 <Image
                                     radius="full"
-                                    className="size-5 z-[1]"
+                                    className="size-5 z-[1] object-cover"
                                     src={repostedInfo?.postBy?.photo}
                                     alt=""
                                 />

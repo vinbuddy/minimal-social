@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Accordion, AccordionItem, Avatar, Button, Listbox, ListboxItem, useDisclosure } from "@nextui-org/react";
+import { Accordion, AccordionItem, Avatar, Button, Listbox, ListboxItem, useDisclosure } from "@heroui/react";
 import {
     TrashIcon,
     PaletteIcon,

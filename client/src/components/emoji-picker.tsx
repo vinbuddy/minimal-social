@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
+import { Button, Popover, PopoverContent, PopoverTrigger } from "@heroui/react";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import { SmileIcon } from "lucide-react";

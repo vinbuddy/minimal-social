@@ -11,11 +11,11 @@ import {
     Tabs,
     Tab,
     Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { useState } from "react";
 import useSWR from "swr";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { TRANSITION_EASINGS } from "@nextui-org/framer-utils";
+import { TRANSITION_EASINGS } from "@heroui/framer-utils";
 
 import UserItem from "../user/user-item";
 import UserSkeletons from "../user/user-skeletons";

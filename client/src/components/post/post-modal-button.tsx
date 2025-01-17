@@ -8,7 +8,7 @@ import {
     Modal,
     ModalContent,
     ModalBody,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import axios from "axios";
 import { toast } from "sonner";
 import { ImagePlusIcon, PlusIcon, SmileIcon } from "lucide-react";
@@ -293,7 +293,7 @@ export default function PostModalButton({ type = "create", post, children, open,
 
     const renderPostForm = () => {
         return (
-            <div>
+            (<div>
                 <div className="flex">
                     <section>
                         <Avatar size="lg" src={currentUser?.photo} />
@@ -386,7 +386,7 @@ export default function PostModalButton({ type = "create", post, children, open,
                         {type === "create" ? "Post" : "Edit"}
                     </Button>
                 </div>
-            </div>
+            </div>)
         );
     };
 

@@ -1,4 +1,4 @@
-import { Avatar, Badge } from "@nextui-org/react";
+import { Avatar, Badge } from "@heroui/react";
 import { AtSignIcon, MessageCircleIcon, UserIcon } from "lucide-react";
 import { HeartIcon, RepostIcon } from "@/assets/icons";
 import { IUserBadgeTheme } from "@/types/user";

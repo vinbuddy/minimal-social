@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import NextImage from "next/image";
 import { XIcon } from "lucide-react";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { Navigation, A11y, Mousewheel } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
