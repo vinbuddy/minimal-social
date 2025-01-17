@@ -78,7 +78,7 @@ export default function LoginPage() {
     };
 
     return (
-        (<div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-12">
             <div className="mx-auto grid w-[350px] gap-6">
                 <div className="grid gap-2 text-center">
                     <h1 className="text-3xl font-bold">Sign in</h1>
@@ -162,7 +162,7 @@ export default function LoginPage() {
                         variant="bordered"
                         className="w-full"
                         startContent={<GoogleIcon />}
-                        onClick={handleLoginWithGoogle}
+                        onPress={handleLoginWithGoogle}
                     >
                         Login with Google
                     </Button>
@@ -174,6 +174,6 @@ export default function LoginPage() {
                     </Link>
                 </div>
             </div>
-        </div>)
+        </div>
     );
 }

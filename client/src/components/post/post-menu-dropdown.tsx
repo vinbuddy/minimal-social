@@ -91,7 +91,7 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
                               <DropdownItem
                                   as={item?.href ? Link : undefined}
                                   href={item?.href}
-                                  onClick={item?.onClick}
+                                  onPress={item?.onClick}
                                   className={item.className ?? ""}
                                   color={item.color}
                                   key={item.key}
@@ -104,7 +104,7 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
                               <DropdownItem
                                   as={item?.href ? Link : undefined}
                                   href={item?.href}
-                                  onClick={item?.onClick}
+                                  onPress={item?.onClick}
                                   className={item.className ?? ""}
                                   color={item.color}
                                   key={item.key}

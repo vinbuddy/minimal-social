@@ -58,7 +58,7 @@ export default function PostActivitiesModalButton({ post, ...rest }: IProps) {
 
     return (
         <>
-            <Button onClick={onOpen}>{rest.children}</Button>
+            <Button onPress={onOpen}>{rest.children}</Button>
 
             <Modal
                 size="lg"

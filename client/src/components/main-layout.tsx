@@ -240,7 +240,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 key="logout"
                                 color="danger"
                                 className="text-danger"
-                                onClick={handleLogOut}
+                                onPress={handleLogOut}
                             >
                                 Log out
                             </DropdownItem>

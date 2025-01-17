@@ -121,7 +121,7 @@ export default function SearchMessage({ conversation }: IProps) {
                                 variant="flat"
                                 radius="full"
                                 isLoading={loadingMore}
-                                onClick={() => setPage(size + 1)}
+                                onPress={() => setPage(size + 1)}
                             >
                                 Load more
                             </Button>

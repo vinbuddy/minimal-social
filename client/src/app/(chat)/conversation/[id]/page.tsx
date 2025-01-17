@@ -1,14 +1,5 @@
 "use client";
-import {
-    Avatar,
-    Button,
-    Drawer,
-    DrawerBody,
-    DrawerContent,
-    DrawerHeader,
-    Tooltip,
-    useDisclosure,
-} from "@heroui/react";
+import { Avatar, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, Tooltip, useDisclosure } from "@heroui/react";
 import { ArrowLeftIcon, InfoIcon, Phone, Video } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -119,7 +110,7 @@ function ConversationDetailPage() {
                         <header className="min-h-[40px] flex items-center justify-between pb-5 px-4  border-b-1 border-divider">
                             <div className="flex items-center cursor-pointer">
                                 <div className="me-3 lg:hidden block">
-                                    <Button onClick={onBack} title="Back" isIconOnly radius="full" variant="light">
+                                    <Button onPress={onBack} title="Back" isIconOnly radius="full" variant="light">
                                         <ArrowLeftIcon size={20} />
                                     </Button>
                                 </div>

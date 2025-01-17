@@ -71,7 +71,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
             <div id="search-message" className="h-screen overflow-auto bg-content1 border-divider px-4 scrollbar">
                 <header className="min-h-[40px] flex items-center gap-2 pb-5 sticky pt-4 top-0 bg-content1 z-10">
                     <Button
-                        onClick={() => setIsSearchMode(false)}
+                        onPress={() => setIsSearchMode(false)}
                         title="Back"
                         isIconOnly
                         radius="full"
@@ -91,7 +91,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
         return (
             <div id="conversation-storage" className="h-screen overflow-auto bg-content1 border-divider px-4 scrollbar">
                 <header className="min-h-[40px] flex items-center gap-2 pb-5 sticky pt-4 top-0 bg-content1 z-10">
-                    <Button onClick={() => setStorageType(null)} title="Back" isIconOnly radius="full" variant="light">
+                    <Button onPress={() => setStorageType(null)} title="Back" isIconOnly radius="full" variant="light">
                         <ArrowLeftIcon size={20} />
                     </Button>
                     <h1>Conversation Storage</h1>
@@ -145,7 +145,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                         radius="full"
                         startContent={<SearchIcon size={18} className="text-default-500" />}
                         className="text-default-500"
-                        onClick={() => setIsSearchMode(true)}
+                        onPress={() => setIsSearchMode(true)}
                     >
                         Search
                     </Button>
@@ -175,7 +175,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                         }}
                                         key="new"
                                         startContent={<ImageIcon size={18} className="text-default-600" />}
-                                        onClick={() => setStorageType("media")}
+                                        onPress={() => setStorageType("media")}
                                     >
                                         Media files
                                     </ListboxItem>
@@ -185,7 +185,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                         }}
                                         key="copy"
                                         startContent={<FileIcon size={18} />}
-                                        onClick={() => setStorageType("file")}
+                                        onPress={() => setStorageType("file")}
                                     >
                                         Files
                                     </ListboxItem>
@@ -195,7 +195,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                         }}
                                         key="link"
                                         startContent={<LinkIcon size={18} />}
-                                        onClick={() => setStorageType("link")}
+                                        onPress={() => setStorageType("link")}
                                     >
                                         Links
                                     </ListboxItem>

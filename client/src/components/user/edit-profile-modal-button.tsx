@@ -141,7 +141,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
 
     return (
         <>
-            <Button type="button" {...rest} onClick={onOpen}>
+            <Button type="button" {...rest} onPress={onOpen}>
                 {rest.children}
             </Button>
 
@@ -179,7 +179,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
                                                 <div className="mt-6 gap-4 flex justify-center">
                                                     <Button
                                                         size="sm"
-                                                        onClick={() => removeImage()}
+                                                        onPress={() => removeImage()}
                                                         color="danger"
                                                         radius="full"
                                                         variant="light"

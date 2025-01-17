@@ -155,7 +155,7 @@ export default function PostActions({ post }: IProps) {
         <div>
             <Button
                 title="like"
-                onClick={isLiked ? handleUnLike : handleLike}
+                onPress={isLiked ? handleUnLike : handleLike}
                 size="sm"
                 radius="full"
                 color={isLiked ? "danger" : "default"}
@@ -177,7 +177,7 @@ export default function PostActions({ post }: IProps) {
             </Button>
 
             <Button
-                onClick={isReposted ? handleUnRepost : handleRepost}
+                onPress={isReposted ? handleUnRepost : handleRepost}
                 title="repost"
                 size="sm"
                 radius="full"

@@ -73,7 +73,7 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
                 isIconOnly
                 color="default"
                 radius="full"
-                onClick={handleHide}
+                onPress={handleHide}
             >
                 <XIcon className="text-[#777] text-xl" />
             </Button>

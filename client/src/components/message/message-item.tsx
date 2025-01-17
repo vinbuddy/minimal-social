@@ -4,7 +4,7 @@ import MessageItemGroup from "./message-item-group";
 import { useAuthStore, useMessagesStore } from "@/hooks/store";
 import { IMessage } from "@/types/message";
 import { IConversation } from "@/types/conversation";
-import { forwardRef, Ref, useEffect, useRef } from "react";
+import { forwardRef, Fragment, Ref, useEffect, useRef } from "react";
 
 interface IProps {
     className?: string;
@@ -38,7 +38,7 @@ function MessageItem({ className = "", messages, originalMessages, conversation 
     const lastSeenMessage = [...originalMessages].reverse().find((message) => {
         return (
             // Người xem không phải currentUser
-            (message.seenBy.length > 0 && message.seenBy.some((user) => user._id !== currentUser?._id))
+            message.seenBy.length > 0 && message.seenBy.some((user) => user._id !== currentUser?._id)
         );
     });
 
@@ -52,7 +52,7 @@ function MessageItem({ className = "", messages, originalMessages, conversation 
             <div className="flex-1 flex flex-col gap-1">
                 {messages.length > 0 &&
                     messages?.map((message, index) => (
-                        <>
+                        <Fragment key={message._id}>
                             <MessageItemGroup
                                 ref={(el) => {
                                     messageRefs.current[message._id] = el;
@@ -80,7 +80,7 @@ function MessageItem({ className = "", messages, originalMessages, conversation 
                                         />
                                     ))}
                             </div>
-                        </>
+                        </Fragment>
                     ))}
             </div>
         </div>

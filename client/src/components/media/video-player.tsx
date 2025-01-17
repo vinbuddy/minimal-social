@@ -159,7 +159,10 @@ function VideoPlayer(
         if (playOrPause && isThumbnail) {
             return (
                 <div className="absolute flex items-center justify-center cursor-pointer top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <button className={`rounded-full p-5 bg-[rgba(0,0,0,0.5)] scale-100 visible transition-all`}>
+                    <button
+                        aria-label={playing ? "Pause video" : "Play video"}
+                        className={`rounded-full p-5 bg-[rgba(0,0,0,0.5)] scale-100 visible transition-all`}
+                    >
                         <PlayIcon fill="#fff" className="text-white text-xl" />
                     </button>
                 </div>
@@ -173,6 +176,7 @@ function VideoPlayer(
                     className="absolute flex items-center justify-center cursor-pointer top-0 left-0 right-0 bottom-20"
                 >
                     <button
+                        aria-label={playing ? "Pause video" : "Play video"}
                         className={`rounded-full p-5 bg-[rgba(0,0,0,0.5)] scale-0 invisible transition-all ${
                             !playing ? "!scale-100 !visible" : ""
                         }`}
@@ -209,7 +213,11 @@ function VideoPlayer(
                 {/* Muted Toggle button */}
                 {showVolume && (
                     <div className={`absolute right-3 ${!timeline ? "bottom-3" : "bottom-10"}`}>
-                        <button onClick={handleToggleMute} className=" rounded-full p-2 bg-[rgba(0,0,0,0.5)]">
+                        <button
+                            aria-label={muted ? "Unmute video" : "Mute video"}
+                            onClick={handleToggleMute}
+                            className=" rounded-full p-2 bg-[rgba(0,0,0,0.5)]"
+                        >
                             {muted ? (
                                 <VolumeXIcon size={18} className="text-white" />
                             ) : (

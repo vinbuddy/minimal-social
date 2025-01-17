@@ -119,7 +119,7 @@ export default function ProfilePage() {
                                                         isIconOnly
                                                         variant="light"
                                                         isLoading={loading}
-                                                        onClick={handleNavigateToConversation}
+                                                        onPress={handleNavigateToConversation}
                                                     >
                                                         <SendIcon size={16} />
                                                     </Button>

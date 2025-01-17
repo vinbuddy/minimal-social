@@ -12,6 +12,7 @@ function ConversationPage() {
                     height={350}
                     src="/images/conversation-gif-bg.gif"
                     alt="background"
+                    priority
                 />
                 <h1 className="text-3xl text-black mt-3 font-semibold">Welcome to Minimal Chat</h1>
             </div>

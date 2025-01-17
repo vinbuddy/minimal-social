@@ -480,7 +480,7 @@ export default function MessageList({ conversation }: IProps) {
                         }
                     )}
                 >
-                    <Button isIconOnly variant="flat" radius="full" onClick={handleBackToBottom}>
+                    <Button isIconOnly variant="flat" radius="full" onPress={handleBackToBottom}>
                         <ArrowDownIcon />
                     </Button>
                 </div>

@@ -196,7 +196,7 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                         <div className="flex items-center gap-3">
                             <Button
                                 title="like"
-                                onClick={isLiked ? handleUnLike : handleLike}
+                                onPress={isLiked ? handleUnLike : handleLike}
                                 size="sm"
                                 radius="full"
                                 color={isLiked ? "danger" : "default"}

@@ -80,7 +80,7 @@ export default function ChangeEmojiConversationModal({ children, defaultEmoji, c
                                 />
                             </ModalBody>
                             <ModalFooter>
-                                <Button onClick={handleChangeEmoji} isLoading={loading} color="primary" fullWidth>
+                                <Button onPress={handleChangeEmoji} isLoading={loading} color="primary" fullWidth>
                                     {emoji ?? ""}&nbsp;Change
                                 </Button>
                             </ModalFooter>

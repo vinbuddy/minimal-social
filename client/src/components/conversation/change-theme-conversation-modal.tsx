@@ -147,10 +147,10 @@ export default function ChangeThemeConversationModal({ children, conversation }:
                                 </section>
                             </ModalBody>
                             <ModalFooter>
-                                <Button color="default" variant="light" fullWidth onClick={onClose}>
+                                <Button color="default" variant="light" fullWidth onPress={onClose}>
                                     Cancel
                                 </Button>
-                                <Button color="primary" fullWidth isLoading={loading} onClick={handleChangeTheme}>
+                                <Button color="primary" fullWidth isLoading={loading} onPress={handleChangeTheme}>
                                     Change theme
                                 </Button>
                             </ModalFooter>

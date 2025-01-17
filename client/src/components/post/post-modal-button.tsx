@@ -1,14 +1,5 @@
 "use client";
-import {
-    Button,
-    Popover,
-    PopoverTrigger,
-    PopoverContent,
-    Avatar,
-    Modal,
-    ModalContent,
-    ModalBody,
-} from "@heroui/react";
+import { Button, Popover, PopoverTrigger, PopoverContent, Avatar, Modal, ModalContent, ModalBody } from "@heroui/react";
 import axios from "axios";
 import { toast } from "sonner";
 import { ImagePlusIcon, PlusIcon, SmileIcon } from "lucide-react";
@@ -293,7 +284,7 @@ export default function PostModalButton({ type = "create", post, children, open,
 
     const renderPostForm = () => {
         return (
-            (<div>
+            <div>
                 <div className="flex">
                     <section>
                         <Avatar size="lg" src={currentUser?.photo} />
@@ -366,7 +357,7 @@ export default function PostModalButton({ type = "create", post, children, open,
                         <Button
                             variant="light"
                             color="default"
-                            onClick={() => {
+                            onPress={() => {
                                 setIsOpen(false);
                                 setOpen && setOpen(false);
                             }}
@@ -375,7 +366,7 @@ export default function PostModalButton({ type = "create", post, children, open,
                         </Button>
                     )}
                     <Button
-                        onClick={type === "create" ? handleCreatePost : handleEditPost}
+                        onPress={type === "create" ? handleCreatePost : handleEditPost}
                         isDisabled={
                             caption.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0 && mediaFiles.length === 0
                         }
@@ -386,7 +377,7 @@ export default function PostModalButton({ type = "create", post, children, open,
                         {type === "create" ? "Post" : "Edit"}
                     </Button>
                 </div>
-            </div>)
+            </div>
         );
     };
 
@@ -398,7 +389,7 @@ export default function PostModalButton({ type = "create", post, children, open,
                     children
                 ) : (
                     <Button
-                        onClick={() => {
+                        onPress={() => {
                             setIsOpen(true);
                             setOpen && setOpen(true);
                         }}
