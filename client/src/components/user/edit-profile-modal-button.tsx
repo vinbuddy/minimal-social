@@ -109,7 +109,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
         }
 
         try {
-            const res = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/${currentUser?._id}`, formData, {
+            const res = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/edit`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -141,7 +141,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
 
     return (
         <>
-            <Button {...rest} onClick={onOpen}>
+            <Button type="button" {...rest} onClick={onOpen}>
                 {rest.children}
             </Button>
 

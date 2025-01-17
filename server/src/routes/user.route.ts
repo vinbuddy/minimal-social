@@ -19,18 +19,21 @@ const uploadFile = multer();
 
 const router: Router = express.Router();
 
-router.put("/:id", uploadFile.single("file"), verifyToken, editProfileHandler);
 router.get("/search", verifyToken, searchUserHandler);
 router.get("/following", verifyToken, getFollowingsHandler);
 router.get("/follower", verifyToken, getFollowersHandler);
 router.get("/", verifyAdminToken, getUsersHandler);
 router.get("/suggestion", getFollowSuggestionsHandler);
+// --
 router.get("/:id", verifyToken, getUserHandler);
+// --
 
 router.put("/follow", verifyToken, followUserHandler);
 router.put("/unfollow", verifyToken, unfollowUserHandler);
 
 router.put("/block/:id", verifyToken, blockUserHandler);
 router.put("/unblock/:id", verifyToken, unblockUserHandler);
+
+router.put("/edit", uploadFile.single("file"), verifyToken, editProfileHandler);
 
 export default router;

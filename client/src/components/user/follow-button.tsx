@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/hooks/store";
 import { IUser } from "@/types/user";
 import axiosInstance from "@/utils/http-request";
+import { showToast } from "@/utils/toast";
 
 interface IProps extends ButtonProps {
     user: IUser;
@@ -46,11 +47,10 @@ export default function FollowButton({ user, onAfterFollowed, onAfterUnFollowed,
 
             onAfterFollowed && onAfterFollowed();
 
-            toast.success("Followed successfully", { position: "bottom-center" });
+            showToast("Followed successfully", "success");
         } catch (error: any) {
             setIsFollowed(false);
-            toast.error("Failed to follow user", { position: "bottom-center" });
-            toast.error(error.response.data.message, { position: "bottom-center" });
+            showToast(error?.response?.data?.message ?? "Failed to follow user", "error");
         }
     };
 
@@ -66,17 +66,17 @@ export default function FollowButton({ user, onAfterFollowed, onAfterUnFollowed,
 
             onAfterUnFollowed && onAfterUnFollowed();
 
-            toast.success("Unfollowed successfully", { position: "bottom-center" });
+            showToast("Unfollowed successfully", "success");
         } catch (error: any) {
             setIsFollowed(true);
 
-            toast.error("Failed to unfollow", { position: "bottom-center" });
-            toast.error(error.response.data.message, { position: "bottom-center" });
+            showToast(error?.response?.data?.message ?? "Failed to unfollow user", "error");
         }
     };
 
     return (
         <Button
+            type="button"
             onPress={isFollowed ? handleUnFollow : handleFollow}
             color={isFollowed ? "default" : "primary"}
             variant={isFollowed ? "ghost" : "solid"}

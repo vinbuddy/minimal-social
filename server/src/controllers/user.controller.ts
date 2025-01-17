@@ -161,9 +161,9 @@ export async function getFollowSuggestionsHandler(req: Request, res: Response, n
 
 export async function editProfileHandler(_req: Request, res: Response, next: NextFunction) {
     try {
-        const req = _req as RequestWithFile;
-        const userId = req.params.id;
+        const req = _req as RequestWithFile & RequestWithUser;
         const { bio, username } = req.body;
+        const userId = req.user?._id?.toString();
 
         if (!userId) {
             return res.status(400).json({ statusCode: 400, message: "Id is required" });
@@ -313,12 +313,15 @@ export async function blockUserHandler(_req: Request, res: Response, next: NextF
         }
 
         user.blockedUsers.push(new mongoose.Types.ObjectId(blockedUserId));
+        await user.save();
 
-        // un-follow user
+        // Me: un-follow user blocked
+        await UserModel.findByIdAndUpdate(userId, { $pull: { followings: blockedUserId } });
+        await UserModel.findByIdAndUpdate(blockedUserId, { $pull: { followers: userId } });
+
+        // Blocked user: un-follow me
         await UserModel.findByIdAndUpdate(blockedUserId, { $pull: { followings: userId } });
         await UserModel.findByIdAndUpdate(userId, { $pull: { followers: blockedUserId } });
-
-        await user.save();
 
         return res.status(200).json({ message: "User blocked successfully" });
     } catch (error) {

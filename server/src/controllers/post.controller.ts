@@ -9,6 +9,7 @@ import cloudinary from "../shared/configs/cloudinary";
 import CommentModel from "../models/comment.model";
 import { getPostQueryHelper } from "../services/post.service";
 import { moderateImage } from "../shared/helpers/media-moderation";
+import { RequestWithUser } from "../shared/types/request";
 
 interface RequestWithFiles extends Request {
     files: Express.Multer.File[];
@@ -142,16 +143,39 @@ export async function deletePostHandler(req: Request, res: Response, next: NextF
     } catch (error) {}
 }
 
-export async function getAllPostsHandler(req: Request, res: Response, next: NextFunction) {
+export async function getAllPostsHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 15;
 
+        // Me: Blocked some users
+        const currentUserId = req.user._id?.toString();
+        const currentUser = await UserModel.findById(currentUserId);
+        const blockedUsers = currentUser?.blockedUsers ?? [];
+
+        // Users: Blocked me
+        const blockedByUsers = await UserModel.find({
+            blockedUsers: {
+                $in: [new mongoose.Types.ObjectId(currentUserId)],
+            },
+        }).distinct("_id");
+
+        const condition = {
+            $or: [
+                { postBy: currentUser?._id }, // Include my posts
+                { postBy: { $nin: [...blockedUsers, ...blockedByUsers] } }, // Exclude posts from both blocked and blocking users
+            ],
+        };
+
         const skip = (Number(page) - 1) * limit;
-        const totalPosts = await PostModel.countDocuments();
+        const totalPosts = await PostModel.countDocuments(condition);
         const totalPages = Math.ceil(totalPosts / limit);
 
         const posts = await PostModel.aggregate([
+            {
+                $match: condition,
+            },
             { $sort: { createdAt: -1 } },
             { $skip: skip },
             { $limit: limit },
@@ -280,30 +304,39 @@ export async function getPostDetailHandler(req: Request, res: Response, next: Ne
     }
 }
 
-export async function getLikedPostsHandler(req: Request, res: Response, next: NextFunction) {
+export async function getLikedPostsHandler(_req: Request, res: Response, next: NextFunction) {
     try {
-        // const req = _req as RequestWithUser;
+        const req = _req as RequestWithUser;
 
-        const userId = req.query.userId as string;
-        // const userId = req.user._id;
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 15;
 
+        // Me: Blocked some users
+        const currentUserId = req.user._id?.toString();
+        const currentUser = await UserModel.findById(currentUserId);
+        const blockedUsers = currentUser?.blockedUsers ?? [];
+
+        // Users: Blocked me
+        const blockedByUsers = await UserModel.find({
+            blockedUsers: {
+                $in: [new mongoose.Types.ObjectId(currentUserId)],
+            },
+        }).distinct("_id");
+
+        const condition = {
+            $and: [
+                { likes: { $in: [currentUser?._id] } }, // Include my liked posts
+                { postBy: { $nin: [...blockedUsers, ...blockedByUsers] } }, // Exclude posts from both blocked and blocking users
+            ],
+        };
+
         const skip = (page - 1) * limit;
 
-        const user = await UserModel.findById(userId);
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        const totalPosts = await PostModel.countDocuments({
-            likes: { $in: [userId] },
-        });
+        const totalPosts = await PostModel.countDocuments(condition);
         const totalPages = Math.ceil(totalPosts / limit);
 
         const posts = await PostModel.aggregate([
-            { $match: { likes: { $in: [new mongoose.Types.ObjectId(userId)] } } },
+            { $match: condition },
             { $sort: { createdAt: -1 } },
             { $skip: skip },
             { $limit: limit },
