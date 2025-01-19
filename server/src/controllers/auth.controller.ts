@@ -103,7 +103,12 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
     try {
         const { email, password }: LoginUserInput = loginSchema.parse(req.body);
 
-        const user = await UserModel.findOne({ email }).lean(); // Find user by email address in the database
+        const user = await UserModel.findOne({ email })
+            .populate({
+                path: "blockedUsers",
+                select: USER_MODEL_HIDDEN_FIELDS,
+            })
+            .lean(); // Find user by email address in the database
 
         if (!user) {
             return res.status(400).json({ statusCode: 400, message: "User not found" });
@@ -352,7 +357,6 @@ export async function getMeHandler(_req: Request, res: Response, next: NextFunct
             .select(USER_MODEL_HIDDEN_FIELDS);
 
         return res.status(200).json({ statusCode: 200, data: user });
-        res.status(200).json({ statusCode: 200, data: "me" });
     } catch (error) {
         next(error);
     }

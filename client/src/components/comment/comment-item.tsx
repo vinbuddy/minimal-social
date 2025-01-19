@@ -163,7 +163,7 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
 
                             <div>
                                 <CommentMenuDropdown comment={comment}>
-                                    <button className="px-2 outline-none group-hover:block hidden">
+                                    <button className="px-2 outline-none group-hover:visible invisible">
                                         <EllipsisIcon size={18} />
                                     </button>
                                 </CommentMenuDropdown>

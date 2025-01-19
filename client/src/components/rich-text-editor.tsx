@@ -7,6 +7,7 @@ import { IUser } from "@/types/user";
 import { setCaretAtTheEnd } from "@/utils/editor";
 import axiosInstance from "@/utils/http-request";
 import { useDebounce } from "@/hooks";
+import { useAuthStore } from "@/hooks/store";
 
 interface IProps {
     className?: string;
@@ -46,6 +47,7 @@ function RichTextEditor(
     const debouncedSearch = useDebounce(userName, 750);
 
     const isOpenMention = isTypingMention === true && debouncedSearch.length > 0 && suggestions.length > 0;
+    const { currentUser } = useAuthStore();
 
     // Using forward ref inside it
     useImperativeHandle(ref, () => contentInnerRef.current!, []);
@@ -189,22 +191,24 @@ function RichTextEditor(
                     <Spinner />
                 ) : (
                     <>
-                        {suggestions.map((user: IUser) => (
-                            <div
-                                key={user._id}
-                                className="hover:bg-content2 transition ease-in px-3 flex items-center gap-3 py-2 cursor-pointer"
-                                onClick={() => selectMention(user?.username)}
-                            >
-                                <Avatar
-                                    size="sm"
+                        {suggestions
+                            .filter((s) => !currentUser?.blockedUsers.some((blockedUser) => blockedUser._id === s._id))
+                            .map((user: IUser) => (
+                                <div
                                     key={user._id}
+                                    className="hover:bg-content2 transition ease-in px-3 flex items-center gap-3 py-2 cursor-pointer"
                                     onClick={() => selectMention(user?.username)}
-                                    src={user?.photo}
-                                    alt=""
-                                />
-                                {user?.username}
-                            </div>
-                        ))}
+                                >
+                                    <Avatar
+                                        size="sm"
+                                        key={user._id}
+                                        onClick={() => selectMention(user?.username)}
+                                        src={user?.photo}
+                                        alt=""
+                                    />
+                                    {user?.username}
+                                </div>
+                            ))}
                     </>
                 )}
 
