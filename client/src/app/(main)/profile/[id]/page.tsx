@@ -30,7 +30,6 @@ export default function ProfilePage() {
     const [postType, setPostType] = useState<"post" | "repost" | "liked">("post");
 
     const { data: user, isLoading, error } = useSWR<{ data: IUser }>(`/user/${params.id}`);
-    console.log("user: ", user);
     const [followerCount, setFollowerCount] = useState(user?.data?.followers?.length ?? 0);
     const { loading, startLoading, stopLoading } = useLoading();
     const isOwner = useIsOwner(user?.data?._id);
@@ -190,17 +189,17 @@ export default function ProfilePage() {
 
                     {isOwner && (
                         <section className="mt-10">
-                            <PostModalButton fullWidth />
+                            <PostModalButton fullWidth isResponsive={false} />
                         </section>
                     )}
 
                     {/* Posts */}
                     {isBlocked ? (
-                        <div className="mt-10">
+                        <div className="mt-5">
                             <Alert color="warning" title="You blocked this user, you can not see their posts" />
                         </div>
                     ) : (
-                        <section className="mt-10">
+                        <section className="mt-5">
                             <Tabs
                                 onSelectionChange={(key) => setPostType(key.toString() as typeof postType)}
                                 variant="underlined"

@@ -28,13 +28,22 @@ import { useBreakpoint, useGlobalMutation, useLoading } from "@/hooks";
 import { showToast } from "@/utils/toast";
 
 interface IProps extends ButtonProps {
+    isResponsive?: boolean;
     actionType?: "create" | "edit";
     post?: IPost;
     children?: React.ReactNode;
     open?: boolean;
     setOpen?: Dispatch<SetStateAction<boolean>>;
 }
-export default function PostModalButton({ actionType = "create", post, children, open, setOpen, ...rest }: IProps) {
+export default function PostModalButton({
+    isResponsive = true,
+    actionType = "create",
+    post,
+    children,
+    open,
+    setOpen,
+    ...rest
+}: IProps) {
     const [isOpen, setIsOpen] = useState<boolean>(!!open);
     const { currentUser } = useAuthStore();
     const { startLoading, stopLoading, loading } = useLoading();
@@ -106,8 +115,6 @@ export default function PostModalButton({ actionType = "create", post, children,
     };
 
     const handlePasteMediaFiles = async (event: React.ClipboardEvent<HTMLInputElement>) => {
-        event.preventDefault();
-
         // Get images from clipboard
         const items = event.clipboardData.items;
         const files: any = [];
@@ -119,6 +126,8 @@ export default function PostModalButton({ actionType = "create", post, children,
         }
 
         if (files.length > 0) {
+            event.preventDefault();
+
             const fileInfos: IMediaFile[] = [];
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
@@ -392,7 +401,7 @@ export default function PostModalButton({ actionType = "create", post, children,
     };
 
     // Show modal if breakpoint is mobile
-    if (breakpoint === "mobile") {
+    if (breakpoint === "mobile" && isResponsive) {
         return (
             <>
                 {children ? (

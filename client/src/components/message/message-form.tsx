@@ -95,8 +95,6 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
     };
 
     const handlePasteMediaFiles = async (event: React.ClipboardEvent<HTMLInputElement>) => {
-        event.preventDefault();
-
         // Get images from clipboard
         const items = event.clipboardData.items;
         const files: any = [];
@@ -108,6 +106,8 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
         }
 
         if (files.length > 0) {
+            event.preventDefault();
+
             const fileInfos: IMediaFile[] = [];
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];

@@ -1,22 +1,16 @@
 "use client";
 
-import {
-    Dropdown,
-    DropdownMenu,
-    DropdownItem,
-    DropdownTrigger,
-    DropdownSection,
-    useDisclosure,
-} from "@heroui/react";
+import { Dropdown, DropdownMenu, DropdownItem, DropdownTrigger, DropdownSection, useDisclosure } from "@heroui/react";
 import { BanIcon, FlagTriangleRightIcon, HeartHandshakeIcon, LogOutIcon, SettingsIcon, ShareIcon } from "lucide-react";
 
 import { IUser } from "@/types/user";
-import { useCopyToClipboard, useGlobalMutation, useIsOwner } from "@/hooks";
+import { useCopyToClipboard, useGlobalMutation, useIsOwner, useLoading } from "@/hooks";
 import ConfirmationModal from "../confirmation-modal";
 import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import { useState } from "react";
 import { useAuthStore } from "@/hooks/store";
+import { useRouter } from "next/navigation";
 
 interface IProps {
     children: React.ReactNode;
@@ -33,6 +27,9 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
     const [isBlocked, setIsBlocked] = useState<boolean>(() => {
         return currentUser?.blockedUsers.some((blockedUser) => blockedUser._id === user._id) ?? false;
     });
+    const { startLoading, stopLoading } = useLoading();
+
+    const router = useRouter();
 
     const handleBlock = async () => {
         try {
@@ -95,6 +92,31 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
         }
     };
 
+    const handleLogOut = async (): Promise<void> => {
+        try {
+            startLoading();
+
+            const response = await axiosInstance.post("/auth/logout");
+
+            if (response.status === 200) {
+                useAuthStore.setState({
+                    currentUser: null,
+                    isAuthenticated: false,
+                    accessToken: undefined,
+                    refreshToken: undefined,
+                });
+
+                router.push("/login");
+
+                showToast("Logout successfully", "success");
+            }
+        } catch (error: any) {
+            showToast(error?.response?.data?.message || "An error occurred", "error");
+        } finally {
+            stopLoading();
+        }
+    };
+
     return (
         <>
             <ConfirmationModal
@@ -147,6 +169,7 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
                             className="text-danger"
                             startContent={<LogOutIcon size={16} />}
                             key="logout"
+                            onPress={handleLogOut}
                         >
                             Logout
                         </DropdownItem>
