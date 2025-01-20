@@ -109,7 +109,7 @@ export default function PostDetail({ post }: IProps) {
                             </button>
                         </PostMenuDropdown>
                     </div>
-                    <PostModalButton post={post} open={openEditModal} setOpen={setOpenEditModal} type="edit">
+                    <PostModalButton post={post} open={openEditModal} setOpen={setOpenEditModal} actionType="edit">
                         <div></div>
                     </PostModalButton>
                 </div>

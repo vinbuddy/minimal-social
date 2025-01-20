@@ -1,5 +1,15 @@
 "use client";
-import { Button, Popover, PopoverTrigger, PopoverContent, Avatar, Modal, ModalContent, ModalBody } from "@heroui/react";
+import {
+    Button,
+    Popover,
+    PopoverTrigger,
+    PopoverContent,
+    Avatar,
+    Modal,
+    ModalContent,
+    ModalBody,
+    ButtonProps,
+} from "@heroui/react";
 import axios from "axios";
 import { toast } from "sonner";
 import { ImagePlusIcon, PlusIcon, SmileIcon } from "lucide-react";
@@ -17,14 +27,14 @@ import { useAuthStore } from "@/hooks/store";
 import { useBreakpoint, useGlobalMutation, useLoading } from "@/hooks";
 import { showToast } from "@/utils/toast";
 
-interface IProps {
-    type?: "create" | "edit";
+interface IProps extends ButtonProps {
+    actionType?: "create" | "edit";
     post?: IPost;
     children?: React.ReactNode;
     open?: boolean;
     setOpen?: Dispatch<SetStateAction<boolean>>;
 }
-export default function PostModalButton({ type = "create", post, children, open, setOpen }: IProps) {
+export default function PostModalButton({ actionType = "create", post, children, open, setOpen, ...rest }: IProps) {
     const [isOpen, setIsOpen] = useState<boolean>(!!open);
     const { currentUser } = useAuthStore();
     const { startLoading, stopLoading, loading } = useLoading();
@@ -51,7 +61,7 @@ export default function PostModalButton({ type = "create", post, children, open,
             const isClickInsideEmojiPicker = emojiPickerElement?.contains(event.target as Node);
 
             // // Determine if the click is outside both popover and emoji picker
-            if (type === "edit" && !isClickInsidePopover && !isClickInsideEmojiPicker) {
+            if (actionType === "edit" && !isClickInsidePopover && !isClickInsideEmojiPicker) {
                 handleOpenChange(false);
             }
         };
@@ -61,7 +71,7 @@ export default function PostModalButton({ type = "create", post, children, open,
         return () => {
             document.removeEventListener("click", clickOutsidePopover);
         };
-    }, [popoverRef.current, type]);
+    }, [popoverRef.current, actionType]);
 
     const uploadMediaFiles = async (e: ChangeEvent<HTMLInputElement>) => {
         const files: any = e.target.files;
@@ -172,7 +182,7 @@ export default function PostModalButton({ type = "create", post, children, open,
         setMediaFiles([]);
         setCaption("");
 
-        if (fileInputRef.current && type === "create") {
+        if (fileInputRef.current && actionType === "create") {
             const emptyFileList = new DataTransfer();
             fileInputRef.current.files = emptyFileList.files;
         }
@@ -324,7 +334,7 @@ export default function PostModalButton({ type = "create", post, children, open,
                                 }}
                             />
 
-                            {type === "create" && (
+                            {actionType === "create" && (
                                 <MediaFileUploaderButton
                                     disableRipple
                                     className="bg-transparent p-0 gap-0 justify-start"
@@ -346,7 +356,7 @@ export default function PostModalButton({ type = "create", post, children, open,
                                     scrollHorizontally
                                     videoPreview={true}
                                     mediaFiles={mediaFiles}
-                                    onRemoveMediaFile={type === "create" ? removeMediaFiles : undefined}
+                                    onRemoveMediaFile={actionType === "create" ? removeMediaFiles : undefined}
                                 />
                             </div>
                         </div>
@@ -366,7 +376,7 @@ export default function PostModalButton({ type = "create", post, children, open,
                         </Button>
                     )}
                     <Button
-                        onPress={type === "create" ? handleCreatePost : handleEditPost}
+                        onPress={actionType === "create" ? handleCreatePost : handleEditPost}
                         isDisabled={
                             caption.replace(/&nbsp;|<[^>]*>/g, "").trim().length === 0 && mediaFiles.length === 0
                         }
@@ -374,7 +384,7 @@ export default function PostModalButton({ type = "create", post, children, open,
                         variant="bordered"
                         isLoading={loading}
                     >
-                        {type === "create" ? "Post" : "Edit"}
+                        {actionType === "create" ? "Post" : "Edit"}
                     </Button>
                 </div>
             </div>
@@ -423,13 +433,23 @@ export default function PostModalButton({ type = "create", post, children, open,
                 size="lg"
                 shouldFlip
                 backdrop="opaque"
-                offset={type === "create" ? 20 : -20}
+                offset={actionType === "create" ? 20 : -20}
                 defaultOpen={isOpen}
                 isOpen={isOpen}
                 onOpenChange={handleOpenChange}
                 shouldCloseOnBlur
+                triggerScaleOnOpen={false}
+                shouldCloseOnScroll={false}
             >
-                <PopoverTrigger>{children ? children : <Button color="primary">Create</Button>}</PopoverTrigger>
+                <PopoverTrigger>
+                    {children ? (
+                        children
+                    ) : (
+                        <Button color="primary" {...rest}>
+                            Create
+                        </Button>
+                    )}
+                </PopoverTrigger>
                 <PopoverContent className="p-0">
                     <div ref={popoverRef} className="w-[calc(100vw_-_115px)] md:w-[598px] p-4">
                         {renderPostForm()}

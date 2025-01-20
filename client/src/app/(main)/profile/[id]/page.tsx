@@ -21,6 +21,7 @@ import { showToast } from "@/utils/toast";
 import ProfileMenuDropdown from "@/components/user/profile-menu-dropdown";
 import ErrorMessage from "@/components/error-message";
 import ScreenCenterWrapper from "@/components/screen-center-wrapper";
+import PostModalButton from "@/components/post/post-modal-button";
 
 export default function ProfilePage() {
     const params = useParams() as { id: string };
@@ -61,7 +62,6 @@ export default function ProfilePage() {
         isLoading: isPostLoading,
         error: postError,
         setSize: setPage,
-        mutate,
     } = usePagination<IPost>(getURL());
 
     const handleNavigateToConversation = async () => {
@@ -187,6 +187,12 @@ export default function ProfilePage() {
                             )}
                         </div>
                     </section>
+
+                    {isOwner && (
+                        <section className="mt-10">
+                            <PostModalButton fullWidth />
+                        </section>
+                    )}
 
                     {/* Posts */}
                     {isBlocked ? (
