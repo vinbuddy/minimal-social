@@ -202,7 +202,17 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
                 })
                 .populate({ path: "sender", select: USER_MODEL_HIDDEN_FIELDS })
                 .populate({ path: "replyTo" })
-                .populate({ path: "conversation" })
+                .populate({
+                    path: "conversation",
+                    populate: {
+                        path: "participants",
+                        select: USER_MODEL_HIDDEN_FIELDS,
+                        populate: {
+                            path: "blockedUsers",
+                            select: USER_MODEL_HIDDEN_FIELDS,
+                        },
+                    },
+                })
                 .populate({ path: "reactions.user", select: USER_MODEL_HIDDEN_FIELDS });
 
             // Check hasPrevPage
@@ -236,6 +246,14 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
             })
             .populate({
                 path: "conversation",
+                populate: {
+                    path: "participants",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                    populate: {
+                        path: "blockedUsers",
+                        select: USER_MODEL_HIDDEN_FIELDS,
+                    },
+                },
             })
             .populate({
                 path: "reactions.user",
@@ -276,6 +294,14 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
                 })
                 .populate({
                     path: "conversation",
+                    populate: {
+                        path: "participants",
+                        select: USER_MODEL_HIDDEN_FIELDS,
+                        populate: {
+                            path: "blockedUsers",
+                            select: USER_MODEL_HIDDEN_FIELDS,
+                        },
+                    },
                 })
                 .populate({
                     path: "reactions.user",
@@ -302,6 +328,14 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
                 })
                 .populate({
                     path: "conversation",
+                    populate: {
+                        path: "participants",
+                        select: USER_MODEL_HIDDEN_FIELDS,
+                        populate: {
+                            path: "blockedUsers",
+                            select: USER_MODEL_HIDDEN_FIELDS,
+                        },
+                    },
                 })
                 .populate({
                     path: "reactions.user",
@@ -325,7 +359,17 @@ export async function getMessagesWithCursorHandler(_req: Request, res: Response,
                 })
                 .populate({ path: "sender", select: USER_MODEL_HIDDEN_FIELDS })
                 .populate({ path: "replyTo" })
-                .populate({ path: "conversation" })
+                .populate({
+                    path: "conversation",
+                    populate: {
+                        path: "participants",
+                        select: USER_MODEL_HIDDEN_FIELDS,
+                        populate: {
+                            path: "blockedUsers",
+                            select: USER_MODEL_HIDDEN_FIELDS,
+                        },
+                    },
+                })
                 .populate({ path: "reactions.user", select: USER_MODEL_HIDDEN_FIELDS });
 
             const _message = direction === "prev" ? messages[messages.length - 1] : messages[0];

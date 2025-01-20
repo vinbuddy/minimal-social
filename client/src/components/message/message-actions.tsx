@@ -1,6 +1,7 @@
 "use client";
 import { Button, Chip } from "@heroui/react";
 import { EllipsisVerticalIcon, ReplyIcon, SmileIcon } from "lucide-react";
+import cn from "classnames";
 
 import MessageEmojiReaction from "./message-emoji-reaction";
 import MessageMenuDropdown from "./message-menu-dropdown";
@@ -10,7 +11,7 @@ import { formatTime } from "@/utils/datetime";
 import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import { useAuthStore, useReplyStore } from "@/hooks/store";
-import { useGlobalMutation } from "@/hooks";
+import { useGlobalMutation, useIsBlockMode, useOtherUserConversation } from "@/hooks";
 
 interface IProps {
     message: IMessage;
@@ -21,6 +22,11 @@ export default function MessageActions({ message, isOwnMessage }: IProps) {
     const { reply } = useReplyStore();
     const { currentUser } = useAuthStore();
     const mutate = useGlobalMutation();
+
+    const otherUser = useOtherUserConversation(message?.conversation);
+    const isBlockMode = useIsBlockMode({
+        otherUser: otherUser,
+    });
 
     const handleReactMessage = async (emoji: string) => {
         try {
@@ -45,25 +51,37 @@ export default function MessageActions({ message, isOwnMessage }: IProps) {
 
     return (
         <section
-            className={`flex items-center flex-wrap invisible group-hover:visible ${
-                isOwnMessage ? "order-1" : "order-2"
-            }`}
+            className={cn("flex items-center flex-wrap invisible group-hover:visible", {
+                "order-1": isOwnMessage,
+                "order-2": !isOwnMessage,
+            })}
         >
-            <MessageEmojiReaction onAfterPicked={(emoji: string) => handleReactMessage(emoji)}>
-                <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                    <SmileIcon size={16} className="text-default-400" />
-                </Button>
-            </MessageEmojiReaction>
-            <Button onPress={() => reply(message)} isIconOnly size="sm" radius="full" color="default" variant="light">
-                <ReplyIcon size={16} className="text-default-400" />
-            </Button>
-            <MessageMenuDropdown message={message} isOwnMessage={isOwnMessage}>
-                <Button isIconOnly size="sm" radius="full" color="default" variant="light">
-                    <EllipsisVerticalIcon size={16} className="text-default-400" />
-                </Button>
-            </MessageMenuDropdown>
+            {!isBlockMode && (
+                <>
+                    <MessageEmojiReaction onAfterPicked={(emoji: string) => handleReactMessage(emoji)}>
+                        <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                            <SmileIcon size={16} className="text-default-400" />
+                        </Button>
+                    </MessageEmojiReaction>
+                    <Button
+                        onPress={() => reply(message)}
+                        isIconOnly
+                        size="sm"
+                        radius="full"
+                        color="default"
+                        variant="light"
+                    >
+                        <ReplyIcon size={16} className="text-default-400" />
+                    </Button>
+                    <MessageMenuDropdown message={message} isOwnMessage={isOwnMessage}>
+                        <Button isIconOnly size="sm" radius="full" color="default" variant="light">
+                            <EllipsisVerticalIcon size={16} className="text-default-400" />
+                        </Button>
+                    </MessageMenuDropdown>
+                </>
+            )}
             {!message?.mediaFiles?.length && (
-                <Chip size="sm" variant="flat" className={`px-1 text-default-500 text-tiny`}>
+                <Chip size="sm" variant="flat" className="px-1 text-default-500 text-tiny">
                     {formatTime(message?.createdAt)}
                 </Chip>
             )}

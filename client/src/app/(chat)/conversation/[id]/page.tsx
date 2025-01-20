@@ -11,24 +11,24 @@ import MessageForm from "@/components/message/message-form";
 import MessageList from "@/components/message/message-list";
 import UserName from "@/components/user/user-name";
 
-import { useAuthStore } from "@/hooks/store";
 import { IConversation } from "@/types/conversation";
 import { useConversationContext } from "@/contexts/conversation-context";
 import { IMediaFile } from "@/types/post";
 import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/media-file";
 import { showToast } from "@/utils/toast";
+import { useIsBlockMode, useOtherUserConversation } from "@/hooks";
 
 function ConversationDetailPage() {
     const [isOpenConversationInfo, setIsOpenConversationInfo] = useState<boolean>(false);
     const [mediaFiles, setMediaFiles] = useState<IMediaFile[]>([]);
 
     const params = useParams<{ id: string }>();
-    const currentUser = useAuthStore((state) => state.currentUser);
 
     const { data } = useSWR<{ data: IConversation }>(`/conversation/${params.id}`);
-
-    const otherUser =
-        data && currentUser && data?.data?.participants?.find((participant) => participant._id !== currentUser._id);
+    const otherUser = useOtherUserConversation(data?.data);
+    const isBlockMode = useIsBlockMode({
+        conversation: data?.data,
+    });
 
     const { onBack } = useConversationContext();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -95,113 +95,120 @@ function ConversationDetailPage() {
     });
 
     return (
-        <>
-            <div className="grid grid-cols-12 h-full">
-                <section
-                    className={`col-span-12 sm:col-span-12 ${
-                        isOpenConversationInfo
-                            ? "md:col-span-8 lg:col-span-8 xl:col-span-8 2xl:col-span-8"
-                            : "md:col-span-12 lg:col-span-12 xl:col-span-12 2xl:col-span-12"
-                    }`}
-                >
-                    <div {...getRootProps()} className="h-screen flex flex-col justify-between overflow-auto py-4">
-                        <input {...getInputProps()} />
-                        {/* User - Actions */}
-                        <header className="min-h-[40px] flex items-center justify-between pb-5 px-4  border-b-1 border-divider">
-                            <div className="flex items-center cursor-pointer">
-                                <div className="me-3 lg:hidden block">
-                                    <Button onPress={onBack} title="Back" isIconOnly radius="full" variant="light">
-                                        <ArrowLeftIcon size={20} />
-                                    </Button>
-                                </div>
-
-                                <Avatar radius="full" src={otherUser?.photo} />
-
-                                <div className="ms-3">
-                                    <UserName user={otherUser} className="font-semibold hover:no-underline" />
-                                    {/* <p className="text-sm text-default-500">Online 4 minutes ago</p> */}
-                                </div>
+        <div className="grid grid-cols-12 h-full">
+            <section
+                className={`col-span-12 sm:col-span-12 ${
+                    isOpenConversationInfo
+                        ? "md:col-span-8 lg:col-span-8 xl:col-span-8 2xl:col-span-8"
+                        : "md:col-span-12 lg:col-span-12 xl:col-span-12 2xl:col-span-12"
+                }`}
+            >
+                <div {...getRootProps()} className="h-screen flex flex-col justify-between overflow-auto py-4">
+                    <input {...getInputProps()} />
+                    {/* User - Actions */}
+                    <header className="min-h-[40px] flex items-center justify-between pb-5 px-4  border-b-1 border-divider">
+                        <div className="flex items-center cursor-pointer">
+                            <div className="me-3 lg:hidden block">
+                                <Button onPress={onBack} title="Back" isIconOnly radius="full" variant="light">
+                                    <ArrowLeftIcon size={20} />
+                                </Button>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <Tooltip content="Call">
-                                    <Button size="sm" isIconOnly color="default" variant="light">
-                                        <Phone size={18} />
-                                    </Button>
-                                </Tooltip>
-                                <Tooltip content="Video call">
-                                    <Button size="sm" isIconOnly color="default" variant="light">
-                                        <Video size={18} />
-                                    </Button>
-                                </Tooltip>
-                                <div className="lg:block hidden">
-                                    <Button
-                                        onPress={() => setIsOpenConversationInfo(!isOpenConversationInfo)}
-                                        size="sm"
-                                        isIconOnly
-                                        color="default"
-                                        variant={isOpenConversationInfo ? "flat" : "light"}
-                                    >
-                                        <InfoIcon size={18} />
-                                    </Button>
-                                </div>
-                                <div className="lg:hidden block">
-                                    <Button
-                                        onPress={onOpen}
-                                        size="sm"
-                                        isIconOnly
-                                        color="default"
-                                        variant={isOpenConversationInfo ? "flat" : "light"}
-                                    >
-                                        <InfoIcon size={18} />
-                                    </Button>
-                                </div>
+                            <Avatar radius="full" src={otherUser?.photo} />
+
+                            <div className="ms-3">
+                                <UserName user={otherUser} className="font-semibold hover:no-underline" />
+                                {/* <p className="text-sm text-default-500">Online 4 minutes ago</p> */}
                             </div>
-                        </header>
+                        </div>
 
-                        {isDragActive && (
-                            <div className="p-5 h-full overflow-hidden">
-                                <div className="rounded-2xl border-2 border-dashed border-default w-full overflow-y-auto overflow-x-hidden h-full flex justify-center items-center">
-                                    <h4>Drag and drop files here</h4>
-                                </div>
+                        <div className="flex items-center gap-2">
+                            <Tooltip content="Call">
+                                <Button size="sm" isIconOnly color="default" variant="light">
+                                    <Phone size={18} />
+                                </Button>
+                            </Tooltip>
+                            <Tooltip content="Video call">
+                                <Button size="sm" isIconOnly color="default" variant="light">
+                                    <Video size={18} />
+                                </Button>
+                            </Tooltip>
+                            <div className="lg:block hidden">
+                                <Button
+                                    onPress={() => setIsOpenConversationInfo(!isOpenConversationInfo)}
+                                    size="sm"
+                                    isIconOnly
+                                    color="default"
+                                    variant={isOpenConversationInfo ? "flat" : "light"}
+                                >
+                                    <InfoIcon size={18} />
+                                </Button>
                             </div>
-                        )}
+                            <div className="lg:hidden block">
+                                <Button
+                                    onPress={onOpen}
+                                    size="sm"
+                                    isIconOnly
+                                    color="default"
+                                    variant={isOpenConversationInfo ? "flat" : "light"}
+                                >
+                                    <InfoIcon size={18} />
+                                </Button>
+                            </div>
+                        </div>
+                    </header>
 
-                        {/* Message */}
-                        {data?.data && !isDragActive && <MessageList conversation={data?.data} />}
+                    {isDragActive && (
+                        <div className="p-5 h-full overflow-hidden">
+                            <div className="rounded-2xl border-2 border-dashed border-default w-full overflow-y-auto overflow-x-hidden h-full flex justify-center items-center">
+                                <h4>Drag and drop files here</h4>
+                            </div>
+                        </div>
+                    )}
 
+                    {/* Message */}
+                    {data?.data && !isDragActive && <MessageList conversation={data?.data} />}
+
+                    {isBlockMode && (
+                        <div className="flex justify-center items-center gap-x-2 px-4 pt-4 border-t border-default">
+                            <span className="text-default-500 text-sm">You can not send messages to this user.</span>
+                        </div>
+                    )}
+
+                    {/* Message Form */}
+                    {data?.data && !isBlockMode && (
                         <MessageForm
                             conversation={data?.data}
                             mediaFiles={mediaFiles?.length > 0 ? mediaFiles : undefined}
                         />
-                    </div>
+                    )}
+                </div>
+            </section>
+            {isOpenConversationInfo && (
+                <section className="col-span-12 sm:col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4 border-default border-l">
+                    <ConversationInfo conversation={data?.data} partner={otherUser} />
                 </section>
-                {isOpenConversationInfo && (
-                    <section className="col-span-12 sm:col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4 border-default border-l">
-                        <ConversationInfo conversation={data?.data} partner={otherUser} />
-                    </section>
-                )}
+            )}
 
-                <Drawer
-                    classNames={{
-                        base: "!rounded-none",
-                    }}
-                    isOpen={isOpen}
-                    onOpenChange={onOpenChange}
-                >
-                    <DrawerContent>
-                        {(onClose) => (
-                            <>
-                                <DrawerHeader className="flex items-center gap-2"></DrawerHeader>
-                                <DrawerBody className="!px-0">
-                                    <ConversationInfo conversation={data?.data} partner={otherUser} />
-                                </DrawerBody>
-                            </>
-                        )}
-                    </DrawerContent>
-                </Drawer>
-            </div>
-        </>
+            <Drawer
+                classNames={{
+                    base: "!rounded-none",
+                }}
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+            >
+                <DrawerContent>
+                    {(onClose) => (
+                        <>
+                            <DrawerHeader className="flex items-center gap-2"></DrawerHeader>
+                            <DrawerBody className="!px-0">
+                                <ConversationInfo conversation={data?.data} partner={otherUser} />
+                            </DrawerBody>
+                        </>
+                    )}
+                </DrawerContent>
+            </Drawer>
+        </div>
     );
 }
 

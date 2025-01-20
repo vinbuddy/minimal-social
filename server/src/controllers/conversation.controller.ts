@@ -83,7 +83,12 @@ export async function getConversationsHandler(_req: Request, res: Response, next
             .populate({
                 path: "participants",
                 select: USER_MODEL_HIDDEN_FIELDS,
+                populate: {
+                    path: "blockedUsers",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                },
             })
+
             .populate("theme")
             .lean();
 
@@ -184,6 +189,10 @@ export async function getConversationDetailHandler(req: Request, res: Response, 
             .populate({
                 path: "participants",
                 select: USER_MODEL_HIDDEN_FIELDS,
+                populate: {
+                    path: "blockedUsers",
+                    select: USER_MODEL_HIDDEN_FIELDS,
+                },
             })
             .populate("theme");
 
