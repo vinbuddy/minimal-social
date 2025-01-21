@@ -11,6 +11,7 @@ import { showToast } from "@/utils/toast";
 import { useState } from "react";
 import { useAuthStore } from "@/hooks/store";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface IProps {
     children: React.ReactNode;
@@ -153,7 +154,12 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
                 {isOwner ? (
                     <DropdownMenu variant="flat" aria-label="Static Actions">
                         <DropdownSection aria-label="setting" showDivider>
-                            <DropdownItem startContent={<SettingsIcon size={16} />} key="setting">
+                            <DropdownItem
+                                startContent={<SettingsIcon size={16} />}
+                                key="setting"
+                                href="/setting/account"
+                                as={Link}
+                            >
                                 Settings
                             </DropdownItem>
                             <DropdownItem

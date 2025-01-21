@@ -111,7 +111,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 <nav className="flex flex-col items-center p-4">
                     <header className="h-[40px] flex items-center mb-5">
                         <Link
-                            href="#"
+                            href="/"
                             className="max-w-full group flex  shrink-0 items-center justify-center gap-2 rounded-full text-lg font-semibold  md:text-base"
                         >
                             <Image
