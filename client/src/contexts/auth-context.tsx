@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import useAuthStore from "../hooks/store/use-auth-store";
 import { IUser } from "../types/user";
 import PageLoading from "@/components/page-loading";
+import dynamic from "next/dynamic";
 
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
@@ -86,7 +87,6 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                 }
             } catch (error: any) {
                 console.error(error);
-                // useAuthStore.setState({ currentUser: null, isAuthenticated: false });
             } finally {
                 setLoading(false);
             }
@@ -102,5 +102,5 @@ const AuthContextProvider = ({ children }: { children: any }) => {
     return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
 };
 
-// export default dynamic(() => Promise.resolve(AuthContextProvider), { ssr: false });
-export default AuthContextProvider;
+export default dynamic(() => Promise.resolve(AuthContextProvider), { ssr: false });
+// export default AuthContextProvider;
