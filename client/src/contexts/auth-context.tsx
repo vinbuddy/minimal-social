@@ -10,7 +10,8 @@ export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
 
 const AuthContextProvider = ({ children }: { children: any }) => {
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [initialized, setInitialized] = useState<boolean>(false);
     const { currentUser } = useAuthStore();
 
     const pathName = usePathname();
@@ -60,6 +61,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
 
     useEffect(() => {
         const initializeAuth = async () => {
+            if (initialized) return;
             try {
                 setLoading(true);
 
@@ -93,7 +95,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
         if (typeof window !== "undefined") {
             initializeAuth();
         }
-    }, []);
+    }, [initialized, pathName, router]);
 
     if (loading) return <PageLoading />;
 
