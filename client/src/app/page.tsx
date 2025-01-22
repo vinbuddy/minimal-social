@@ -3,7 +3,7 @@ import { Spinner, Tab, Tabs } from "@heroui/react";
 import { Fragment, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-import MainLayout from "@/components/main-layout";
+import MainLayout from "@/layouts/main-layout";
 import PostModalButton from "@/components/post/post-modal-button";
 import PostItem from "@/components/post/post-item";
 import PostSkeletons from "@/components/post/post-skeletons";

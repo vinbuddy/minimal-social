@@ -15,7 +15,7 @@ export const loginSchema = z.object({
 });
 
 export const otpSchema = z.object({
-    email: z.string({ required_error: "Email is required" }).email(),
+    email: z.string({ required_error: "Email is required" }).email().optional(),
     otp: z.string({ required_error: "OTP is required" }),
 });
 export const otpResetPasswordSchema = z.object({

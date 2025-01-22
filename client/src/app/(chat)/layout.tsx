@@ -2,7 +2,7 @@
 import cn from "classnames";
 
 import ConversationList from "@/components/conversation/conversation-list";
-import MainLayout from "@/components/main-layout";
+import MainLayout from "@/layouts/main-layout";
 import { useBreakpoint, useItemClick } from "@/hooks";
 import { IConversation } from "@/types/conversation";
 import { ConversationContext } from "@/contexts/conversation-context";

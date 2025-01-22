@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import passport from "passport";
 import UserModel, { User, USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import {
     CreateUserInput,
@@ -363,9 +362,6 @@ export async function getMeHandler(_req: Request, res: Response, next: NextFunct
 }
 
 export async function googleAuthCallbackHandler(_req: Request, res: Response, next: NextFunction) {
-    console.log("res: ", res);
-    console.log("googleAuthCallbackHandler");
-
     try {
         const req = _req as RequestWithUser;
 

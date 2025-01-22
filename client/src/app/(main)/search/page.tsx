@@ -9,7 +9,6 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import useSWR from "swr";
 
 import BackButton from "@/components/back-button";
-import MainLayout from "@/components/main-layout";
 import PostItem from "@/components/post/post-item";
 import UserItem from "@/components/user/user-item";
 import UserSuggestionList from "@/components/user/user-suggetion-list";

@@ -1,8 +1,15 @@
 import { Request } from "express";
 import { User } from "../../models/user.model";
 
+export interface UserToken {
+    _id: string;
+    isAdmin: boolean;
+    iat: number;
+    exp: number;
+}
+
 export interface RequestWithUser extends Request {
-    user: User;
+    user: UserToken;
 }
 
 export interface RequestWithFiles extends Request {

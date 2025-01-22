@@ -7,7 +7,6 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import BackButton from "@/components/back-button";
 import CommentForm from "@/components/comment/comment-form";
 import CommentItem from "@/components/comment/comment-item";
-import MainLayout from "@/components/main-layout";
 import PostDetail from "@/components/post/post-detail";
 
 import { usePagination } from "@/hooks";

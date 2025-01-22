@@ -20,6 +20,12 @@ export interface IUser {
     isNotification: boolean;
 
     blockedUsers: IUser[];
+
+    googleId?: string;
+
+    createdAt: string;
+
+    updatedAt: string;
 }
 
 export interface IUserBadgeTheme {

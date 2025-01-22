@@ -5,7 +5,7 @@ import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
-import MainLayout from "@/components/main-layout";
+import MainLayout from "@/layouts/main-layout";
 import NotificationItem from "@/components/notification/notification-item";
 import NotificationSkeletons from "@/components/notification/notification-skeletons";
 

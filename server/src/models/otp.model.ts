@@ -28,7 +28,7 @@ class OTP {
     otp: string;
 
     @prop({ required: false, default: "register" })
-    type: "register" | "forgot";
+    type: "register" | "forgot" | "change";
 
     @prop({ default: Date.now, expires: process.env.OTP_EXPIRATION ?? "5m" })
     createdAt: Date;
