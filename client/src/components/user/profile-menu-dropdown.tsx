@@ -34,7 +34,7 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
 
     const handleBlock = async () => {
         try {
-            await axiosInstance.put(`/user/block/${user._id}`);
+            await axiosInstance.put(`/account/block/${user._id}`);
 
             showToast(`Blocked ${user.username}`, "success");
             setIsBlocked(true);
@@ -71,7 +71,7 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
 
     const handleUnblock = async () => {
         try {
-            await axiosInstance.put(`/user/unblock/${user._id}`);
+            await axiosInstance.put(`/account/unblock/${user._id}`);
 
             showToast(`Unblocked ${user.username}`, "success");
             setIsBlocked(false);

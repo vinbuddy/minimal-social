@@ -34,7 +34,6 @@ export default function UserFollowInfoModal({ children, type = "follower", user 
 
     const {
         data: users,
-        loadingMore,
         error,
         isReachedEnd,
         size,
@@ -43,9 +42,14 @@ export default function UserFollowInfoModal({ children, type = "follower", user 
         mutate,
     } = usePagination<IUser>(user ? getURL() : null);
 
+    const handleOpenModal = () => {
+        mutate();
+        onOpen();
+    };
+
     return (
         <>
-            <div className="cursor-pointer" onClick={onOpen}>
+            <div className="cursor-pointer" onClick={handleOpenModal}>
                 {children}
             </div>
 
@@ -93,8 +97,8 @@ export default function UserFollowInfoModal({ children, type = "follower", user 
                                             next={() => setPage(size + 1)}
                                             hasMore={!isReachedEnd}
                                             loader={
-                                                <div className="flex justify-center items-center overflow-hidden h-[70px]">
-                                                    <Spinner size="md" />
+                                                <div>
+                                                    <UserSkeletons length={3} />
                                                 </div>
                                             }
                                             dataLength={users?.length ?? 0}
@@ -104,7 +108,6 @@ export default function UserFollowInfoModal({ children, type = "follower", user 
                                             ))}
                                         </InfiniteScroll>
                                     )}
-                                    {isLoading && <UserSkeletons length={3} />}
                                 </div>
                             </ModalBody>
                             <ModalFooter></ModalFooter>

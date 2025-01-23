@@ -6,6 +6,7 @@ import { Button } from "@heroui/react";
 import cn from "classnames";
 
 import BackButton from "../components/back-button";
+import Link from "next/link";
 
 interface IProps {
     children: React.ReactNode;
@@ -54,6 +55,8 @@ export default function SettingLayout({ children }: IProps) {
                                             startContent={link.icon}
                                             fullWidth
                                             variant={isActive ? "flat" : "light"}
+                                            href={link.href}
+                                            as={Link}
                                         >
                                             {link.content}
                                         </Button>

@@ -2,9 +2,10 @@ import { Button, Skeleton } from "@heroui/react";
 
 interface IProps {
     length: number;
+    isShowedFollowButton?: boolean;
 }
 
-export default function UserSkeletons({ length = 1 }: IProps) {
+export default function UserSkeletons({ length = 1, isShowedFollowButton = true }: IProps) {
     return (
         <>
             {Array.from({ length }).map((_, index) => (
@@ -14,15 +15,16 @@ export default function UserSkeletons({ length = 1 }: IProps) {
                 >
                     <section className="flex items-center gap-4">
                         <Skeleton className="rounded-full w-[40px] h-[40px]" />
-                        <h4>
-                            <Skeleton className="h-3 w-3/12 rounded-lg" />
-                        </h4>
+
+                        <Skeleton className="h-3 w-[80px] rounded-lg" />
                     </section>
-                    <section>
-                        <Button color="default" isDisabled>
-                            Follow
-                        </Button>
-                    </section>
+                    {isShowedFollowButton && (
+                        <section>
+                            <Button color="default" isDisabled>
+                                Follow
+                            </Button>
+                        </section>
+                    )}
                 </div>
             ))}
         </>

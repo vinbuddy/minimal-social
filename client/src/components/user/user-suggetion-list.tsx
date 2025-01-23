@@ -35,8 +35,8 @@ export default function UserSuggestionList() {
                     next={() => setPage(size + 1)}
                     hasMore={!isReachedEnd}
                     loader={
-                        <div className="flex justify-center items-center overflow-hidden h-[70px]">
-                            <Spinner size="md" />
+                        <div>
+                            <UserSkeletons length={4} />
                         </div>
                     }
                     dataLength={users?.length ?? 0}
@@ -48,8 +48,6 @@ export default function UserSuggestionList() {
                     ))}
                 </InfiniteScroll>
             )}
-
-            {isLoading && <UserSkeletons length={4} />}
         </div>
     );
 }
