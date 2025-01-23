@@ -1,5 +1,5 @@
 "use client";
-import { Alert, Avatar, Button, Spinner, Tab, Tabs, Tooltip } from "@heroui/react";
+import { Alert, Avatar, Button, Spinner, Tab, Tabs } from "@heroui/react";
 import { useParams, useRouter } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -131,28 +131,6 @@ export default function ProfilePage() {
                                 <UserName className="text-2xl justify-center" user={user?.data} />
 
                                 <div className="flex items-center gap-2">
-                                    {!isOwner && !isBlocked && (
-                                        <>
-                                            <FollowButton
-                                                size="md"
-                                                radius="md"
-                                                fullWidth={false}
-                                                user={user?.data}
-                                                onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
-                                                onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
-                                            />
-                                            <Tooltip content="Send message" placement="bottom" closeDelay={0}>
-                                                <Button
-                                                    isIconOnly
-                                                    variant="light"
-                                                    isLoading={loading}
-                                                    onPress={handleNavigateToConversation}
-                                                >
-                                                    <SendIcon size={16} />
-                                                </Button>
-                                            </Tooltip>
-                                        </>
-                                    )}
                                     {isOwner && (
                                         <EditProfileModalButton variant="flat">Edit profile</EditProfileModalButton>
                                     )}
@@ -191,6 +169,28 @@ export default function ProfilePage() {
                         <section className="mt-10">
                             <PostModalButton fullWidth isResponsive={false} />
                         </section>
+                    )}
+
+                    {!isOwner && !isBlocked && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+                            <FollowButton
+                                size="md"
+                                radius="md"
+                                fullWidth={true}
+                                user={user?.data}
+                                onAfterFollowed={() => setFollowerCount((prev) => prev + 1)}
+                                onAfterUnFollowed={() => setFollowerCount((prev) => prev - 1)}
+                            />
+                            <Button
+                                variant="flat"
+                                isLoading={loading}
+                                startContent={<SendIcon size={16} />}
+                                fullWidth={true}
+                                onPress={handleNavigateToConversation}
+                            >
+                                Send message
+                            </Button>
+                        </div>
                     )}
 
                     {/* Posts */}
