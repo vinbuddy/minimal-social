@@ -36,7 +36,7 @@ app.use(
         secret: process.env.SESSION_SECRET_KEY as string,
         resave: false,
         saveUninitialized: true,
-        cookie: { secure: process.env.ENVIRONMENT === "production", maxAge: 30 * 60 * 1000 }, // 30 minutes},
+        cookie: { secure: process.env.ENVIRONMENT === "production", sameSite: "none", maxAge: 30 * 60 * 1000 }, // 30 minutes},
     })
 );
 
