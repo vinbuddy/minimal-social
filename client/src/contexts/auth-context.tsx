@@ -11,6 +11,8 @@ import PageSlowLoading from "@/components/page-slow-loading";
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
 
+const publicRoutes = ["/login", "/register", "/otp", "/forgot", "/reset"];
+
 const AuthContextProvider = ({ children }: { children: any }) => {
     const [isInitializing, setIsInitializing] = useState<boolean>(true);
     const [isShowSlowLoading, setIsShowSlowLoading] = useState<boolean>(false);
@@ -81,7 +83,8 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                     const user = result.data as IUser;
                     useAuthStore.setState({ currentUser: user, isAuthenticated: true });
 
-                    if (pathName === "/login" || pathName === "/register") {
+                    // Redirect if user is authenticated and trying to access public routes
+                    if (publicRoutes.includes(pathName)) {
                         router.push("/");
                     }
 
@@ -90,7 +93,9 @@ const AuthContextProvider = ({ children }: { children: any }) => {
 
                 // If user is not authenticated, redirect to login page
                 if (response.status === 403) {
-                    router.push("/login");
+                    if (!publicRoutes.includes(pathName)) {
+                        router.push("/login");
+                    }
                 }
 
                 // If user authenticated and token is expired, refresh token
