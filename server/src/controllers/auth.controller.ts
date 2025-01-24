@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { CookieOptions, NextFunction, Request, Response } from "express";
 import UserModel, { User, USER_MODEL_HIDDEN_FIELDS } from "../models/user.model";
 import {
     CreateUserInput,
@@ -16,7 +16,6 @@ import { sendEmail } from "../shared/helpers/email-sender";
 import otpGenerator from "otp-generator";
 import { OTPModel } from "../models/otp.model";
 import jwt from "jsonwebtoken";
-import cookieMode from "../shared/configs/cookie";
 import env from "dotenv";
 
 env.config();
@@ -24,6 +23,13 @@ env.config();
 interface RequestWithUser extends Request {
     user: User;
 }
+
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.ENVIRONMENT === "production",
+    path: "/",
+    sameSite: process.env.ENVIRONMENT === "production" ? "none" : "strict",
+} as CookieOptions;
 
 export async function registerHandler(req: Request, res: Response, next: NextFunction) {
     try {
@@ -134,17 +140,11 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
 
         return res
             .cookie("accessToken", accessToken, {
-                httpOnly: true,
-                secure: process.env.ENVIRONMENT === "production" ? true : false,
-                path: "/",
-                sameSite: "none",
+                ...cookieOptions,
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             })
             .cookie("refreshToken", refreshToken, {
-                httpOnly: true,
-                secure: process.env.ENVIRONMENT === "production" ? true : false,
-                path: "/",
-                sameSite: "none",
+                ...cookieOptions,
                 maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             })
             .status(200)
@@ -171,18 +171,8 @@ export async function logoutHandler(_req: Request, res: Response, next: NextFunc
         );
 
         return res
-            .clearCookie("accessToken", {
-                httpOnly: true,
-                secure: process.env.ENVIRONMENT === "production" ? true : false,
-                path: "/",
-                sameSite: "none",
-            })
-            .clearCookie("refreshToken", {
-                httpOnly: true,
-                secure: process.env.ENVIRONMENT === "production" ? true : false,
-                path: "/",
-                sameSite: "none",
-            })
+            .clearCookie("accessToken", cookieOptions)
+            .clearCookie("refreshToken", cookieOptions)
             .status(200)
             .json({ statusCode: 200, message: "Logged out successfully" });
     } catch (error) {
@@ -220,17 +210,11 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
 
         return res
             .cookie("accessToken", newAccessToken, {
-                httpOnly: true,
-                secure: process.env.ENVIRONMENT === "production" ? true : false,
-                path: "/",
-                sameSite: "none",
+                ...cookieOptions,
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             })
             .cookie("refreshToken", newRefreshToken, {
-                httpOnly: true,
-                secure: process.env.ENVIRONMENT === "production" ? true : false,
-                path: "/",
-                sameSite: "none",
+                ...cookieOptions,
                 maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             })
             .status(200)
@@ -377,17 +361,11 @@ export async function googleAuthCallbackHandler(_req: Request, res: Response, ne
 
         return res
             .cookie("accessToken", accessToken, {
-                httpOnly: true,
-                secure: process.env.ENVIRONMENT === "production" ? true : false,
-                path: "/",
-                sameSite: "none",
+                ...cookieOptions,
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             })
             .cookie("refreshToken", refreshToken, {
-                httpOnly: true,
-                secure: process.env.ENVIRONMENT === "production" ? true : false,
-                path: "/",
-                sameSite: "none",
+                ...cookieOptions,
                 maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             })
             .redirect(`${process.env.CLIENT_BASE_URL as string}/login`);

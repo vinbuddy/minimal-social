@@ -1,19 +1,11 @@
-import Image from "next/image";
+import { Spinner } from "@heroui/react";
 
 export default function PageSlowLoading() {
     return (
         <div className="w-screen h-screen flex flex-col items-center justify-center p-5">
-            <Image
-                className="rounded grayscale md:w-[500px] w-[240px]"
-                width={350}
-                height={350}
-                src="/images/slow-loading.gif"
-                alt="background"
-                priority
-            />
+            <Spinner size="lg" color="primary" />
             <h1 className="text-2xl text-black mt-5 font-semibold text-center">
-                Thanks for your patience! Our server is taking its time because <br />
-                well... free things are not always the fastest. 🚀✨
+                Our server is taking its time, <span className="md:inline block">please wait a moment ...</span>
             </h1>
         </div>
     );

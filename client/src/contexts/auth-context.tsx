@@ -71,7 +71,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
             try {
                 timeoutId = setTimeout(() => {
                     setIsShowSlowLoading(true);
-                }, 3000);
+                }, 4000);
 
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
                     credentials: "include",

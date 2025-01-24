@@ -19,9 +19,9 @@ export default function ConversationSkeletons({ length = 1 }: IProps) {
                         <h4>
                             <Skeleton className="h-3 w-3/12 rounded-lg" />
                         </h4>
-                        <span className="mt-2">
+                        <div className="mt-2">
                             <Skeleton className="h-2 w-2/4 rounded-lg" />
-                        </span>
+                        </div>
                     </section>
                 </div>
             ))}
