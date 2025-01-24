@@ -138,7 +138,7 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
                 secure: process.env.ENVIRONMENT === "production" ? true : false,
                 path: "/",
                 sameSite: "none",
-                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             })
             .cookie("refreshToken", refreshToken, {
                 httpOnly: true,
@@ -170,15 +170,11 @@ export async function logoutHandler(_req: Request, res: Response, next: NextFunc
             { new: true }
         );
 
-        if (cookieMode.isCookieMode) {
-            return res
-                .clearCookie("accessToken")
-                .clearCookie("refreshToken")
-                .status(200)
-                .json({ statusCode: 200, message: "Logged out successfully" });
-        }
-
-        return res.status(200).json({ statusCode: 200, message: "Logged out successfully" });
+        return res
+            .clearCookie("accessToken")
+            .clearCookie("refreshToken")
+            .status(200)
+            .json({ statusCode: 200, message: "Logged out successfully" });
     } catch (error) {
         next(error);
     }
@@ -218,7 +214,7 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
                 secure: process.env.ENVIRONMENT === "production" ? true : false,
                 path: "/",
                 sameSite: "none",
-                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
             })
             .cookie("refreshToken", newRefreshToken, {
                 httpOnly: true,
@@ -227,10 +223,6 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
                 sameSite: "none",
                 maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             })
-            .status(200)
-            .json({ statusCode: 200, data: user, accessToken: newAccessToken, refreshToken: newRefreshToken });
-
-        return res
             .status(200)
             .json({ statusCode: 200, data: user, accessToken: newAccessToken, refreshToken: newRefreshToken });
     } catch (error) {
@@ -366,29 +358,29 @@ export async function googleAuthCallbackHandler(_req: Request, res: Response, ne
         await UserModel.findByIdAndUpdate(user._id, { refreshToken });
 
         const { password: _password, refreshToken: _refreshToken, ...userInfo } = user;
-        if (cookieMode.isCookieMode) {
-            const decodedAccessToken = jwt.decode(accessToken) as User & { exp: number; iat: number };
-            const decodedRefreshToken = jwt.decode(refreshToken) as User & { exp: number; iat: number };
 
-            req.logout((err) => {
-                if (err) {
-                    return next(err);
-                }
-            });
+        req.logout((err) => {
+            if (err) {
+                return next(err);
+            }
+        });
 
-            return res
-                .cookie("accessToken", accessToken, {
-                    ...cookieMode.options,
-                    expires: new Date(decodedAccessToken.exp * 1000),
-                })
-                .cookie("refreshToken", refreshToken, {
-                    ...cookieMode.options,
-                    expires: new Date(decodedRefreshToken.exp * 1000),
-                })
-                .redirect(`${process.env.CLIENT_BASE_URL as string}/login`);
-        }
-
-        return res.redirect(`${process.env.CLIENT_BASE_URL as string}/login`);
+        return res
+            .cookie("accessToken", accessToken, {
+                httpOnly: true,
+                secure: process.env.ENVIRONMENT === "production" ? true : false,
+                path: "/",
+                sameSite: "none",
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            })
+            .cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: process.env.ENVIRONMENT === "production" ? true : false,
+                path: "/",
+                sameSite: "none",
+                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            })
+            .redirect(`${process.env.CLIENT_BASE_URL as string}/login`);
     } catch (error) {
         console.log("error: ", error);
         next(error);
