@@ -17,6 +17,9 @@ import otpGenerator from "otp-generator";
 import { OTPModel } from "../models/otp.model";
 import jwt from "jsonwebtoken";
 import cookieMode from "../shared/configs/cookie";
+import env from "dotenv";
+
+env.config();
 
 interface RequestWithUser extends Request {
     user: User;
@@ -129,23 +132,29 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
         await UserModel.findByIdAndUpdate(user._id, { refreshToken });
 
         const { password: _password, refreshToken: _refreshToken, ...userInfo } = user;
-        if (cookieMode.isCookieMode) {
-            const decodedAccessToken = jwt.decode(accessToken) as User & { exp: number; iat: number };
-            const decodedRefreshToken = jwt.decode(refreshToken) as User & { exp: number; iat: number };
-            return res
-                .cookie("accessToken", accessToken, {
-                    ...cookieMode.options,
-                    expires: new Date(decodedAccessToken.exp * 1000),
-                })
-                .cookie("refreshToken", refreshToken, {
-                    ...cookieMode.options,
-                    expires: new Date(decodedRefreshToken.exp * 1000),
-                })
-                .status(200)
-                .json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
-        }
+        // if (cookieMode.isCookieMode) {
+        //     // const decodedAccessToken = jwt.decode(accessToken) as User & { exp: number; iat: number };
+        //     // const decodedRefreshToken = jwt.decode(refreshToken) as User & { exp: number; iat: number };
 
-        return res.status(200).json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
+        // }
+
+        return res
+            .cookie("accessToken", accessToken, {
+                httpOnly: true,
+                secure: process.env.ENVIRONMENT === "production",
+                path: "/",
+                sameSite: "none",
+            })
+            .cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: process.env.ENVIRONMENT === "production",
+                path: "/",
+                sameSite: "none",
+            })
+            .status(200)
+            .json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
+
+        // return res.status(200).json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
     } catch (error) {
         next(error);
     }

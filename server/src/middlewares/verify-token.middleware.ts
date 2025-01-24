@@ -10,12 +10,12 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     let token = null;
     let accessToken = null;
 
-    if (cookieMode.isCookieMode) {
-        accessToken = req.cookies["accessToken"];
-    } else {
-        token = req.headers["authorization"];
-        accessToken = token && token.split(" ")[1];
-    }
+    accessToken = req.cookies["accessToken"];
+    // if (cookieMode.isCookieMode) {
+    // } else {
+    //     token = req.headers["authorization"];
+    //     accessToken = token && token.split(" ")[1];
+    // }
 
     if (!accessToken) {
         return res.status(401).json({ message: "No access token provided" });
