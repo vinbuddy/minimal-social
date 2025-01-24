@@ -171,8 +171,18 @@ export async function logoutHandler(_req: Request, res: Response, next: NextFunc
         );
 
         return res
-            .clearCookie("accessToken")
-            .clearCookie("refreshToken")
+            .clearCookie("accessToken", {
+                httpOnly: true,
+                secure: process.env.ENVIRONMENT === "production" ? true : false,
+                path: "/",
+                sameSite: "none",
+            })
+            .clearCookie("refreshToken", {
+                httpOnly: true,
+                secure: process.env.ENVIRONMENT === "production" ? true : false,
+                path: "/",
+                sameSite: "none",
+            })
             .status(200)
             .json({ statusCode: 200, message: "Logged out successfully" });
     } catch (error) {
