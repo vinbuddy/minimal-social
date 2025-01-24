@@ -1,4 +1,7 @@
 import { CookieOptions } from "express";
+import env from "dotenv";
+
+env.config();
 
 const cookieMode = {
     options: {
