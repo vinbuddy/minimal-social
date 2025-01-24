@@ -6,11 +6,14 @@ import useAuthStore from "../hooks/store/use-auth-store";
 import { IUser } from "../types/user";
 import PageLoading from "@/components/page-loading";
 import dynamic from "next/dynamic";
+import PageSlowLoading from "@/components/page-slow-loading";
 
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
 
 const AuthContextProvider = ({ children }: { children: any }) => {
+    const [isInitializing, setIsInitializing] = useState<boolean>(true);
+    const [isShowSlowLoading, setIsShowSlowLoading] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
     const pathName = usePathname();
@@ -61,7 +64,13 @@ const AuthContextProvider = ({ children }: { children: any }) => {
 
     useEffect(() => {
         const initializeAuth = async () => {
+            let timeoutId: NodeJS.Timeout | null = null;
+
             try {
+                timeoutId = setTimeout(() => {
+                    setIsShowSlowLoading(true);
+                }, 3000);
+
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
                     credentials: "include",
                 });
@@ -91,7 +100,10 @@ const AuthContextProvider = ({ children }: { children: any }) => {
             } catch (error: any) {
                 console.error(error);
             } finally {
+                if (timeoutId) clearTimeout(timeoutId);
                 setLoading(false);
+                setIsInitializing(false);
+                setIsShowSlowLoading(false);
             }
         };
 
@@ -99,6 +111,11 @@ const AuthContextProvider = ({ children }: { children: any }) => {
             initializeAuth();
         }
     }, [pathName, router]);
+
+    if (isInitializing) {
+        if (isShowSlowLoading) return <PageSlowLoading />;
+        return <PageLoading />;
+    }
 
     if (loading) return <PageLoading />;
 
