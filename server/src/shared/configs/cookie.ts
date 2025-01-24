@@ -6,7 +6,7 @@ env.config();
 const cookieMode = {
     options: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: process.env.ENVIRONMENT === "production",
         path: "/",
         sameSite: "strict",
     } as CookieOptions,
