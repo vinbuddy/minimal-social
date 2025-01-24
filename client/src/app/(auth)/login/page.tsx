@@ -12,6 +12,7 @@ import { useAuthStore } from "@/hooks/store";
 import { useLoading } from "@/hooks";
 import { IUser } from "@/types/user";
 import { GoogleIcon } from "@/assets/icons";
+import { showToast } from "@/utils/toast";
 
 interface IUserLogin {
     password: string;
@@ -59,6 +60,8 @@ export default function LoginPage() {
             }
 
             router.push("/");
+
+            showToast("Login successfully", "success");
         } catch (error: any) {
             setError("root.server", {
                 type: "server",
