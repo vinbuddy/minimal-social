@@ -12,6 +12,7 @@ export const useAuthContext = () => useContext(AuthContext);
 
 const AuthContextProvider = ({ children }: { children: any }) => {
     const [loading, setLoading] = useState<boolean>(false);
+
     const pathName = usePathname();
     const router = useRouter();
 
@@ -33,6 +34,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
 
     const refreshToken = async () => {
         try {
+            setLoading(true);
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh`, {
                 method: "POST",
                 credentials: "include",
@@ -47,26 +49,25 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                 const user = result.data as IUser;
                 useAuthStore.setState({ currentUser: user, isAuthenticated: true });
             }
-
-            if (response.status === 403) {
-                await logout();
-            }
         } catch (error: any) {
             console.error(error);
             useAuthStore.setState({ currentUser: null, isAuthenticated: false });
+
+            await logout();
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
         const initializeAuth = async () => {
             try {
-                setLoading(true);
-
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
                     credentials: "include",
                 });
                 const result = await response.json();
 
+                // If user is authenticated, set user to store
                 if (response.status === 200) {
                     const user = result.data as IUser;
                     useAuthStore.setState({ currentUser: user, isAuthenticated: true });
@@ -78,6 +79,12 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                     return;
                 }
 
+                // If user is not authenticated, redirect to login page
+                if (response.status === 403) {
+                    router.push("/login");
+                }
+
+                // If user authenticated and token is expired, refresh token
                 if (response.status === 401) {
                     await refreshToken();
                 }
@@ -99,4 +106,3 @@ const AuthContextProvider = ({ children }: { children: any }) => {
 };
 
 export default dynamic(() => Promise.resolve(AuthContextProvider), { ssr: false });
-// export default AuthContextProvider;

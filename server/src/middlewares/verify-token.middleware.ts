@@ -7,18 +7,12 @@ import cookieMode from "../shared/configs/cookie";
 dotenv.config();
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    let token = null;
     let accessToken = null;
 
     accessToken = req.cookies["accessToken"];
-    // if (cookieMode.isCookieMode) {
-    // } else {
-    //     token = req.headers["authorization"];
-    //     accessToken = token && token.split(" ")[1];
-    // }
 
     if (!accessToken) {
-        return res.status(401).json({ message: "No access token provided" });
+        return res.status(403).json({ message: "No access token provided" });
     }
 
     try {
