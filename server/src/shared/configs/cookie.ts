@@ -8,7 +8,8 @@ const cookieMode = {
         httpOnly: true,
         secure: process.env.ENVIRONMENT === "production",
         path: "/",
-        sameSite: "strict",
+        sameSite: "none",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     } as CookieOptions,
     isCookieMode: process.env.COOKIE_MODE === "true",
 };

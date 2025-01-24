@@ -128,33 +128,27 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
         const refreshToken = generateToken(user, "refresh");
 
         user.refreshToken = refreshToken;
-        // await user.save({ validateBeforeSave: false });
         await UserModel.findByIdAndUpdate(user._id, { refreshToken });
 
         const { password: _password, refreshToken: _refreshToken, ...userInfo } = user;
-        // if (cookieMode.isCookieMode) {
-        //     // const decodedAccessToken = jwt.decode(accessToken) as User & { exp: number; iat: number };
-        //     // const decodedRefreshToken = jwt.decode(refreshToken) as User & { exp: number; iat: number };
-
-        // }
 
         return res
             .cookie("accessToken", accessToken, {
                 httpOnly: true,
-                secure: process.env.ENVIRONMENT === "production",
+                secure: process.env.ENVIRONMENT === "production" ? true : false,
                 path: "/",
                 sameSite: "none",
+                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             })
             .cookie("refreshToken", refreshToken, {
                 httpOnly: true,
-                secure: process.env.ENVIRONMENT === "production",
+                secure: process.env.ENVIRONMENT === "production" ? true : false,
                 path: "/",
                 sameSite: "none",
+                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             })
             .status(200)
             .json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
-
-        // return res.status(200).json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
     } catch (error) {
         next(error);
     }
@@ -195,11 +189,7 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
     try {
         let refreshToken = null;
 
-        if (cookieMode.isCookieMode) {
-            refreshToken = req.cookies.refreshToken;
-        } else {
-            refreshToken = req.headers["authorization"]?.split(" ")[1];
-        }
+        refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
             return res.status(404).json({ statusCode: 401, message: "Refresh token not found" });
@@ -216,37 +206,29 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
             return res.status(404).json({ statusCode: 404, message: "User not found" });
         }
 
-        // if (user.refreshToken !== refreshToken) {
-        //     return res.status(403).json({ statusCode: 403, message: "Invalid refresh token" });
-        // }
-
-        // // Check if the refresh token is expired
-        // const currentTime = Date.now() / 1000;
-        // if (decoded.exp < currentTime) {
-        //     return res.status(403).json({ statusCode: 403, message: "Refresh token expired" });
-        // }
-
         const newAccessToken = generateToken(user, "access");
         const newRefreshToken = generateToken(user, "refresh");
 
         user.refreshToken = newRefreshToken;
         await user.save({ validateBeforeSave: false });
 
-        if (cookieMode) {
-            const decodedAccessToken = jwt.decode(newAccessToken) as User & { exp: number; iat: number };
-            const decodedRefreshToken = jwt.decode(newRefreshToken) as User & { exp: number; iat: number };
-            return res
-                .cookie("accessToken", newAccessToken, {
-                    ...cookieMode.options,
-                    expires: new Date(decodedAccessToken.exp * 1000),
-                })
-                .cookie("refreshToken", newRefreshToken, {
-                    ...cookieMode.options,
-                    expires: new Date(decodedRefreshToken.exp * 1000),
-                })
-                .status(200)
-                .json({ statusCode: 200, data: user, accessToken: newAccessToken, refreshToken: newRefreshToken });
-        }
+        return res
+            .cookie("accessToken", newAccessToken, {
+                httpOnly: true,
+                secure: process.env.ENVIRONMENT === "production" ? true : false,
+                path: "/",
+                sameSite: "none",
+                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            })
+            .cookie("refreshToken", newRefreshToken, {
+                httpOnly: true,
+                secure: process.env.ENVIRONMENT === "production" ? true : false,
+                path: "/",
+                sameSite: "none",
+                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+            })
+            .status(200)
+            .json({ statusCode: 200, data: user, accessToken: newAccessToken, refreshToken: newRefreshToken });
 
         return res
             .status(200)
