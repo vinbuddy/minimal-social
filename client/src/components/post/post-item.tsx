@@ -156,7 +156,7 @@ export default function PostItem({ post: _post }: IProps) {
                                     post={post}
                                     open={openEditModal}
                                     setOpen={setOpenEditModal}
-                                    type="edit"
+                                    actionType="edit"
                                 >
                                     <div></div>
                                 </PostModalButton>
