@@ -357,18 +357,18 @@ export async function googleAuthCallbackHandler(_req: Request, res: Response, ne
             if (err) {
                 return next(err);
             }
-        });
 
-        return res
-            .cookie("accessToken", accessToken, {
-                ...cookieOptions,
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-            })
-            .cookie("refreshToken", refreshToken, {
-                ...cookieOptions,
-                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-            })
-            .redirect(`${process.env.CLIENT_BASE_URL as string}/login`);
+            return res
+                .cookie("accessToken", accessToken, {
+                    ...cookieOptions,
+                    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                })
+                .cookie("refreshToken", refreshToken, {
+                    ...cookieOptions,
+                    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+                })
+                .redirect(`${process.env.CLIENT_BASE_URL as string}/login`);
+        });
     } catch (error) {
         console.log("error: ", error);
         next(error);
