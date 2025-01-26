@@ -19,12 +19,10 @@ export function initializeLoginWithGoogleService() {
                         email: profile.emails?.[0].value,
                     }).lean();
 
-                    if (userFound) done(null, userFound);
-
                     // Login
                     if (userFound && userFound.googleId === profile.id) {
-                        console.log("userFound.googleId: ", userFound.googleId);
-                        done(null, userFound);
+                        console.log("USER LOGIN WITH GOOGLE");
+                        return done(null, userFound);
                     }
 
                     // Login and update googleId
@@ -37,8 +35,13 @@ export function initializeLoginWithGoogleService() {
                             { new: true }
                         );
 
-                        console.log("user update: ", user);
-                        if (user) done(null, user);
+                        console.log("USER LOGIN AND UPDATE GOOGLE ID");
+                        if (user) return done(null, user);
+                    }
+
+                    // Login with existed googleId
+                    if (userFound) {
+                        return done(null, userFound);
                     }
 
                     // Register new user
@@ -50,11 +53,12 @@ export function initializeLoginWithGoogleService() {
                             photo: profile.photos?.[0].value,
                         });
 
-                        console.log("user: ", user);
-                        done(null, user);
+                        console.log("USER REGISTER WITH GOOGLE");
+
+                        return done(null, user);
                     }
                 } catch (error) {
-                    done(error);
+                    return done(error);
                 }
             }
         )
