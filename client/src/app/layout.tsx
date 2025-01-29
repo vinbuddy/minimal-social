@@ -5,9 +5,8 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 import { SocketProvider } from "@/contexts/socket-context";
-import { HeroProvider as NextUIProvider, SWRConfigProvider } from "./providers";
+import { HeroProvider as NextUIProvider, StreamProvider, SWRConfigProvider } from "./providers";
 import dynamic from "next/dynamic";
-// import AuthContextProvider from "@/contexts/auth-context";
 
 const AuthContextProvider = dynamic(() => import("@/contexts/auth-context"), {
     ssr: false,
@@ -32,8 +31,10 @@ export default function RootLayout({
                     <NextUIProvider>
                         <SWRConfigProvider>
                             <SocketProvider>
-                                {children}
-                                <Toaster />
+                                <StreamProvider>
+                                    {children}
+                                    <Toaster />
+                                </StreamProvider>
                             </SocketProvider>
                         </SWRConfigProvider>
                     </NextUIProvider>
