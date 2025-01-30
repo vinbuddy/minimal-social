@@ -54,6 +54,7 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
             },
             tokenProvider: streamTokenProvider,
         });
+        console.log("client: ", client);
 
         setStreamVideoClient(client);
     }, [currentUser]);

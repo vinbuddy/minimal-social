@@ -17,6 +17,7 @@ import { IMediaFile } from "@/types/post";
 import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/media-file";
 import { showToast } from "@/utils/toast";
 import { useIsBlockMode, useOtherUserConversation } from "@/hooks";
+import CallSetupModal from "@/components/call/call-setup-modal";
 
 function ConversationDetailPage() {
     const [isOpenConversationInfo, setIsOpenConversationInfo] = useState<boolean>(false);
@@ -123,11 +124,15 @@ function ConversationDetailPage() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <Tooltip content="Call">
-                                <Button size="sm" isIconOnly color="default" variant="light">
-                                    <Phone size={18} />
-                                </Button>
-                            </Tooltip>
+                            <Button size="sm" isIconOnly color="default" variant="light">
+                                <CallSetupModal>
+                                    <div className="size-full">
+                                        <Phone size={18} />
+                                    </div>
+                                </CallSetupModal>
+                            </Button>
+                            {/* <Tooltip content="Call">
+                            </Tooltip> */}
                             <Tooltip content="Video call">
                                 <Button size="sm" isIconOnly color="default" variant="light">
                                     <Video size={18} />

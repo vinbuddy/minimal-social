@@ -7,7 +7,7 @@ import { useBreakpoint, useItemClick } from "@/hooks";
 import { IConversation } from "@/types/conversation";
 import { ConversationContext } from "@/contexts/conversation-context";
 
-export default function ConversationLayout({ children }: { children: React.ReactNode }) {
+export default function ChatLayout({ children }: { children: React.ReactNode }) {
     const breakpoint = useBreakpoint();
     const { item: itemClicked, onItemClick } = useItemClick<IConversation>();
 
