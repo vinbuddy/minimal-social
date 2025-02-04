@@ -126,9 +126,7 @@ function ConversationDetailPage() {
                         <div className="flex items-center gap-2">
                             <Button size="sm" isIconOnly color="default" variant="light">
                                 <CallSetupModal>
-                                    <div className="size-full">
-                                        <Phone size={18} />
-                                    </div>
+                                    <Phone size={18} />
                                 </CallSetupModal>
                             </Button>
                             {/* <Tooltip content="Call">

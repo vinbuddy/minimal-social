@@ -39,7 +39,6 @@ export default function CallSetupModal({ children }: IProps) {
 
     const [isCameraDisabled, setIsCameraDisabled] = useState(false);
     const [isMicDisabled, setIsMicDisabled] = useState(false);
-    console.log("isMicDisabled: ", isMicDisabled);
 
     const client = useStreamVideoClient();
 
@@ -50,7 +49,6 @@ export default function CallSetupModal({ children }: IProps) {
                 setIsCameraDisabled(cameraPermission.state == "denied");
 
                 const micPermission = await navigator.permissions.query({ name: "microphone" as PermissionName });
-                console.log("micPermission: ", micPermission);
                 setIsMicDisabled(micPermission.state == "denied");
 
                 // cameraPermission.onchange = () => setIsCameraDisabled(cameraPermission.state === "denied");
@@ -82,7 +80,7 @@ export default function CallSetupModal({ children }: IProps) {
                 if (calls.length > 0) {
                     setCall(calls[0]);
                 } else {
-                    // Nếu không có cuộc gọi nào, tạo một cuộc gọi mới
+                    // Create new call if not found
                     const newCall = client.call("default", id);
                     await newCall.create();
                     setCall(newCall);
@@ -117,8 +115,17 @@ export default function CallSetupModal({ children }: IProps) {
 
     return (
         <>
-            <div onClick={onOpen}>{children}</div>
-            <Modal size="5xl" scrollBehavior="inside" isOpen={isOpen} onOpenChange={onOpenChange}>
+            <div className="size-full flex items-center justify-center" onClick={onOpen}>
+                {children}
+            </div>
+            <Modal
+                isDismissable={false}
+                backdrop="blur"
+                size="4xl"
+                scrollBehavior="inside"
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+            >
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -126,27 +133,25 @@ export default function CallSetupModal({ children }: IProps) {
                             <ModalBody id="call-setup" className="py-0 px-6 scrollbar">
                                 {call && (
                                     <StreamCall call={call}>
-                                        <StreamTheme>
-                                            {/* <SpeakerLayout /> */}
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        <StreamTheme className="h-full">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 h-full">
                                                 <section>
-                                                    <div className="flex-1 min-h-[250px] rounded-xl overflow-hidden bg-content2 border border-default relative">
-                                                        <div className="absolute inset-0">
-                                                            <VideoPreview
-                                                                className={cn(
-                                                                    "w-full h-full text-default-500",
-                                                                    "[&>div]:flex",
-                                                                    "[&>div]:h-full",
-                                                                    "[&>div]:items-center",
-                                                                    "[&>div]:justify-center"
-                                                                )}
-                                                            />
-                                                        </div>
+                                                    <div className="h-full overflow-hidden rounded-2xl bg-content2">
+                                                        <VideoPreview
+                                                            className={cn(
+                                                                "w-full h-full text-default-500",
+                                                                "[&>div]:flex",
+                                                                "[&>div]:h-full",
+                                                                "[&>div]:items-center",
+                                                                "[&>div]:justify-center",
+                                                                "[&>video]:h-full"
+                                                            )}
+                                                        />
                                                     </div>
                                                 </section>
 
                                                 <section className="flex flex-col justify-between">
-                                                    <h3>
+                                                    <h3 className="mb-5">
                                                         Call id: <Chip>{call?.id}</Chip>
                                                     </h3>
                                                     {/* CAM CONTROL */}
@@ -192,8 +197,13 @@ export default function CallSetupModal({ children }: IProps) {
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center gap-5">
-                                                        <Button fullWidth color="default" variant="light">
+                                                    <div className="flex items-center gap-5 mt-5">
+                                                        <Button
+                                                            fullWidth
+                                                            color="default"
+                                                            variant="light"
+                                                            onPress={onClose}
+                                                        >
                                                             Cancel
                                                         </Button>
                                                         <Button fullWidth color="primary">
