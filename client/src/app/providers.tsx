@@ -10,6 +10,7 @@ import { fetcher } from "@/utils/http-request";
 import { streamTokenProvider } from "./actions";
 import PageLoading from "@/components/page-loading";
 import { useAuthStore } from "@/hooks/store";
+import { usePathname } from "next/navigation";
 
 export function SWRConfigProvider({ children }: { children: React.ReactNode }) {
     return (
@@ -41,6 +42,9 @@ export function HeroProvider({ children }: { children: React.ReactNode }) {
 export function StreamProvider({ children }: { children: React.ReactNode }) {
     const [streamVideoClient, setStreamVideoClient] = useState<StreamVideoClient>();
     const { currentUser } = useAuthStore();
+    const pathName = usePathname();
+
+    const publicRoutes = ["/login", "/register", "/otp", "/forgot", "/reset"];
 
     useEffect(() => {
         if (!currentUser) return;
@@ -58,6 +62,8 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
 
         setStreamVideoClient(client);
     }, [currentUser]);
+
+    if (publicRoutes.includes(pathName)) return <>{children}</>;
 
     if (!streamVideoClient) return <PageLoading />;
 

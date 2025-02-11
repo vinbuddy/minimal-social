@@ -75,8 +75,10 @@ export default function MessageContent({ message, isOwnMessage, conversation }: 
     };
 
     const getThemeStyle = (): CSSProperties | undefined => {
+        const isHasTheme = conversation?.theme?.color;
+
         return isOwnMessage && !isEmojiMessageOnly(message?.content)
-            ? { backgroundColor: conversation?.theme?.color, color: "white" }
+            ? { backgroundColor: conversation?.theme?.color, color: isHasTheme ? "white" : undefined }
             : undefined;
     };
 

@@ -85,6 +85,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
 
                     // Redirect if user is authenticated and trying to access public routes
                     if (publicRoutes.includes(pathName)) {
+                        setIsInitializing(false);
                         router.push("/");
                     }
 
@@ -94,6 +95,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                 // If user is not authenticated, redirect to login page
                 if (response.status === 403) {
                     if (!publicRoutes.includes(pathName)) {
+                        setIsInitializing(false);
                         router.push("/login");
                     }
                 }
