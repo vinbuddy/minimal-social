@@ -19,7 +19,10 @@ export const streamTokenProvider = async () => {
     const user = result.data as IUser;
     const streamClient = new StreamClient(process.env.NEXT_PUBLIC_STREAM_API_KEY!, process.env.STREAM_SECRET_KEY!);
 
-    const token = streamClient.generateUserToken({ user_id: user._id });
+    const now = Math.floor(Date.now() / 1000);
+    const adjustedIat = now - 10;
+
+    const token = streamClient.generateUserToken({ user_id: user._id, iat: adjustedIat });
 
     return token;
 };

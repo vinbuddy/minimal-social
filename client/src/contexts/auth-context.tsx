@@ -7,11 +7,10 @@ import { IUser } from "../types/user";
 import PageLoading from "@/components/page-loading";
 import dynamic from "next/dynamic";
 import PageSlowLoading from "@/components/page-slow-loading";
+import { PUBLIC_ROUTES } from "@/constants/route";
 
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
-
-const publicRoutes = ["/login", "/register", "/otp", "/forgot", "/reset"];
 
 const AuthContextProvider = ({ children }: { children: any }) => {
     const [isInitializing, setIsInitializing] = useState<boolean>(true);
@@ -77,14 +76,19 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                     credentials: "include",
                 });
                 const result = await response.json();
+                const user = result.data as IUser;
 
-                // If user is authenticated, set user to store
                 if (response.status === 200) {
-                    const user = result.data as IUser;
                     useAuthStore.setState({ currentUser: user, isAuthenticated: true });
 
+                    if (user?.isAdmin && PUBLIC_ROUTES.includes(pathName)) {
+                        setIsInitializing(false);
+                        router.push("/admin");
+                        return;
+                    }
+
                     // Redirect if user is authenticated and trying to access public routes
-                    if (publicRoutes.includes(pathName)) {
+                    if (PUBLIC_ROUTES.includes(pathName)) {
                         setIsInitializing(false);
                         router.push("/");
                     }
@@ -94,7 +98,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
 
                 // If user is not authenticated, redirect to login page
                 if (response.status === 403) {
-                    if (!publicRoutes.includes(pathName)) {
+                    if (!PUBLIC_ROUTES.includes(pathName)) {
                         setIsInitializing(false);
                         router.push("/login");
                     }
@@ -108,6 +112,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                 console.error(error);
             } finally {
                 if (timeoutId) clearTimeout(timeoutId);
+
                 setLoading(false);
                 setIsInitializing(false);
                 setIsShowSlowLoading(false);
@@ -120,11 +125,16 @@ const AuthContextProvider = ({ children }: { children: any }) => {
     }, [pathName, router]);
 
     if (isInitializing) {
-        if (isShowSlowLoading) return <PageSlowLoading />;
+        if (isShowSlowLoading) {
+            return <PageSlowLoading />;
+        }
+
         return <PageLoading />;
     }
 
-    if (loading) return <PageLoading />;
+    if (loading) {
+        return <PageLoading />;
+    }
 
     return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
 };
