@@ -9,6 +9,8 @@ import ConfirmationModal from "../confirmation-modal";
 import axiosInstance from "@/utils/http-request";
 import { IPost } from "@/types/post";
 import { useCopyToClipboard, useGlobalMutation, useIsOwner } from "@/hooks";
+import { useTranslation } from "react-i18next";
+import { TranslationNameSpace } from "@/types/translation";
 
 interface IProps {
     children: React.ReactNode | React.JSX.Element | React.ReactElement;
@@ -31,14 +33,17 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
     const mutate = useGlobalMutation();
     const isOwner = useIsOwner(post?.postBy?._id);
     const copy = useCopyToClipboard();
+    const { t: tPost } = useTranslation<TranslationNameSpace>("post");
 
     const handleDeletePost = async () => {
         try {
             if (!post) return;
-            const response = await axiosInstance.delete(`/post/${post._id}`);
+
+            await axiosInstance.delete(`/post/${post._id}`);
 
             mutate((key) => typeof key === "string" && key.includes("/post"));
-            toast.success("Delete post successfully", {
+
+            toast.success(tPost("POST_DELETED_SUCCESS"), {
                 position: "bottom-center",
             });
         } catch (error: any) {
@@ -50,13 +55,13 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
     const items: PostMenuItem[] = [
         {
             key: "copy",
-            content: "Copy link",
+            content: tPost("POST_MENU.COPY_LINK"),
             icon: <LinkIcon size={18} />,
             onClick: () => copy(`${window.location.origin}/post/${post._id}`),
         },
         {
             key: "detail",
-            content: "View post",
+            content: tPost("POST_MENU.VIEW_POST"),
             icon: <EyeIcon size={18} />,
             href: `/post/${post._id}`,
         },
@@ -65,14 +70,14 @@ export default function PostMenuDropdown({ children, post, onOpenEditModal }: IP
     const ownerItems: PostMenuItem[] = [
         {
             key: "edit",
-            content: "Edit post",
+            content: tPost("POST_MENU.EDIT"),
             icon: <WandSparkles size={18} />,
             onClick: () => onOpenEditModal && onOpenEditModal(),
         },
         ...items,
         {
             key: "delete",
-            content: "Delete post",
+            content: tPost("POST_MENU.DELETE"),
             icon: <TrashIcon size={18} />,
             color: "danger",
             className: "text-danger",

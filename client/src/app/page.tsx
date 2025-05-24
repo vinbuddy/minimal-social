@@ -13,11 +13,13 @@ import { usePagination } from "@/hooks";
 import { IPost } from "@/types/post";
 import { useSocketContext } from "@/contexts/socket-context";
 import ErrorMessage from "@/components/error-message";
+import { useTranslation } from "react-i18next";
+import { TranslationNameSpace } from "@/types/translation";
 
 function Home() {
     const [postType, setPostType] = useState<"feed" | "following" | "liked">("feed");
     const { currentUser } = useAuthStore();
-    const { socket } = useSocketContext();
+    const { t: tPost } = useTranslation<TranslationNameSpace>("post");
 
     const getURL = () => {
         switch (postType) {
@@ -52,9 +54,9 @@ function Home() {
                             aria-label="Tabs colors"
                             radius="md"
                         >
-                            <Tab key="feed" title="Feed" />
-                            <Tab key="following" title="Following" />
-                            <Tab key="liked" title="Liked" />
+                            <Tab key="feed" title={tPost("POST_FEED")} />
+                            <Tab key="following" title={tPost("POST_FOLLOWING")} />
+                            <Tab key="liked" title={tPost("POST_LIKED")} />
                         </Tabs>
 
                         <PostModalButton />

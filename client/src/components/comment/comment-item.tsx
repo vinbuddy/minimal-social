@@ -17,6 +17,7 @@ import { HeartIcon } from "@/assets/icons";
 import { IComment } from "@/types/comment";
 import { usePagination } from "@/hooks";
 import { useAuthStore, useReplyStore } from "@/hooks/store";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     comment: IComment;
@@ -32,6 +33,8 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
     const [likeCount, setLikeCount] = useState<number>(comment?.likeCount ?? 0);
 
     const [isOpenReply, setIsOpenReply] = useState<boolean>(false);
+
+    const { t } = useTranslation("common");
 
     const {
         data: replies,
@@ -158,7 +161,7 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                             </button>
 
                             <button onClick={() => handleReply(comment)} className="px-2 ">
-                                Reply
+                                {t("REPLY")}
                             </button>
 
                             <div>

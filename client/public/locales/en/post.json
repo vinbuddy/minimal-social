@@ -1,5 +1,20 @@
 {
-    "POST_CREATED_SUCCESS": "Post created successfully.",
-    "POST_EDITED_SUCCESS": "Post edited successfully.",
-    "POST_MENTIONED_YOU": "mentioned in a post."
+    "POST_CREATED_SUCCESS": "Post created successfully",
+    "POST_EDITED_SUCCESS": "Post edited successfully",
+    "POST_DELETED_SUCCESS": "Post deleted successfully",
+    "POST_MENTIONED_YOU": "mentioned in a post",
+    "POST_IS_EDITED": "This post is edited",
+    "POST_IS_REPOSTED": "Reposted",
+    "POST_FEED": "Your feed",
+    "POST_FOLLOWING": "Following",
+    "POST_LIKED": "Liked",
+
+    "POST_MENU.EDIT": "Edit post",
+    "POST_MENU.DELETE": "Delete post",
+    "POST_MENU.COPY_LINK": "Copy link",
+    "POST_MENU.VIEW_POST": "View post",
+
+    "POST_DETAIL.SEE_ACTIVITY": "See activities",
+    "POST_DETAIL.ACTIVITY": "Post activities",
+    "POST_DETAIL.ACTIVITY_EMPTY": "This post has not activated yet"
 }

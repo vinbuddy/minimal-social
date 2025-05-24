@@ -3,5 +3,9 @@
     "EDIT": "Edit",
     "CLOSE": "Close",
     "DELETE": "Delete",
-    "POST": "Post"
+    "POST": "Post",
+    "REPOST": "Repost",
+    "LIKE": "Like",
+    "COMMENT": "Comment",
+    "REPLY": "Reply"
 }

@@ -1,12 +1,13 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { BanIcon, LanguagesIcon, LockIcon } from "lucide-react";
 import { Button } from "@heroui/react";
 import cn from "classnames";
 
 import BackButton from "../components/back-button";
 import Link from "next/link";
+import { useAuthStore } from "@/hooks/store";
 
 interface IProps {
     children: React.ReactNode;
@@ -25,13 +26,15 @@ const navLinks = [
     },
     {
         content: "Languages",
-        href: "/setting/languages",
+        href: "/setting/language",
         icon: <LanguagesIcon size={16} />,
     },
 ];
 
 export default function SettingLayout({ children }: IProps) {
     const pathName = usePathname();
+    const router = useRouter();
+    const { currentUser } = useAuthStore();
 
     return (
         <div className="contain-none md:container">
@@ -39,7 +42,11 @@ export default function SettingLayout({ children }: IProps) {
                 <div className="col-span-4 md:col-span-3">
                     <aside className="h-screen flex flex-col sticky top-0 z-[1] p-5 overflow-y-auto scrollbar border-r border-default">
                         <div className="flex items-center gap-4">
-                            <BackButton />
+                            <BackButton
+                                onPress={() => {
+                                    router.push(`/profile/${currentUser?._id}`);
+                                }}
+                            />
                             <span className="text-lg">Setting</span>
                         </div>
                         <ul className="mt-5">

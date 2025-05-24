@@ -8,7 +8,7 @@ i18n.use(Backend)
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
-        lng: "en",
+        lng: "vi",
         fallbackLng: "en",
         supportedLngs: ["en", "vi"],
         ns: ["common", "post", "comment", "user"],

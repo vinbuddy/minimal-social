@@ -27,6 +27,8 @@ import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
 import { usePagination } from "@/hooks";
 import ErrorMessage from "../error-message";
+import { useTranslation } from "react-i18next";
+import { TranslationNameSpace } from "@/types/translation";
 
 interface IProps extends ButtonProps {
     post: IPost;
@@ -35,6 +37,8 @@ interface IProps extends ButtonProps {
 export default function PostActivitiesModalButton({ post, ...rest }: IProps) {
     const [activity, setActivity] = useState<"like" | "repost">("like");
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const { t: tPost } = useTranslation<TranslationNameSpace>("post");
+    const { t } = useTranslation<TranslationNameSpace>("common");
 
     const getURL = () => {
         switch (activity) {
@@ -106,18 +110,17 @@ export default function PostActivitiesModalButton({ post, ...rest }: IProps) {
                     {(onClose) => (
                         <>
                             <ModalHeader className="flex items-center justify-between">
-                                Post Activities
+                                {tPost("POST_DETAIL.ACTIVITY")}
                                 <Tabs
                                     onSelectionChange={(key) => setActivity(key.toString() as typeof activity)}
                                     size="sm"
-                                    // variant="solid"
                                 >
                                     <Tab
                                         key="like"
                                         title={
                                             <div className="flex items-center space-x-2">
                                                 <HeartIcon size={18} />
-                                                <span>Likes</span>
+                                                <span>{t("LIKE")}</span>
                                                 <Chip size="sm" variant="faded">
                                                     {post.likeCount ?? 0}
                                                 </Chip>
@@ -129,7 +132,7 @@ export default function PostActivitiesModalButton({ post, ...rest }: IProps) {
                                         title={
                                             <div className="flex items-center space-x-2">
                                                 <RepostIcon size={18} />
-                                                <span>Repost</span>
+                                                <span>{t("REPOST")}</span>
                                                 <Chip size="sm" variant="faded">
                                                     {post?.repostCount ?? 0}
                                                 </Chip>
@@ -142,7 +145,7 @@ export default function PostActivitiesModalButton({ post, ...rest }: IProps) {
                                 <div>
                                     {error && !isLoading && <ErrorMessage error={error} className="text-center" />}
                                     {users.length === 0 && !isLoading && !error && (
-                                        <p className="text-center">This post has not activated yet</p>
+                                        <p className="text-center">{tPost("POST_DETAIL.ACTIVITY_EMPTY")}</p>
                                     )}
                                     {!error && users.length > 0 && (
                                         <InfiniteScroll
