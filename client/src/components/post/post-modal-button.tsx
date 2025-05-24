@@ -27,6 +27,8 @@ import { useAuthStore } from "@/hooks/store";
 import { useBreakpoint, useGlobalMutation, useLoading } from "@/hooks";
 import { showToast } from "@/utils/toast";
 import { useTranslation } from "react-i18next";
+import { TranslationNameSpace } from "@/types/translation";
+import { ENV } from "@/config/env";
 
 interface IProps extends ButtonProps {
     isResponsive?: boolean;
@@ -58,7 +60,8 @@ export default function PostModalButton({
     const contentRef = useRef<HTMLDivElement>(null);
     const popoverRef = useRef<HTMLDivElement>(null);
 
-    const { t } = useTranslation("common");
+    const { t } = useTranslation<TranslationNameSpace>("common");
+    const { t: tPost } = useTranslation<TranslationNameSpace>("post");
 
     useEffect(() => {
         setIsOpen(open ?? false);
@@ -230,7 +233,7 @@ export default function PostModalButton({
         }
 
         try {
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/post`, formData, {
+            const response = await axios.post(`${ENV.API_BASE_URL}/post`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -259,7 +262,7 @@ export default function PostModalButton({
             setIsOpen(false);
             setOpen && setOpen(false);
 
-            showToast("Post created successfully.", "success");
+            showToast(tPost("POST_CREATED_SUCCESS"), "success");
         } catch (error: any) {
             showToast(error.response.data.message, "error");
         } finally {
@@ -281,7 +284,7 @@ export default function PostModalButton({
         startLoading();
 
         try {
-            const response = await axiosInstance.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/post`, {
+            const response = await axiosInstance.put(`${ENV.API_BASE_URL}/post`, {
                 caption,
                 postId: post?._id,
             });
@@ -293,7 +296,7 @@ export default function PostModalButton({
             setIsOpen(false);
             setOpen && setOpen(false);
 
-            toast.success("Post edited successfully.", { position: "bottom-center" });
+            toast.success(tPost("POST_EDITED_SUCCESS"), { position: "bottom-center" });
         } catch (error: any) {
             toast.error("Failed to edit post.", { position: "bottom-center" });
             toast.error(error.response.data.message, { position: "bottom-center" });
@@ -384,7 +387,7 @@ export default function PostModalButton({
                                 setOpen && setOpen(false);
                             }}
                         >
-                            Close
+                            {t("CLOSE")}
                         </Button>
                     )}
                     <Button
@@ -396,7 +399,7 @@ export default function PostModalButton({
                         variant="bordered"
                         isLoading={loading}
                     >
-                        {actionType === "create" ? "Post" : "Edit"}
+                        {actionType === "create" ? t("POST") : t("EDIT")}
                     </Button>
                 </div>
             </div>

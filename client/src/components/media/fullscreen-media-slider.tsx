@@ -12,7 +12,6 @@ import "swiper/css/scrollbar";
 
 import { IMediaFile } from "@/types/post";
 import VideoPlayer from "./video-player";
-import { useVideoStore } from "@/hooks/store";
 
 interface IProps {
     mediaFiles: IMediaFile[];
@@ -25,8 +24,6 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
     const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
     const [activeSlide, setActiveSlide] = useState<number>(activeSlideIndex);
     const swiperRef = useRef<any>(null);
-
-    const { turnOffFullscreenVideo } = useVideoStore();
 
     useEffect(() => {
         if (swiperRef.current && isOpen) {
@@ -49,7 +46,6 @@ function FullScreenMediaSlider({ isOpen = false, activeSlideIndex = 0, mediaFile
         const currentSlide = videoRefs.current[activeSlide];
 
         if (mediaFiles[activeSlide].type === "video" && currentSlide) {
-            // turnOffFullscreenVideo(currentSlide?.src);
             currentSlide.pause();
             currentSlide.muted = true;
 

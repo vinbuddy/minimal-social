@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
 import { useAuthStore } from "@/hooks/store";
+import { ENV } from "@/config/env";
 
 interface SocketContextType {
     socket: Socket | null;
@@ -17,7 +18,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     useEffect(() => {
         if (!currentUser) return;
 
-        const newSocket = io(process.env.NEXT_PUBLIC_API_BASE_URL as string, {
+        const newSocket = io(ENV.API_BASE_URL as string, {
             withCredentials: true,
         });
 

@@ -9,6 +9,7 @@ import { Button, Input } from "@heroui/react";
 import axios from "axios";
 
 import { useLoading } from "@/hooks";
+import { ENV } from "@/config/env";
 
 interface IUserRegister {
     username: string;
@@ -37,7 +38,7 @@ export default function RegisterPage() {
             // Send email otp
             startLoading();
             const response = await axios.post(
-                (process.env.NEXT_PUBLIC_API_BASE_URL as string) + "/auth/register",
+                (ENV.API_BASE_URL as string) + "/auth/register",
                 {
                     username: data.username,
                     email: data.email,
@@ -65,7 +66,7 @@ export default function RegisterPage() {
     };
 
     return (
-        (<div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-12">
             <div className="mx-auto grid w-[350px] gap-6">
                 <div className="grid gap-2 text-center">
                     <h1 className="text-3xl font-bold">Sign up</h1>
@@ -210,6 +211,6 @@ export default function RegisterPage() {
                     </Link>
                 </div>
             </div>
-        </div>)
+        </div>
     );
 }

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 import { useAuthStore } from "@/hooks/store";
 import { useLoading } from "@/hooks";
+import { ENV } from "@/config/env";
 
 interface IUserResetPassword {
     password: string;
@@ -49,7 +50,7 @@ export default function ResetPage({ searchParams }: { searchParams: { toEmail: s
             if (!searchParams?.toEmail) return;
 
             const response = await axios.post(
-                (process.env.NEXT_PUBLIC_API_BASE_URL as string) + "/auth/reset",
+                (ENV.API_BASE_URL as string) + "/auth/reset",
                 {
                     email: searchParams?.toEmail,
                     password: data.password,

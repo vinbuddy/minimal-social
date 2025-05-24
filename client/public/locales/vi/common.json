@@ -1,3 +1,7 @@
 {
-    "CREATE": "Tạo mới"
+    "CREATE": "Tạo mới",
+    "EDIT": "Chỉnh sửa",
+    "CLOSE": "Đóng",
+    "DELETE": "Xóa",
+    "POST": "Đăng bài"
 }

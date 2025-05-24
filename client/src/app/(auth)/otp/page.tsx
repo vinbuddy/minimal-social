@@ -7,6 +7,7 @@ import axios from "axios";
 
 import { useAuthStore } from "@/hooks/store";
 import { useLoading } from "@/hooks";
+import { ENV } from "@/config/env";
 
 const OTP_LENGTH = 6;
 
@@ -65,7 +66,7 @@ export default function OtpPage({ searchParams }: { searchParams: { type: "regis
             startLoading();
 
             const response = await axios.post(
-                process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/verify-otp",
+                ENV.API_BASE_URL + "/auth/verify-otp",
                 {
                     email: searchParams?.toEmail,
                     otp: otp.join(""),
@@ -93,7 +94,7 @@ export default function OtpPage({ searchParams }: { searchParams: { type: "regis
             startLoading();
 
             const response = await axios.post(
-                process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/forgot/verify",
+                ENV.API_BASE_URL + "/auth/forgot/verify",
                 {
                     email: searchParams?.toEmail,
                     otp: otp.join(""),
@@ -119,8 +120,8 @@ export default function OtpPage({ searchParams }: { searchParams: { type: "regis
             startLoading();
             let url =
                 searchParams?.type === "forgot"
-                    ? process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/forgot"
-                    : process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/register";
+                    ? ENV.API_BASE_URL + "/auth/forgot"
+                    : ENV.API_BASE_URL + "/auth/register";
             const response = await axios.post(url, {
                 email: searchParams?.toEmail,
             });

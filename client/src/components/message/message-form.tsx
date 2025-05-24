@@ -23,6 +23,7 @@ import data from "@emoji-mart/data";
 import { init } from "emoji-mart";
 import useReplyStore from "@/hooks/store/use-reply-store";
 import StickerGifDropdown from "../sticker-gif-dropdown";
+import { ENV } from "@/config/env";
 
 init({ data });
 
@@ -214,7 +215,7 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
         try {
             // Send message
             if (message.trim().length > 0) {
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formData, {
+                const response = await axios.post(`${ENV.API_BASE_URL}/message`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
@@ -224,7 +225,7 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
 
             // Send media files
             if (!message.trim().length && mediaFiles.length > 0) {
-                const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formMediaFilesData, {
+                const res = await axios.post(`${ENV.API_BASE_URL}/message`, formMediaFilesData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
@@ -234,14 +235,14 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
 
             // Send both message and media files
             if (mediaFiles.length > 0 && message.trim().length > 0) {
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formData, {
+                const response = await axios.post(`${ENV.API_BASE_URL}/message`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                     withCredentials: true,
                 });
 
-                const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formMediaFilesData, {
+                const res = await axios.post(`${ENV.API_BASE_URL}/message`, formMediaFilesData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
@@ -249,7 +250,6 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
                 });
             }
 
-            // mutate((key) => typeof key === "string" && key.includes("/message"));
             mutate((key) => typeof key === "string" && key.includes("/conversation"));
 
             reset();
@@ -272,7 +272,7 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
             formData.append("senderId", currentUser._id);
             formData.append("conversationId", conversation._id);
 
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formData, {
+            const response = await axios.post(`${ENV.API_BASE_URL}/message`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -305,7 +305,7 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
                 formData.append("stickerUrl", url);
             }
 
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/message`, formData, {
+            const response = await axios.post(`${ENV.API_BASE_URL}/message`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

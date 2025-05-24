@@ -8,6 +8,7 @@ import PageLoading from "@/components/page-loading";
 import dynamic from "next/dynamic";
 import PageSlowLoading from "@/components/page-slow-loading";
 import { PUBLIC_ROUTES } from "@/constants/route";
+import { ENV } from "@/config/env";
 
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
@@ -21,7 +22,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
     const router = useRouter();
 
     const logout = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/logout`, {
+        const response = await fetch(`${ENV.API_BASE_URL}/auth/logout`, {
             method: "POST",
             credentials: "include",
         });
@@ -39,7 +40,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
     const refreshToken = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh`, {
+            const response = await fetch(`${ENV.API_BASE_URL}/auth/refresh`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -94,7 +95,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                     setIsShowSlowLoading(true);
                 }, 4000);
 
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
+                const response = await fetch(`${ENV.API_BASE_URL}/auth/me`, {
                     credentials: "include",
                 });
                 const result = await response.json();

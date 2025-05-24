@@ -12,6 +12,7 @@ import { showToast } from "@/utils/toast";
 import { IUser } from "@/types/user";
 import { useAuthStore } from "@/hooks/store";
 import { useGlobalMutation, useLoading } from "@/hooks";
+import { ENV } from "@/config/env";
 
 interface IProps extends ButtonProps {}
 
@@ -109,7 +110,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
         }
 
         try {
-            const res = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/edit`, formData, {
+            const res = await axios.put(`${ENV.API_BASE_URL}/user/edit`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

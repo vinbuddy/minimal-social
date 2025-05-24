@@ -1,3 +1,7 @@
 {
-    "CREATE": "Create"
+    "CREATE": "Create",
+    "EDIT": "Edit",
+    "CLOSE": "Close",
+    "DELETE": "Delete",
+    "POST": "Post"
 }

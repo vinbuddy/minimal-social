@@ -9,8 +9,9 @@ import { ISticker } from "@/types/sticker";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation, HashNavigation } from "swiper/modules";
+import { ENV } from "@/config/env";
 
-const gf = new GiphyFetch(process.env.NEXT_PUBLIC_GIPHY_API_KEY as string);
+const gf = new GiphyFetch(ENV.GIPHY_API_KEY as string);
 
 interface IProps {
     popoverProps?: Omit<PopoverProps, "children">;

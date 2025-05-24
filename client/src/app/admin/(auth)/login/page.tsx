@@ -13,6 +13,7 @@ import { useLoading } from "@/hooks";
 import { IUser } from "@/types/user";
 import { GoogleIcon } from "@/assets/icons";
 import { showToast } from "@/utils/toast";
+import { ENV } from "@/config/env";
 
 interface IAdminLogin {
     password: string;
@@ -41,7 +42,7 @@ export default function AdminLoginPage() {
         try {
             startLoading();
             const response = await axios.post(
-                process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/login",
+                ENV.API_BASE_URL + "/auth/login",
                 {
                     email: formData.email,
                     password: formData.password,

@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
-
-import { IMediaFile } from "@/types/post";
+import NextImage from "next/image";
+import { XIcon } from "lucide-react";
+import cn from "classnames";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, A11y, Mousewheel } from "swiper/modules";
@@ -9,10 +10,9 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
-import NextImage from "next/image";
-import { XIcon } from "lucide-react";
+
 import VideoPlayer from "./video-player";
-import { Image } from "@heroui/react";
+import { IMediaFile } from "@/types/post";
 
 interface IProps {
     mediaFiles: IMediaFile[];
@@ -30,7 +30,7 @@ function MediaFileSlider({
     onRemoveMediaFile,
 }: IProps) {
     return (
-        <div className={`media-file-slider`}>
+        <div className="media-file-slider">
             {mediaFiles?.length! > 0 && (
                 <Swiper
                     modules={[Navigation, Mousewheel, A11y]}
@@ -51,41 +51,27 @@ function MediaFileSlider({
                                 key={index}
                                 style={{
                                     aspectRatio: aspectRatio,
-                                    // aspect ratio = 1 / 1 unset aspectRatio property
                                     flexGrow: aspectRatio === 1 ? "none" : `calc(${file.width} / ${file.height})`,
                                 }}
                                 className="rounded-xl group"
                             >
                                 <div
-                                    className={`${mediaFiles.length > 1 && "w-full"} ${
-                                        mediaFiles.some((file) => file.type === "video") ? "!w-auto" : ""
-                                    } h-full rounded-xl relative cursor-pointer`}
+                                    className={cn("h-full rounded-xl relative cursor-pointer", {
+                                        "w-full": mediaFiles.length > 1,
+                                        "!w-auto": mediaFiles.some((file) => file.type === "video"),
+                                    })}
                                     onClick={() => !!onMediaFileClick && onMediaFileClick(index)}
                                 >
                                     {file.type === "image" ? (
-                                        onRemoveMediaFile ? (
-                                            <NextImage
-                                                className="w-full h-auto block rounded-xl"
-                                                src={file?.url}
-                                                width={file.width}
-                                                height={file.height}
-                                                placeholder="blur"
-                                                blurDataURL={file?.url}
-                                                alt="Next Preview Image"
-                                            />
-                                        ) : (
-                                            <Image
-                                                classNames={{ wrapper: "h-full", img: "!h-full" }}
-                                                as={NextImage}
-                                                className="w-full h-auto block rounded-xl"
-                                                src={file?.url}
-                                                width={file.width}
-                                                height={file.height}
-                                                placeholder="blur"
-                                                blurDataURL={file?.url}
-                                                alt="Preview Image"
-                                            />
-                                        )
+                                        <NextImage
+                                            className="w-full h-auto block rounded-xl"
+                                            src={file?.url}
+                                            width={file.width}
+                                            height={file.height}
+                                            placeholder="blur"
+                                            blurDataURL={file?.url}
+                                            alt="Next Preview Image"
+                                        />
                                     ) : (
                                         <>
                                             <VideoPlayer

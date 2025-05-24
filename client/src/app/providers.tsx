@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 import { PUBLIC_ROUTES } from "@/constants/route";
 
 import "../i18n";
+import { ENV } from "@/config/env";
 
 export function SWRConfigProvider({ children }: { children: React.ReactNode }) {
     return (
@@ -52,7 +53,7 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
 
         try {
             const client = StreamVideoClient.getOrCreateInstance({
-                apiKey: process.env.NEXT_PUBLIC_STREAM_API_KEY!,
+                apiKey: ENV.STREAM_API_KEY!,
                 user: {
                     id: currentUser._id,
                     name: currentUser.username,
