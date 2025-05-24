@@ -24,6 +24,7 @@ import { init } from "emoji-mart";
 import useReplyStore from "@/hooks/store/use-reply-store";
 import StickerGifDropdown from "../sticker-gif-dropdown";
 import { ENV } from "@/config/env";
+import { useTranslation } from "react-i18next";
 
 init({ data });
 
@@ -44,6 +45,8 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
     const { replyTo, unReply } = useReplyStore();
     const { startLoading, stopLoading, loading } = useLoading();
     const mutate = useGlobalMutation();
+
+    const { t: tChat } = useTranslation("chat");
 
     useEffect(() => {
         if (_mediaFiles) {
@@ -175,8 +178,6 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
     };
 
     const handleSendMessage = async () => {
-        // e.preventDefault();
-
         if (!currentUser || !conversation) {
             alert("User or conversation not found.");
             return;
@@ -215,7 +216,7 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
         try {
             // Send message
             if (message.trim().length > 0) {
-                const response = await axios.post(`${ENV.API_BASE_URL}/message`, formData, {
+                await axios.post(`${ENV.API_BASE_URL}/message`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
@@ -225,7 +226,7 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
 
             // Send media files
             if (!message.trim().length && mediaFiles.length > 0) {
-                const res = await axios.post(`${ENV.API_BASE_URL}/message`, formMediaFilesData, {
+                await axios.post(`${ENV.API_BASE_URL}/message`, formMediaFilesData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
@@ -235,14 +236,14 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
 
             // Send both message and media files
             if (mediaFiles.length > 0 && message.trim().length > 0) {
-                const response = await axios.post(`${ENV.API_BASE_URL}/message`, formData, {
+                await axios.post(`${ENV.API_BASE_URL}/message`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                     withCredentials: true,
                 });
 
-                const res = await axios.post(`${ENV.API_BASE_URL}/message`, formMediaFilesData, {
+                await axios.post(`${ENV.API_BASE_URL}/message`, formMediaFilesData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
@@ -279,7 +280,6 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
                 withCredentials: true,
             });
 
-            // mutate((key) => typeof key === "string" && key.includes("/message"));
             mutate((key) => typeof key === "string" && key.includes("/conversation"));
             reset();
         } catch (error) {
@@ -305,7 +305,7 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
                 formData.append("stickerUrl", url);
             }
 
-            const response = await axios.post(`${ENV.API_BASE_URL}/message`, formData, {
+            await axios.post(`${ENV.API_BASE_URL}/message`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -327,7 +327,11 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
             {replyTo && (
                 <div className="border-t border-divider py-2 px-5 flex justify-between items-center gap-4 bg-content2 mb-4">
                     <div className="flex-1 overflow-hidden">
-                        <h4 className="text-sm ">Replying to {replyTo?.sender?.username}</h4>
+                        <h4 className="text-sm ">
+                            {tChat("CHAT.MESSAGE.REPLY_TO", {
+                                username: replyTo?.sender?.username || "Unknown User",
+                            })}
+                        </h4>
                         <p className="text-default-500 text-sm truncate w-full mt-1">
                             {replyTo?.mediaFiles?.length > 0 && !replyTo?.content ? "Photo" : replyTo?.content}
                         </p>
@@ -408,7 +412,7 @@ export default function MessageForm({ conversation, mediaFiles: _mediaFiles }: I
                             }}
                             onPaste={handlePasteMediaFiles}
                             className="leading-[1.6] flex-1 max-h-52 overflow-y-scroll scrollbar "
-                            placeholder="Type your message..."
+                            placeholder={tChat("CHAT.MESSAGE_PLACEHOLDER")}
                         />
 
                         <EmojiPicker

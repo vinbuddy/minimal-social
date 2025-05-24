@@ -13,5 +13,12 @@
     "THEME_LIGHT": "Light",
     "THEME_DARK": "Dark",
     "LOGOUT": "Logout",
-    "SIGN_IN_AS": "Sign in as"
+    "SIGN_IN_AS": "Sign in as",
+    "SEARCH": "Search",
+    "DRAG_AND_DROP": "Drag and drop to upload",
+    "LOAD_MORE": "Load more",
+    "NO_RESULT": "No results found",
+    "YOU": "You",
+    "TODAY": "Today",
+    "YESTERDAY": "Yesterday"
 }

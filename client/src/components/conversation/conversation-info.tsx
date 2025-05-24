@@ -27,6 +27,7 @@ import { IConversation } from "@/types/conversation";
 import { ImageIcon } from "@/assets/icons";
 import { showToast } from "@/utils/toast";
 import axiosInstance from "@/utils/http-request";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     partner?: IUser | null;
@@ -43,6 +44,8 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
         onOpenChange: onOpenChangeDelete,
         onClose: onCloseDelete,
     } = useDisclosure();
+    const { t } = useTranslation("common");
+    const { t: tChat } = useTranslation("chat");
 
     const handleDeleteConversation = async (): Promise<void> => {
         try {
@@ -79,7 +82,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                     >
                         <ArrowLeftIcon size={20} />
                     </Button>
-                    <h1>Search message</h1>
+                    <h1>{tChat("CHAT.SEARCH_MESSAGE")}</h1>
                 </header>
 
                 <SearchMessage conversation={conversation} />
@@ -94,7 +97,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                     <Button onPress={() => setStorageType(null)} title="Back" isIconOnly radius="full" variant="light">
                         <ArrowLeftIcon size={20} />
                     </Button>
-                    <h1>Conversation Storage</h1>
+                    <h1>{tChat("CHAT.STORAGE")}</h1>
                 </header>
 
                 <div>
@@ -138,7 +141,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                         startContent={<UserIcon size={18} className="text-default-500" />}
                         className="text-default-500"
                     >
-                        Profile
+                        {t("PROFILE")}
                     </Button>
                     <Button
                         variant="flat"
@@ -147,7 +150,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                         className="text-default-500"
                         onPress={() => setIsSearchMode(true)}
                     >
-                        Search
+                        {t("SEARCH")}
                     </Button>
                 </div>
             </section>
@@ -166,7 +169,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                         }}
                         defaultExpandedKeys={["1"]}
                     >
-                        <AccordionItem key="1" aria-label="Accordion 2" title="Storage">
+                        <AccordionItem key="1" aria-label="Accordion 2" title={tChat("CHAT.STORAGE")}>
                             <div>
                                 <Listbox variant="flat" className="p-0 pb-1 text-default-700">
                                     <ListboxItem
@@ -177,7 +180,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                         startContent={<ImageIcon size={18} className="text-default-600" />}
                                         onPress={() => setStorageType("media")}
                                     >
-                                        Media files
+                                        {tChat("CHAT.STORAGE.MEDIA_FILE")}
                                     </ListboxItem>
                                     <ListboxItem
                                         classNames={{
@@ -187,7 +190,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                         startContent={<FileIcon size={18} />}
                                         onPress={() => setStorageType("file")}
                                     >
-                                        Files
+                                        {tChat("CHAT.STORAGE.FILE")}
                                     </ListboxItem>
                                     <ListboxItem
                                         classNames={{
@@ -197,12 +200,12 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                         startContent={<LinkIcon size={18} />}
                                         onPress={() => setStorageType("link")}
                                     >
-                                        Links
+                                        {tChat("CHAT.STORAGE.LINK")}
                                     </ListboxItem>
                                 </Listbox>
                             </div>
                         </AccordionItem>
-                        <AccordionItem key="2" aria-label="Accordion 1" title="Settings">
+                        <AccordionItem key="2" aria-label="Accordion 1" title={tChat("CHAT.SETTING")}>
                             <div>
                                 <Listbox variant="flat" className="p-0 pb-1 text-default-700">
                                     <ListboxItem
@@ -213,7 +216,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                         startContent={<PaletteIcon size={18} />}
                                     >
                                         <ChangeThemeConversationModal conversation={conversation}>
-                                            Theme
+                                            {t("THEME")}
                                         </ChangeThemeConversationModal>
                                     </ListboxItem>
                                     <ListboxItem
@@ -227,13 +230,13 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                             conversationId={conversation?._id}
                                             defaultEmoji={conversation?.emoji}
                                         >
-                                            Emoji icon
+                                            {tChat("CHAT.SETTING.EMOJI")}
                                         </ChangeEmojiConversationModal>
                                     </ListboxItem>
                                 </Listbox>
                             </div>
                         </AccordionItem>
-                        <AccordionItem key="3" aria-label="Accordion 3" title="Security">
+                        <AccordionItem key="3" aria-label="Accordion 3" title={tChat("CHAT.SECURITY")}>
                             <div>
                                 <Listbox variant="flat" className="p-0 pb-1 text-default-700">
                                     <ListboxItem
@@ -246,7 +249,7 @@ export default function ConversationInfo({ partner, conversation }: IProps) {
                                         startContent={<TrashIcon size={18} />}
                                         onPress={onOpenChangeDelete}
                                     >
-                                        Delete conversation
+                                        {tChat("CHAT.SECURITY.DELETE_CONVERSATION")}
                                     </ListboxItem>
                                 </Listbox>
                             </div>

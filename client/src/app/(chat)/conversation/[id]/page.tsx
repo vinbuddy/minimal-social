@@ -18,6 +18,7 @@ import { checkLimitSize, getFileDimension, getFileFormat } from "@/utils/media-f
 import { showToast } from "@/utils/toast";
 import { useIsBlockMode, useOtherUserConversation } from "@/hooks";
 import CallSetupModal from "@/components/call/call-setup-modal";
+import { useTranslation } from "react-i18next";
 
 function ConversationDetailPage() {
     const [isOpenConversationInfo, setIsOpenConversationInfo] = useState<boolean>(false);
@@ -33,6 +34,9 @@ function ConversationDetailPage() {
 
     const { onBack } = useConversationContext();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+    const { t } = useTranslation("common");
+    const { t: tChat } = useTranslation("chat");
 
     const handleOnDropFiles = async (files: File[]) => {
         if (!files) {
@@ -119,7 +123,6 @@ function ConversationDetailPage() {
 
                             <div className="ms-3">
                                 <UserName user={otherUser} className="font-semibold hover:no-underline" />
-                                {/* <p className="text-sm text-default-500">Online 4 minutes ago</p> */}
                             </div>
                         </div>
 
@@ -129,8 +132,6 @@ function ConversationDetailPage() {
                                     <Phone size={18} />
                                 </CallSetupModal>
                             </Button>
-                            {/* <Tooltip content="Call">
-                            </Tooltip> */}
                             <Tooltip content="Video call">
                                 <Button size="sm" isIconOnly color="default" variant="light">
                                     <Video size={18} />
@@ -164,7 +165,7 @@ function ConversationDetailPage() {
                     {isDragActive && (
                         <div className="p-5 h-full overflow-hidden">
                             <div className="rounded-2xl border-2 border-dashed border-default w-full overflow-y-auto overflow-x-hidden h-full flex justify-center items-center">
-                                <h4>Drag and drop files here</h4>
+                                <h4>{t("DRAG_AND_DROP")}</h4>
                             </div>
                         </div>
                     )}
@@ -174,7 +175,7 @@ function ConversationDetailPage() {
 
                     {isBlockMode && (
                         <div className="flex justify-center items-center gap-x-2 px-4 pt-4 border-t border-default">
-                            <span className="text-default-500 text-sm">You can not send messages to this user.</span>
+                            <span className="text-default-500 text-sm">{tChat("CHAT.SEND_MESSAGE_BLOCKED")}</span>
                         </div>
                     )}
 

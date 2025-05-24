@@ -11,6 +11,7 @@ import { useDebounce, usePagination } from "@/hooks";
 import { IMessage } from "@/types/message";
 import { IConversation } from "@/types/conversation";
 import { useMessagesStore } from "@/hooks/store";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     conversation: IConversation;
@@ -20,6 +21,9 @@ export default function SearchMessage({ conversation }: IProps) {
     const [searchValue, setSearchValue] = useState<string>("");
     const debouncedSearch = useDebounce(searchValue, 800);
     const { messageIdReferenced, setMessageIdReferenced, setIsReference } = useMessagesStore();
+
+    const { t: tChat } = useTranslation("chat");
+    const { t } = useTranslation("common");
 
     const {
         data: messages,
@@ -99,7 +103,7 @@ export default function SearchMessage({ conversation }: IProps) {
                 isClearable
                 defaultValue={""}
                 value={searchValue}
-                placeholder="Search in conversation"
+                placeholder={tChat("CHAT.SEARCH_MESSAGE_PLACEHOLDER")}
                 variant="faded"
                 size="md"
                 startContent={<SearchIcon className="text-default-400 me-1" size={18} />}
@@ -110,7 +114,7 @@ export default function SearchMessage({ conversation }: IProps) {
             />
             <div className="py-5">
                 {messages.length === 0 && !isLoading && !error && (
-                    <p className="text-center text-default-500">No result found</p>
+                    <p className="text-center text-default-500">{t("NO_RESULT")}</p>
                 )}
                 <ul>
                     {messageList}
@@ -123,7 +127,7 @@ export default function SearchMessage({ conversation }: IProps) {
                                 isLoading={loadingMore}
                                 onPress={() => setPage(size + 1)}
                             >
-                                Load more
+                                {t("LOAD_MORE")}
                             </Button>
                         </li>
                     )}

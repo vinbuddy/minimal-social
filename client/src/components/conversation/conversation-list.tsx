@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input, Spinner } from "@heroui/react";
+import { Input, Spinner } from "@heroui/react";
 import { LoaderIcon, SearchIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -18,6 +18,7 @@ import { IConversation, IPrivateConversationResult } from "@/types/conversation"
 import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
 import ErrorMessage from "../error-message";
+import { useTranslation } from "react-i18next";
 
 type ConversationResponse = {
     data: {
@@ -35,6 +36,8 @@ export default function ConversationList({ onConversationClick }: IProps) {
     const { currentUser } = useAuthStore();
     const debouncedSearch = useDebounce(searchValue, 800);
     const router = useRouter();
+    const { t: tChat } = useTranslation("chat");
+    const { t } = useTranslation("common");
 
     // Generate API URL
     const getURL = useCallback(() => {
@@ -100,7 +103,7 @@ export default function ConversationList({ onConversationClick }: IProps) {
     const renderPrivateConversationResults = useMemo(() => {
         if (!debouncedSearch) return null;
 
-        if (isSearchResultEmpty) return <p className="text-center">No search results</p>;
+        if (isSearchResultEmpty) return <p className="text-center">{tChat("CHAT.NO_CONVERSATION")}</p>;
         if (searchError) return <ErrorMessage error={searchError} className="text-center" />;
 
         return (
@@ -191,7 +194,7 @@ export default function ConversationList({ onConversationClick }: IProps) {
                     isClearable={!isSearchLoading}
                     classNames={{ base: "w-full", inputWrapper: "h-[2.8rem] px-4" }}
                     value={searchValue}
-                    placeholder="Search..."
+                    placeholder={t("SEARCH") + "..."}
                     size="md"
                     variant="faded"
                     startContent={<SearchIcon className="text-default-400 me-1" size={18} />}

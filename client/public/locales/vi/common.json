@@ -13,5 +13,12 @@
     "THEME_LIGHT": "Sáng",
     "THEME_DARK": "Tối",
     "LOGOUT": "Đăng xuất",
-    "SIGN_IN_AS": "Đăng nhập bằng"
+    "SIGN_IN_AS": "Đăng nhập bằng",
+    "SEARCH": "Tìm kiếm",
+    "DRAG_AND_DROP": "Kéo và thả để tải lên",
+    "LOAD_MORE": "Tải thêm",
+    "NO_RESULT": "Không tìm thấy kết quả",
+    "YOU": "Bạn",
+    "TODAY": "Hôm nay",
+    "YESTERDAY": "Hôm qua"
 }

@@ -11,8 +11,8 @@ i18n.use(Backend)
         lng: "vi",
         fallbackLng: "en",
         supportedLngs: ["en", "vi"],
-        ns: ["common", "post", "comment", "user"],
-        defaultNS: "post",
+        ns: ["common", "post", "comment", "user", "chat"],
+        defaultNS: "common",
         backend: {
             loadPath: "/locales/{{lng}}/{{ns}}.json",
         },
