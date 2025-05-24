@@ -3,7 +3,6 @@ import { Avatar, Button, Spinner } from "@heroui/react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { RedoIcon, SendHorizontalIcon, SmileIcon, XIcon } from "lucide-react";
-import { toast } from "sonner";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 
 import RichTextEditor from "@/components/rich-text-editor";
@@ -14,6 +13,7 @@ import { useGlobalMutation, useLoading } from "@/hooks";
 import { showToast } from "@/utils/toast";
 import { IComment } from "@/types/comment";
 import { IPost } from "@/types/post";
+import { useTranslation } from "react-i18next";
 
 // type TargetType = IPost | IVideo;
 type CommentTargetType = IPost;
@@ -33,6 +33,8 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
     const mutate = useGlobalMutation();
     const { replyTo, unReply } = useReplyStore();
 
+    const { t: tComment } = useTranslation("comment");
+
     const [comment, setComment] = useState<string>("");
     const commentInputRef = useRef<HTMLDivElement>(null);
 
@@ -49,8 +51,6 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
     };
 
     const handleSubmit = async () => {
-        // e.preventDefault();
-
         if (!comment.trim()) return;
 
         try {
@@ -74,7 +74,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                     targetType: "Comment",
                     action: "comment",
                     photo: currentUser?.photo,
-                    message: `commented on your post`,
+                    message: tComment("COMMENT_MESSAGE.COMMENTED_ON_YOUR_POST"),
                     sender: currentUser?._id,
                     receivers: [target?.postBy?._id],
                     url: `/post/${params?.id}?commentId=${commentResponse?._id}`,
@@ -85,7 +85,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                     targetType: "Comment",
                     action: "comment",
                     photo: currentUser?.photo,
-                    message: `replied on your comment`,
+                    message: tComment("COMMENT_MESSAGE.REPLIED_TO_YOUR_COMMENT"),
                     sender: currentUser?._id,
                     receivers: [replyTo?.commentBy?._id],
                     url: `/post/${params?.id}?commentId=${commentResponse?._id}&rootComment=${
@@ -107,7 +107,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                 mutate((key) => typeof key === "string" && key.includes("/comment"));
             }
 
-            showToast("Commented successfully", "success");
+            showToast(tComment("COMMENT_MESSAGE.COMMENTED_SUCCESS"), "success");
         } catch (error: any) {
             console.error(error);
             showToast("Failed to comment", "error");
@@ -123,7 +123,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
     }, []);
 
     return (
-        (<div>
+        <div>
             {replyTo && (
                 <div className="flex items-center justify-between mb-2 pe-4">
                     <div className="flex items-center justify-center w-[40px]">
@@ -171,7 +171,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                             }
                         }}
                         className="leading-[1.6] flex-1"
-                        placeholder="Type your comment..."
+                        placeholder={tComment("COMMENT_PLACEHOLDER") + "..."}
                     />
 
                     <EmojiPicker
@@ -198,6 +198,6 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                     {loading ? <Spinner size="sm" /> : <SendHorizontalIcon size={20} />}
                 </Button>
             </form>
-        </div>)
+        </div>
     );
 }

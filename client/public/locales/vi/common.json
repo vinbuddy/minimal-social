@@ -7,5 +7,11 @@
     "REPOST": "Đăng lại",
     "LIKE": "Thích",
     "COMMENT": "Bình luận",
-    "REPLY": "Trả lời"
+    "REPLY": "Trả lời",
+    "PROFILE": "Trang cá nhân",
+    "THEME": "Giao diện",
+    "THEME_LIGHT": "Sáng",
+    "THEME_DARK": "Tối",
+    "LOGOUT": "Đăng xuất",
+    "SIGN_IN_AS": "Đăng nhập bằng"
 }

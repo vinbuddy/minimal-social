@@ -35,6 +35,7 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
     const [isOpenReply, setIsOpenReply] = useState<boolean>(false);
 
     const { t } = useTranslation("common");
+    const { t: tComment } = useTranslation("comment");
 
     const {
         data: replies,
@@ -189,7 +190,9 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                                         )
                                     }
                                 >
-                                    See {comment?.replyCount ?? 0} replies
+                                    {tComment("COMMENT.VIEW_REPLY_COUNT", {
+                                        count: comment?.replyCount ?? 0,
+                                    })}
                                 </Button>
                             </div>
                         )}
@@ -243,7 +246,9 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                                         )
                                     }
                                 >
-                                    See {comment?.replyCount ?? 0} replies
+                                    {tComment("COMMENT.VIEW_REPLY_COUNT", {
+                                        count: comment?.replyCount ?? 0,
+                                    })}
                                 </Button>
                             </div>
                         )}

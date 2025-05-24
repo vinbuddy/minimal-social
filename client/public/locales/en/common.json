@@ -7,5 +7,11 @@
     "REPOST": "Repost",
     "LIKE": "Like",
     "COMMENT": "Comment",
-    "REPLY": "Reply"
+    "REPLY": "Reply",
+    "PROFILE": "Profile",
+    "THEME": "Theme",
+    "THEME_LIGHT": "Light",
+    "THEME_DARK": "Dark",
+    "LOGOUT": "Logout",
+    "SIGN_IN_AS": "Sign in as"
 }

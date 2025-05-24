@@ -5,6 +5,7 @@ import { showToast } from "@/utils/toast";
 import ConfirmationModal from "../confirmation-modal";
 import axiosInstance from "@/utils/http-request";
 import { useCopyToClipboard, useGlobalMutation, useIsOwner } from "@/hooks";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     children: React.ReactNode | React.JSX.Element | React.ReactElement;
@@ -27,16 +28,18 @@ export default function CommentMenuDropdown({ children, comment }: IProps) {
     const isOwner = useIsOwner(comment?.commentBy?._id);
     const copy = useCopyToClipboard();
 
+    const { t: tComment } = useTranslation("comment");
+
     const handleDeleteComment = async () => {
         if (!comment) return;
 
         try {
-            const response = await axiosInstance.delete(`/comment/${comment._id}`);
+            await axiosInstance.delete(`/comment/${comment._id}`);
 
             mutate((key) => typeof key === "string" && key.includes("/comment"));
             mutate((key) => typeof key === "string" && key.includes("/post"));
 
-            showToast("Delete comment successfully", "success");
+            showToast(tComment("COMMENT_MESSAGE.DELETE_COMMENT_SUCCESS"), "success");
         } catch (error: any) {
             showToast(error.response.data.message, "error");
         }
@@ -45,7 +48,7 @@ export default function CommentMenuDropdown({ children, comment }: IProps) {
     const items: CommentMenuItem[] = [
         {
             key: "copy",
-            content: "Copy content",
+            content: tComment("COMMENT_MENU.COPY_COMMENT"),
             icon: <CopyIcon size={16} />,
             onClick: () => copy(comment.content),
         },
@@ -54,7 +57,7 @@ export default function CommentMenuDropdown({ children, comment }: IProps) {
     const ownerItems: CommentMenuItem[] = [
         {
             key: "delete",
-            content: "Delete comment",
+            content: tComment("COMMENT_MENU.DELETE_COMMENT"),
             icon: <TrashIcon size={16} />,
             color: "danger",
             className: "text-danger",
@@ -68,7 +71,7 @@ export default function CommentMenuDropdown({ children, comment }: IProps) {
     return (
         <>
             <ConfirmationModal
-                title="Are you sure you want to delete this comment ?"
+                title={tComment("COMMENT_MENU.DELETE_COMMENT_CONFIRM")}
                 description=""
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
