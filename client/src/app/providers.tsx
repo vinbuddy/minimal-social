@@ -13,6 +13,8 @@ import { useAuthStore } from "@/hooks/store";
 import { usePathname } from "next/navigation";
 import { PUBLIC_ROUTES } from "@/constants/route";
 
+import "../i18n";
+
 export function SWRConfigProvider({ children }: { children: React.ReactNode }) {
     return (
         <SWRConfig
@@ -72,4 +74,8 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
     if (!streamVideoClient) return <PageLoading />;
 
     return <StreamVideo client={streamVideoClient}>{children}</StreamVideo>;
+}
+
+export function I18nProvider({ children }: { children: React.ReactNode }) {
+    return <>{children}</>;
 }

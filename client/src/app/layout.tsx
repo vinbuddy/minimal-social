@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 import { SocketProvider } from "@/contexts/socket-context";
-import { HeroProvider as NextUIProvider, StreamProvider, SWRConfigProvider } from "./providers";
+import { I18nProvider, HeroProvider as NextUIProvider, StreamProvider, SWRConfigProvider } from "./providers";
 import dynamic from "next/dynamic";
 
 const AuthContextProvider = dynamic(() => import("@/contexts/auth-context"), {
@@ -28,16 +28,18 @@ export default function RootLayout({
         <html lang="en" className="light scrollbar" suppressHydrationWarning>
             <body className={inter.className}>
                 <AuthContextProvider>
-                    <NextUIProvider>
-                        <SWRConfigProvider>
-                            <SocketProvider>
-                                <StreamProvider>
-                                    {children}
-                                    <Toaster />
-                                </StreamProvider>
-                            </SocketProvider>
-                        </SWRConfigProvider>
-                    </NextUIProvider>
+                    <I18nProvider>
+                        <NextUIProvider>
+                            <SWRConfigProvider>
+                                <SocketProvider>
+                                    <StreamProvider>
+                                        {children}
+                                        <Toaster />
+                                    </StreamProvider>
+                                </SocketProvider>
+                            </SWRConfigProvider>
+                        </NextUIProvider>
+                    </I18nProvider>
                 </AuthContextProvider>
             </body>
         </html>

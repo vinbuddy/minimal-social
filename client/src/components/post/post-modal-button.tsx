@@ -26,6 +26,7 @@ import axiosInstance from "@/utils/http-request";
 import { useAuthStore } from "@/hooks/store";
 import { useBreakpoint, useGlobalMutation, useLoading } from "@/hooks";
 import { showToast } from "@/utils/toast";
+import { useTranslation } from "react-i18next";
 
 interface IProps extends ButtonProps {
     isResponsive?: boolean;
@@ -56,6 +57,8 @@ export default function PostModalButton({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const popoverRef = useRef<HTMLDivElement>(null);
+
+    const { t } = useTranslation("common");
 
     useEffect(() => {
         setIsOpen(open ?? false);
@@ -455,7 +458,7 @@ export default function PostModalButton({
                         children
                     ) : (
                         <Button color="primary" {...rest}>
-                            Create
+                            {t("CREATE")}
                         </Button>
                     )}
                 </PopoverTrigger>
