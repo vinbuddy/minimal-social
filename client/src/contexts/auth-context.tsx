@@ -63,6 +63,28 @@ const AuthContextProvider = ({ children }: { children: any }) => {
         }
     };
 
+    const handleAuthenticatedUser = (user: IUser) => {
+        useAuthStore.setState({ currentUser: user, isAuthenticated: true });
+
+        const isPublicRoute = PUBLIC_ROUTES.includes(pathName);
+
+        if (user.isAdmin && isPublicRoute) {
+            return router.push("/admin");
+        }
+
+        if (isPublicRoute) {
+            return router.push("/");
+        }
+    };
+
+    const handleUnauthenticatedUser = () => {
+        const isPublicRoute = PUBLIC_ROUTES.includes(pathName);
+
+        if (!isPublicRoute) {
+            return router.push("/login");
+        }
+    };
+
     useEffect(() => {
         const initializeAuth = async () => {
             let timeoutId: NodeJS.Timeout | null = null;
@@ -79,29 +101,12 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                 const user = result.data as IUser;
 
                 if (response.status === 200) {
-                    useAuthStore.setState({ currentUser: user, isAuthenticated: true });
-
-                    if (user?.isAdmin && PUBLIC_ROUTES.includes(pathName)) {
-                        setIsInitializing(false);
-                        router.push("/admin");
-                        return;
-                    }
-
-                    // Redirect if user is authenticated and trying to access public routes
-                    if (PUBLIC_ROUTES.includes(pathName)) {
-                        setIsInitializing(false);
-                        router.push("/");
-                    }
-
-                    return;
+                    return handleAuthenticatedUser(user);
                 }
 
                 // If user is not authenticated, redirect to login page
                 if (response.status === 403) {
-                    if (!PUBLIC_ROUTES.includes(pathName)) {
-                        setIsInitializing(false);
-                        router.push("/login");
-                    }
+                    return handleUnauthenticatedUser();
                 }
 
                 // If user authenticated and token is expired, refresh token

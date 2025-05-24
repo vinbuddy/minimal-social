@@ -35,41 +35,14 @@ const navLinks: INavLink[] = [
     },
     {
         content: "Reports",
-        href: "/admin/user",
+        href: "/admin/report",
         icon: <MessageSquareWarningIcon size={20} />,
     },
     {
         content: "Analytics",
-        href: "/admin/user",
+        href: "/admin/analytic",
         icon: <BarChart3Icon size={20} />,
     },
-    // {
-    //     content: "Sản phẩm",
-    //     href: "/admin/product",
-    //     icon: <FiShoppingBag />,
-    //     children: [
-    //         {
-    //             content: "Sản phẩm",
-    //             href: "/admin/product",
-    //             icon: <FiShoppingBag />,
-    //         },
-    //         {
-    //             content: "Danh mục",
-    //             href: "/admin/category",
-    //             icon: <TbCategoryPlus />,
-    //         },
-    //         {
-    //             content: "Size",
-    //             href: "/admin/size",
-    //             icon: <RxSize />,
-    //         },
-    //         {
-    //             content: "Topping",
-    //             href: "/admin/topping",
-    //             icon: <LuIceCream2 />,
-    //         },
-    //     ],
-    // },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
