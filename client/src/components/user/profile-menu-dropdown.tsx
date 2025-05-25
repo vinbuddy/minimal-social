@@ -124,20 +124,23 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
     return (
         <>
             <ConfirmationModal
-                title={`You want to ${isBlocked ? "unblock" : "block"} ${user.username} ?`}
+                title={tUser("USER.BLOCK_UNBLOCK_ACTION", {
+                    action: isBlocked ? tUser("USER.UNBLOCK") : tUser("USER.BLOCK"),
+                    username: user.username,
+                })}
                 description={
                     isBlocked ? null : (
                         <span className="text-default-500">
-                            {user.username} will not be able to: <br />
+                            {tUser("USER.BLOCK.NOTE_1", { username: user.username })} <br />
                             <ul className="list-disc pl-5 py-2">
-                                <li>See your profile</li>
-                                <li>Follow you</li>
-                                <li>Send you messages</li>
-                                <li>Comment on your posts</li>
-                                <li>Tag you</li>
-                                <li>See posts on your timeline</li>
+                                <li>{tUser("USER.BLOCK.NOTE_LIST_1")}</li>
+                                <li>{tUser("USER.BLOCK.NOTE_LIST_2")}</li>
+                                <li>{tUser("USER.BLOCK.NOTE_LIST_3")}</li>
+                                <li>{tUser("USER.BLOCK.NOTE_LIST_4")}</li>
+                                <li>{tUser("USER.BLOCK.NOTE_LIST_5")}</li>
+                                <li>{tUser("USER.BLOCK.NOTE_LIST_6")}</li>
                             </ul>
-                            If you followed, blocking {user.username} will also unfollow him.
+                            {tUser("USER.BLOCK.NOTE_2", { username: user.username })}
                         </span>
                     )
                 }
@@ -148,7 +151,13 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
                 onOpenChange={onOpenChange}
                 onOk={isBlocked ? handleUnblock : handleBlock}
                 okButtonProps={{ color: isBlocked ? "primary" : "danger" }}
-                okButtonContent={isBlocked ? "Unblock" : "Block"}
+                okButtonContent={
+                    isBlocked ? (
+                        <span className="first-letter:uppercase">{tUser("USER.UNBLOCK")}</span>
+                    ) : (
+                        <span className="first-letter:uppercase">{tUser("USER.BLOCK")}</span>
+                    )
+                }
                 onClose={onClose}
             />
 

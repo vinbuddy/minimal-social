@@ -3,6 +3,8 @@
     "USER.UNFOLLOW": "Unfollow",
     "USER.BLOCK_USER": "Block User",
     "USER.UNBLOCK_USER": "Unblock User",
+    "USER.UNBLOCK": "unblock",
+    "USER.BLOCK": "block",
     "USER.REPORT_USER": "Report User",
     "USER.SHARE_PROFILE": "Share Profile",
     "USER.SEND_MESSAGE": "Send Message",
@@ -10,6 +12,15 @@
     "USER.SETTING": "Setting",
     "USER.FOLLOWER": "followers",
     "USER.FOLLOWING": "following",
+    "USER.BLOCK_UNBLOCK_ACTION": "Are you sure you want to {{action}} {{username}}?",
+    "USER.BLOCK.NOTE_1": "{{username}} will not be able to",
+    "USER.BLOCK.NOTE_LIST_1": "See your profile",
+    "USER.BLOCK.NOTE_LIST_2": "Follow you",
+    "USER.BLOCK.NOTE_LIST_3": "Send you messages",
+    "USER.BLOCK.NOTE_LIST_4": "Comment on your posts",
+    "USER.BLOCK.NOTE_LIST_5": "Tag you",
+    "USER.BLOCK.NOTE_LIST_6": "See your posts in their feed",
+    "USER.BLOCK.NOTE_2": "If you followed, blocking {{username}} will also unfollow them",
 
     "USER.USERNAME": "Username",
     "USER.BIO": "Bio",
@@ -17,5 +28,11 @@
     "USER.CROP_IMAGE": "Crop Image",
 
     "USER.EDIT.REQUIRE_CHANGE": "You must change something to edit your profile",
-    "USER.EDIT.PROFILE_UPDATED": "Profile updated successfully"
+    "USER.EDIT.PROFILE_UPDATED": "Profile updated successfully",
+
+    "USER.SETTING.TITLE": "Settings",
+    "USER.SETTING.LANGUAGE": "Language",
+    "USER.SETTING.ACCOUNT": "Account",
+    "USER.SETTING.BLOCKED_USER": "Blocked Users",
+    "USER.SETTING.UNBLOCK_CONFIRMATION": "Are you sure you want to unblock {{username}}?"
 }

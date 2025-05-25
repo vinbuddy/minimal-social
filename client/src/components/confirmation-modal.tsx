@@ -4,12 +4,13 @@ import { TriangleAlertIcon } from "lucide-react";
 import React, { isValidElement } from "react";
 
 import { useLoading } from "@/hooks";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     okButtonProps?: ButtonProps;
     title?: string;
     description?: string | React.ReactNode;
-    okButtonContent?: string;
+    okButtonContent?: string | React.ReactNode;
     modalBackdrop?: "transparent" | "opaque" | "blur";
     icon?: React.ReactNode;
     iconBgColor?: string;
@@ -35,6 +36,8 @@ export default function ConfirmationModal({
     onClose,
 }: IProps): React.ReactNode {
     const { loading, startLoading, stopLoading } = useLoading();
+    const { t } = useTranslation("common");
+
     return (
         <>
             <Modal backdrop={modalBackdrop} hideCloseButton isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -61,7 +64,7 @@ export default function ConfirmationModal({
                             </ModalBody>
                             <ModalFooter className="flex justify-between">
                                 <Button fullWidth color="default" variant="light" onPress={onClose}>
-                                    Cancel
+                                    {t("CANCEL")}
                                 </Button>
                                 <Button
                                     isLoading={loading}

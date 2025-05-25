@@ -8,33 +8,34 @@ import cn from "classnames";
 import BackButton from "../components/back-button";
 import Link from "next/link";
 import { useAuthStore } from "@/hooks/store";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     children: React.ReactNode;
 }
 
-const navLinks = [
-    {
-        content: "Account",
-        href: "/setting/account",
-        icon: <LockIcon size={16} />,
-    },
-    {
-        content: "Blocked Users",
-        href: "/setting/blocked",
-        icon: <BanIcon size={16} />,
-    },
-    {
-        content: "Languages",
-        href: "/setting/language",
-        icon: <LanguagesIcon size={16} />,
-    },
-];
-
 export default function SettingLayout({ children }: IProps) {
     const pathName = usePathname();
     const router = useRouter();
     const { currentUser } = useAuthStore();
+    const { t: tUser } = useTranslation("user");
+    const navLinks = [
+        {
+            content: tUser("USER.SETTING.ACCOUNT"),
+            href: "/setting/account",
+            icon: <LockIcon size={16} />,
+        },
+        {
+            content: tUser("USER.SETTING.BLOCKED_USER"),
+            href: "/setting/blocked",
+            icon: <BanIcon size={16} />,
+        },
+        {
+            content: tUser("USER.SETTING.LANGUAGE"),
+            href: "/setting/language",
+            icon: <LanguagesIcon size={16} />,
+        },
+    ];
 
     return (
         <div className="contain-none md:container">
@@ -47,7 +48,7 @@ export default function SettingLayout({ children }: IProps) {
                                     router.push(`/profile/${currentUser?._id}`);
                                 }}
                             />
-                            <span className="text-lg">Setting</span>
+                            <span className="text-lg">{tUser("USER.SETTING.TITLE")}</span>
                         </div>
                         <ul className="mt-5">
                             {navLinks.map((link) => {

@@ -3,6 +3,8 @@
     "USER.UNFOLLOW": "Bỏ theo dõi",
     "USER.BLOCK_USER": "Chặn người dùng",
     "USER.UNBLOCK_USER": "Bỏ chặn người dùng",
+    "USER.UNBLOCK": "bỏ chặn",
+    "USER.BLOCK": "chặn",
     "USER.REPORT_USER": "Báo cáo người dùng",
     "USER.SHARE_PROFILE": "Chia sẻ hồ sơ",
     "USER.SEND_MESSAGE": "Gửi tin nhắn",
@@ -10,6 +12,15 @@
     "USER.SETTING": "Cài đặt",
     "USER.FOLLOWER": "người theo dõi",
     "USER.FOLLOWING": "đang theo dõi",
+    "USER.BLOCK_UNBLOCK_ACTION": "Bạn có muốn {{action}} {{username}} không?",
+    "USER.BLOCK.NOTE_1": "{{username}} sẽ không thể",
+    "USER.BLOCK.NOTE_LIST_1": "Xem hồ sơ của bạn",
+    "USER.BLOCK.NOTE_LIST_2": "Theo dõi bạn",
+    "USER.BLOCK.NOTE_LIST_3": "Gửi tin nhắn cho bạn",
+    "USER.BLOCK.NOTE_LIST_4": "Bình luận về bài viết của bạn",
+    "USER.BLOCK.NOTE_LIST_5": "Gắn thẻ bạn",
+    "USER.BLOCK.NOTE_LIST_6": "Xem bài viết của bạn trên bảng tin của họ",
+    "USER.BLOCK.NOTE_2": "Nếu bạn đã theo dõi, việc chặn {{username}} cũng sẽ hủy theo dõi họ",
 
     "USER.USERNAME": "Tên người dùng",
     "USER.BIO": "Tiểu sử",
@@ -17,5 +28,11 @@
     "USER.CROP_IMAGE": "Cắt hình",
 
     "USER.EDIT.REQUIRE_CHANGE": "Bạn cần thay đổi để cập nhật hồ sơ của mình",
-    "USER.EDIT.PROFILE_UPDATED": "Hồ sơ đã được cập nhật thành công"
+    "USER.EDIT.PROFILE_UPDATED": "Hồ sơ đã được cập nhật thành công",
+
+    "USER.SETTING.TITLE": "Cài đặt",
+    "USER.SETTING.LANGUAGE": "Ngôn ngữ",
+    "USER.SETTING.ACCOUNT": "Tài khoản",
+    "USER.SETTING.BLOCKED_USER": "Người dùng đã chặn",
+    "USER.SETTING.UNBLOCK_CONFIRMATION": "Bạn có muốn bỏ chặn {{username}} không?"
 }

@@ -13,6 +13,7 @@ import { showToast } from "@/utils/toast";
 import { Button, Spinner, useDisclosure } from "@heroui/react";
 import { HeartHandshakeIcon } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function BlockedPage() {
@@ -30,6 +31,7 @@ export default function BlockedPage() {
     } = usePagination<IUser>("/account/blocked");
     const mutation = useGlobalMutation();
     const { currentUser } = useAuthStore();
+    const { t: tUser } = useTranslation("user");
 
     const handleUnblock = async () => {
         try {
@@ -37,7 +39,7 @@ export default function BlockedPage() {
 
             await axiosInstance.put(`/account/unblock/${clickedUser._id}`);
 
-            showToast(`Unblocked ${clickedUser.username}`, "success");
+            showToast(`${tUser("USER.UNBLOCK")} ${clickedUser.username}`, "success");
 
             const updatedCurrentUser = { ...currentUser };
 
@@ -67,7 +69,7 @@ export default function BlockedPage() {
     return (
         <div className="flex justify-center">
             <ConfirmationModal
-                title={`You want to "unblock" ${clickedUser?.username} `}
+                title={tUser("USER.SETTING.UNBLOCK_CONFIRMATION", { username: clickedUser?.username })}
                 description={null}
                 icon={<HeartHandshakeIcon size={24} />}
                 iconBgColor="#000"
@@ -76,12 +78,12 @@ export default function BlockedPage() {
                 onOpenChange={onOpenChange}
                 onOk={handleUnblock}
                 okButtonProps={{ color: "primary" }}
-                okButtonContent="Unblock"
+                okButtonContent={<span className="first-letter:uppercase">{tUser("USER.UNBLOCK")}</span>}
                 onClose={onClose}
             />
 
             <div className="w-full md:max-w-xl">
-                <h1 className="text-xl font-medium mb-5">Blocked account</h1>
+                <h1 className="text-xl font-medium mb-5">{tUser("USER.SETTING.BLOCKED_USER")}</h1>
 
                 <InfiniteScroll
                     scrollableTarget="post-activity"
@@ -109,7 +111,7 @@ export default function BlockedPage() {
                                     onOpen();
                                 }}
                             >
-                                Unblock
+                                <span className="first-letter:uppercase"> {tUser("USER.UNBLOCK")}</span>
                             </Button>
                         </div>
                     ))}

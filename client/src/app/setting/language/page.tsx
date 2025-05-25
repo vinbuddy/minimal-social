@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function LanguagePage() {
-    const { i18n } = useTranslation();
+    const { i18n, t: tUser } = useTranslation("user");
     const [selectedKeys, setSelectedKeys] = useState(new Set([i18n.language]));
 
     const selectedValue = useMemo(() => Array.from(selectedKeys).join(", "), [selectedKeys]);
@@ -22,7 +22,7 @@ export default function LanguagePage() {
 
     return (
         <div>
-            <h1 className="text-xl font-medium mb-5">Language setting</h1>
+            <h1 className="text-xl font-medium mb-5">{tUser("USER.SETTING.LANGUAGE")}</h1>
             <div className="w-2/3">
                 <Listbox
                     disallowEmptySelection
@@ -35,7 +35,12 @@ export default function LanguagePage() {
                     }}
                 >
                     {LANGUAGE_OPTIONS.map((option) => (
-                        <ListboxItem key={option.value}>
+                        <ListboxItem
+                            classNames={{
+                                base: option.value === selectedValue && "bg-content2",
+                            }}
+                            key={option.value}
+                        >
                             <div key={option.value} className="flex items-center gap-4 cursor-pointer">
                                 <Image
                                     width={40}
