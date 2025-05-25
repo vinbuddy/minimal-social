@@ -12,8 +12,8 @@ import FollowButton from "@/components/user/follow-button";
 import UserFollowInfoModal from "@/components/user/user-follow-info-modal";
 import UserName from "@/components/user/user-name";
 import { useAuthStore } from "@/hooks/store";
-import { useIsBlocked, useIsOwner, useLoading, usePagination } from "@/hooks";
-import { IPost } from "@/types/post";
+import { useIsBlocked, useIsOwner, useLoading, usePagination, useVisibility } from "@/hooks";
+import { IPost, ISelectMediaFile } from "@/types/post";
 import { IUser } from "@/types/user";
 import { EllipsisIcon, SendIcon } from "lucide-react";
 import axiosInstance from "@/utils/http-request";
@@ -23,6 +23,7 @@ import ErrorMessage from "@/components/error-message";
 import ScreenCenterWrapper from "@/components/screen-center-wrapper";
 import PostModalButton from "@/components/post/post-modal-button";
 import { useTranslation } from "react-i18next";
+import FullScreenMediaSlider from "@/components/media/fullscreen-media-slider";
 
 export default function ProfilePage() {
     const params = useParams() as { id: string };
@@ -33,9 +34,15 @@ export default function ProfilePage() {
     const { data: user, isLoading, error } = useSWR<{ data: IUser }>(`/user/${params.id}`);
     const [followerCount, setFollowerCount] = useState(user?.data?.followers?.length ?? 0);
     const { loading, startLoading, stopLoading } = useLoading();
+    const { isVisible, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
+
     const isOwner = useIsOwner(user?.data?._id);
 
     const isBlocked = useIsBlocked(user?.data?._id);
+    const [mediaInfo, setMediaInfo] = useState<ISelectMediaFile>({
+        mediaFiles: [],
+        index: 0,
+    });
 
     const { t: tUser } = useTranslation("user");
     const { t: tPost } = useTranslation("post");
@@ -113,6 +120,12 @@ export default function ProfilePage() {
 
     return (
         <div className="flex justify-center w-full">
+            <FullScreenMediaSlider
+                onHide={hideFullscreenSlider}
+                isOpen={isVisible}
+                activeSlideIndex={mediaInfo?.index ?? 0}
+                mediaFiles={mediaInfo?.mediaFiles ?? []}
+            />
             <div className="w-[calc(100vw_-_80px)] md:w-[630px]">
                 <main className="px-4 py-5">
                     <section className="flex flex-wrap justify-center items-center gap-10">
@@ -244,7 +257,13 @@ export default function ProfilePage() {
                                     >
                                         {posts.map((post) => (
                                             <Fragment key={post?._id}>
-                                                <PostItem post={post} />
+                                                <PostItem
+                                                    post={post}
+                                                    onSelectMediaFile={(mediaInfo) => {
+                                                        setMediaInfo(mediaInfo);
+                                                        showFullscreenSlider();
+                                                    }}
+                                                />
                                             </Fragment>
                                         ))}
                                     </InfiniteScroll>

@@ -27,4 +27,9 @@ export interface IPost {
     repostCount?: number;
 }
 
+export interface ISelectMediaFile {
+    mediaFiles: IMediaFile[];
+    index: number;
+}
+
 // export type PostType = "Feed" | "Following" | "UserPosts";
