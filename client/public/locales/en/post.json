@@ -5,6 +5,7 @@
     "POST_MENTIONED_YOU": "mentioned in a post",
     "POST_IS_EDITED": "This post is edited",
     "POST_IS_REPOSTED": "reposted",
+    "POST_REPOSTED": "Reposted",
     "POST_FEED": "Your feed",
     "POST_FOLLOWING": "Following",
     "POST_LIKED": "Liked",
@@ -16,5 +17,7 @@
 
     "POST_DETAIL.SEE_ACTIVITY": "See activities",
     "POST_DETAIL.ACTIVITY": "Post activities",
-    "POST_DETAIL.ACTIVITY_EMPTY": "This post has not activated yet"
+    "POST_DETAIL.ACTIVITY_EMPTY": "This post has not activated yet",
+
+    "POST_EMPTY": "No posts yet"
 }

@@ -16,10 +16,13 @@ import { usePagination, useDebounce } from "@/hooks";
 import { IPost } from "@/types/post";
 import { IUser } from "@/types/user";
 import ErrorMessage from "@/components/error-message";
+import { useTranslation } from "react-i18next";
 
 export default function SearchPage() {
     const [searchValue, setSearchValue] = useState("");
     const debouncedSearch = useDebounce(searchValue, 800);
+
+    const { t } = useTranslation("common");
 
     const searchParams = useSearchParams();
     const query = searchParams.get("query");
@@ -59,7 +62,7 @@ export default function SearchPage() {
                             }}
                             defaultValue={""}
                             value={searchValue}
-                            placeholder="Search..."
+                            placeholder={t("SEARCH") + "..."}
                             size="md"
                             variant="flat"
                             radius="full"
@@ -78,7 +81,7 @@ export default function SearchPage() {
                                 className="bg-content2 rounded-full py-1.5 ps-2 pe-5"
                                 name={
                                     <div className="flex items-center">
-                                        <p className="text-default-400">Searching for: &nbsp;</p>
+                                        <p className="text-default-400">{t("SEARCHING_FOR")}: &nbsp;</p>
                                         <span className="text-link">{query}</span>
                                     </div>
                                 }
@@ -135,7 +138,7 @@ export default function SearchPage() {
                             )}
 
                             {posts.length === 0 && !isSearchLoading && !searchError && (
-                                <p className="text-center">Result not found</p>
+                                <p className="text-center">{t("NO_RESULT")}</p>
                             )}
                             {!searchError && posts.length > 0 && (
                                 <InfiniteScroll

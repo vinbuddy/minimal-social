@@ -1,6 +1,7 @@
 import { Button, Slider, SliderValue } from "@heroui/react";
 import { useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
+import { useTranslation } from "react-i18next";
 interface IProps {
     imageURL: string | null;
     onSave: (url: string) => void;
@@ -10,6 +11,7 @@ interface IProps {
 export default function AvatarCropper({ imageURL, onSave, onCancel }: IProps) {
     const [slideValue, setSlideValue] = useState<SliderValue>(10);
     const cropRef = useRef<AvatarEditor | null>(null);
+    const { t } = useTranslation("common");
 
     const handleSaveCroppedImage = async () => {
         if (cropRef.current) {
@@ -51,10 +53,10 @@ export default function AvatarCropper({ imageURL, onSave, onCancel }: IProps) {
 
             <div className="flex w-full mt-5 gap-4">
                 <Button onPress={onCancel} fullWidth color="default" variant="light">
-                    Cancel
+                    {t("CANCEL")}
                 </Button>
                 <Button onPress={handleSaveCroppedImage} fullWidth color="primary">
-                    Save
+                    {t("SAVE")}
                 </Button>
             </div>
         </div>

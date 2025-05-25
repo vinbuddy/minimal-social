@@ -8,6 +8,7 @@ import { useAuthStore } from "@/hooks/store";
 import { IUser } from "@/types/user";
 import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
+import { useTranslation } from "react-i18next";
 
 interface IProps extends ButtonProps {
     user: IUser;
@@ -17,6 +18,7 @@ interface IProps extends ButtonProps {
 
 export default function FollowButton({ user, onAfterFollowed, onAfterUnFollowed, ...rest }: IProps) {
     const { currentUser } = useAuthStore();
+    const { t: tUser } = useTranslation("user");
 
     const [isFollowed, setIsFollowed] = useState<boolean>(() => {
         if (!currentUser) return false;
@@ -59,7 +61,7 @@ export default function FollowButton({ user, onAfterFollowed, onAfterUnFollowed,
             if (!currentUser) return;
             setIsFollowed(false);
 
-            const response = await axiosInstance.put("/user/unfollow", {
+            await axiosInstance.put("/user/unfollow", {
                 userId: user._id,
                 currentUserId: currentUser._id,
             });
@@ -83,7 +85,7 @@ export default function FollowButton({ user, onAfterFollowed, onAfterUnFollowed,
             className={`${currentUser && currentUser._id === user._id ? "hidden" : ""}`}
             {...rest}
         >
-            {isFollowed ? "Unfollow" : "Follow"}
+            {isFollowed ? tUser("USER.UNFOLLOW") : tUser("USER.FOLLOW")}
         </Button>
     );
 }

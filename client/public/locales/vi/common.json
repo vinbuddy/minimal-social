@@ -20,5 +20,9 @@
     "NO_RESULT": "Không tìm thấy kết quả",
     "YOU": "Bạn",
     "TODAY": "Hôm nay",
-    "YESTERDAY": "Hôm qua"
+    "YESTERDAY": "Hôm qua",
+    "SEARCHING_FOR": "Tìm kiếm",
+    "SAVE": "Lưu",
+    "CANCEL": "Hủy",
+    "COPIED_TO_CLIPBOARD": "Đã sao chép vào bộ nhớ tạm"
 }

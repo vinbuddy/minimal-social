@@ -1,26 +1,15 @@
 "use client";
 
-import {
-    Modal,
-    ModalContent,
-    ModalHeader,
-    ModalBody,
-    useDisclosure,
-    Image,
-    ModalFooter,
-    Tabs,
-    Tab,
-    Spinner,
-} from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, useDisclosure, ModalFooter, Tabs, Tab } from "@heroui/react";
 import { useState } from "react";
 import useSWR from "swr";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { TRANSITION_EASINGS } from "@heroui/framer-utils";
 
 import UserItem from "../user/user-item";
 import UserSkeletons from "../user/user-skeletons";
 import { IMessage } from "@/types/message";
 import ErrorMessage from "../error-message";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     children: React.ReactNode;
@@ -28,8 +17,9 @@ interface IProps {
 }
 
 export default function MessageReactionModal({ children, messageId }: IProps) {
-    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [emoji, setEmoji] = useState("❤️");
+    const { t: tChat } = useTranslation("chat");
 
     const {
         data: reactionData,
@@ -85,7 +75,9 @@ export default function MessageReactionModal({ children, messageId }: IProps) {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex items-center justify-between">Message reactions</ModalHeader>
+                            <ModalHeader className="flex items-center justify-between">
+                                {tChat("CHAT.MESSAGE.REACTION")}
+                            </ModalHeader>
                             <ModalBody id="message-reaction" className="py-0 px-6 scrollbar">
                                 <div>
                                     <Tabs
@@ -118,7 +110,7 @@ export default function MessageReactionModal({ children, messageId }: IProps) {
                                         {error && !isLoading && <ErrorMessage error={error} className="text-center" />}
 
                                         {reactionData?.data?.reactions?.length === 0 && !isLoading && !error && (
-                                            <p className="text-center">This message has not reaction yet</p>
+                                            <p className="text-center">{tChat("CHAT.MESSAGE.REACTION_EMPTY")}</p>
                                         )}
                                         {!error && reactionData?.data && (
                                             <>

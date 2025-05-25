@@ -16,5 +16,17 @@
     "CHAT.SECURITY.DELETE_CONVERSATION": "Xóa cuộc trò chuyện",
 
     "CHAT.MESSAGE_PLACEHOLDER": "Nhập tin nhắn của bạn",
-    "CHAT.MESSAGE.REPLY_TO": "Trả lời tin nhắn {{username}}"
+    "CHAT.MESSAGE.REPLY_TO": "Trả lời tin nhắn {{username}}",
+    "CHAT.MESSAGE_MENU.COPY": "Sao chép tin nhắn",
+    "CHAT.MESSAGE_MENU.DELETE": "Xóa tin nhắn",
+    "CHAT.MESSAGE_MENU.RETRACT": "Thu hồi tin nhắn",
+    "CHAT.MESSAGE_MENU.PIN": "Ghim tin nhắn",
+
+    "CHAT.MESSAGE.DELETED_MESSAGE_SUCCESS": "Xóa tin nhắn thành công",
+    "CHAT.MESSAGE.DELETED_MESSAGE_FAILED": "Xóa tin nhắn thất bại",
+    "CHAT.MESSAGE.RETRACTED_MESSAGE_SUCCESS": "Thu hồi tin nhắn thành công",
+    "CHAT.MESSAGE.RETRACTED_MESSAGE_FAILED": "Thu hồi tin nhắn thất bại",
+
+    "CHAT.MESSAGE.REACTION": "Biểu cảm",
+    "CHAT.MESSAGE.REACTION_EMPTY": "Tin nhắn này chưa có biểu cảm nào"
 }

@@ -1,0 +1,21 @@
+{
+    "USER.FOLLOW": "Theo dõi",
+    "USER.UNFOLLOW": "Bỏ theo dõi",
+    "USER.BLOCK_USER": "Chặn người dùng",
+    "USER.UNBLOCK_USER": "Bỏ chặn người dùng",
+    "USER.REPORT_USER": "Báo cáo người dùng",
+    "USER.SHARE_PROFILE": "Chia sẻ hồ sơ",
+    "USER.SEND_MESSAGE": "Gửi tin nhắn",
+    "USER.EDIT_PROFILE": "Chỉnh sửa hồ sơ",
+    "USER.SETTING": "Cài đặt",
+    "USER.FOLLOWER": "người theo dõi",
+    "USER.FOLLOWING": "đang theo dõi",
+
+    "USER.USERNAME": "Tên người dùng",
+    "USER.BIO": "Tiểu sử",
+    "USER.REMOVE_IMAGE": "Xóa hình",
+    "USER.CROP_IMAGE": "Cắt hình",
+
+    "USER.EDIT.REQUIRE_CHANGE": "Bạn cần thay đổi để cập nhật hồ sơ của mình",
+    "USER.EDIT.PROFILE_UPDATED": "Hồ sơ đã được cập nhật thành công"
+}

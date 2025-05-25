@@ -5,6 +5,7 @@
     "POST_MENTIONED_YOU": "đã đề cập đến bạn trong một bài đăng",
     "POST_IS_EDITED": "Bài đăng này đã được chỉnh sửa",
     "POST_IS_REPOSTED": "đăng lại",
+    "POST_REPOSTED": "Đã đăng lại",
     "POST_FEED": "Dành cho bạn",
     "POST_FOLLOWING": "Đang theo dõi",
     "POST_LIKED": "Đã thích",
@@ -16,5 +17,7 @@
 
     "POST_DETAIL.SEE_ACTIVITY": "Xem tương tác",
     "POST_DETAIL.ACTIVITY": "Các tương tác",
-    "POST_DETAIL.ACTIVITY_EMPTY": "Bài viết chưa có tương tác nào"
+    "POST_DETAIL.ACTIVITY_EMPTY": "Bài viết chưa có tương tác nào",
+
+    "POST_EMPTY": "Chưa có bài đăng nào"
 }

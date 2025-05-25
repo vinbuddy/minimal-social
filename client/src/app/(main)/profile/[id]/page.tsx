@@ -22,6 +22,7 @@ import ProfileMenuDropdown from "@/components/user/profile-menu-dropdown";
 import ErrorMessage from "@/components/error-message";
 import ScreenCenterWrapper from "@/components/screen-center-wrapper";
 import PostModalButton from "@/components/post/post-modal-button";
+import { useTranslation } from "react-i18next";
 
 export default function ProfilePage() {
     const params = useParams() as { id: string };
@@ -35,6 +36,9 @@ export default function ProfilePage() {
     const isOwner = useIsOwner(user?.data?._id);
 
     const isBlocked = useIsBlocked(user?.data?._id);
+
+    const { t: tUser } = useTranslation("user");
+    const { t: tPost } = useTranslation("post");
 
     useEffect(() => {
         if (user) {
@@ -132,7 +136,9 @@ export default function ProfilePage() {
 
                                 <div className="flex items-center gap-2">
                                     {isOwner && (
-                                        <EditProfileModalButton variant="flat">Edit profile</EditProfileModalButton>
+                                        <EditProfileModalButton variant="flat">
+                                            {tUser("USER.EDIT_PROFILE")}
+                                        </EditProfileModalButton>
                                     )}
 
                                     <ProfileMenuDropdown user={user?.data}>
@@ -148,13 +154,14 @@ export default function ProfilePage() {
                                     <div className="flex gap-4 my-4">
                                         <UserFollowInfoModal type="follower" user={user?.data}>
                                             <p>
-                                                {followerCount} <span className="text-default-500">followers</span>
+                                                {followerCount}{" "}
+                                                <span className="text-default-500">{tUser("USER.FOLLOWER")}</span>
                                             </p>
                                         </UserFollowInfoModal>
                                         <UserFollowInfoModal type="following" user={user?.data}>
                                             <p>
                                                 {user?.data?.followings.length}{" "}
-                                                <span className="text-default-500">following</span>
+                                                <span className="text-default-500">{tUser("USER.FOLLOWING")}</span>
                                             </p>
                                         </UserFollowInfoModal>
                                     </div>
@@ -188,7 +195,7 @@ export default function ProfilePage() {
                                 fullWidth={true}
                                 onPress={handleNavigateToConversation}
                             >
-                                Send message
+                                {tUser("USER.SEND_MESSAGE")}
                             </Button>
                         </div>
                     )}
@@ -212,9 +219,9 @@ export default function ProfilePage() {
                                     tab: "h-12",
                                 }}
                             >
-                                <Tab key="post" title="Posts" />
-                                <Tab key="liked" title="Liked post" />
-                                <Tab key="repost" title="Reposts" />
+                                <Tab key="post" title={tPost("POST_FEED")} />
+                                <Tab key="liked" title={tPost("POST_LIKED")} />
+                                <Tab key="repost" title={tPost("POST_REPOSTED")} />
                             </Tabs>
 
                             <div className="mt-5">
@@ -222,7 +229,7 @@ export default function ProfilePage() {
                                     <ErrorMessage className="text-danger" error={postError} />
                                 )}
                                 {posts.length === 0 && !isPostLoading && !postError && (
-                                    <p className="text-center">No post yet</p>
+                                    <p className="text-center">{tPost("POST_EMPTY")}</p>
                                 )}
                                 {!postError && posts.length > 0 && (
                                     <InfiniteScroll

@@ -16,5 +16,17 @@
     "CHAT.SECURITY.DELETE_CONVERSATION": "Delete conversation",
 
     "CHAT.MESSAGE_PLACEHOLDER": "Enter your message",
-    "CHAT.MESSAGE.REPLY_TO": "Reply to {{username}}'s message"
+    "CHAT.MESSAGE.REPLY_TO": "Reply to {{username}}'s message",
+    "CHAT.MESSAGE_MENU.COPY": "Copy message",
+    "CHAT.MESSAGE_MENU.DELETE": "Delete message",
+    "CHAT.MESSAGE_MENU.RETRACT": "Retract message",
+    "CHAT.MESSAGE_MENU.PIN": "Pin message",
+
+    "CHAT.MESSAGE.DELETED_MESSAGE_SUCCESS": "Message deleted successfully",
+    "CHAT.MESSAGE.DELETED_MESSAGE_FAILED": "Failed to delete message",
+    "CHAT.MESSAGE.RETRACTED_MESSAGE_SUCCESS": "Message retracted successfully",
+    "CHAT.MESSAGE.RETRACTED_MESSAGE_FAILED": "Failed to retract message",
+
+    "CHAT.MESSAGE.REACTION": "Reaction",
+    "CHAT.MESSAGE.REACTION_EMPTY": "This message has not reaction yet"
 }

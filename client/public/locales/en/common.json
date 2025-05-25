@@ -20,5 +20,9 @@
     "NO_RESULT": "No results found",
     "YOU": "You",
     "TODAY": "Today",
-    "YESTERDAY": "Yesterday"
+    "YESTERDAY": "Yesterday",
+    "SEARCHING_FOR": "Searching for",
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "COPIED_TO_CLIPBOARD": "Copied to clipboard"
 }

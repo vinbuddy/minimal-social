@@ -1,0 +1,21 @@
+{
+    "USER.FOLLOW": "Follow",
+    "USER.UNFOLLOW": "Unfollow",
+    "USER.BLOCK_USER": "Block User",
+    "USER.UNBLOCK_USER": "Unblock User",
+    "USER.REPORT_USER": "Report User",
+    "USER.SHARE_PROFILE": "Share Profile",
+    "USER.SEND_MESSAGE": "Send Message",
+    "USER.EDIT_PROFILE": "Edit Profile",
+    "USER.SETTING": "Setting",
+    "USER.FOLLOWER": "followers",
+    "USER.FOLLOWING": "following",
+
+    "USER.USERNAME": "Username",
+    "USER.BIO": "Bio",
+    "USER.REMOVE_IMAGE": "Remove Image",
+    "USER.CROP_IMAGE": "Crop Image",
+
+    "USER.EDIT.REQUIRE_CHANGE": "You must change something to edit your profile",
+    "USER.EDIT.PROFILE_UPDATED": "Profile updated successfully"
+}

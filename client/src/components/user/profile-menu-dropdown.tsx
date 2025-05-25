@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useAuthStore } from "@/hooks/store";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     children: React.ReactNode;
@@ -24,6 +25,8 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const { currentUser } = useAuthStore();
     const mutation = useGlobalMutation();
+    const { t: tUser } = useTranslation("user");
+    const { t } = useTranslation("common");
 
     const [isBlocked, setIsBlocked] = useState<boolean>(() => {
         return currentUser?.blockedUsers.some((blockedUser) => blockedUser._id === user._id) ?? false;
@@ -160,14 +163,14 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
                                 href="/setting/account"
                                 as={Link}
                             >
-                                Settings
+                                {tUser("USER.SETTING")}
                             </DropdownItem>
                             <DropdownItem
                                 startContent={<ShareIcon size={16} />}
                                 key="share"
                                 onPress={() => copy(`${window.location.origin}/user/${user._id}`)}
                             >
-                                Share profile link
+                                {tUser("USER.SHARE_PROFILE")}
                             </DropdownItem>
                         </DropdownSection>
                         <DropdownItem
@@ -177,7 +180,7 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
                             key="logout"
                             onPress={handleLogOut}
                         >
-                            Logout
+                            {t("LOGOUT")}
                         </DropdownItem>
                     </DropdownMenu>
                 ) : (
@@ -188,7 +191,7 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
                                 key="share"
                                 onPress={() => copy(`${window.location.origin}/user/${user._id}`)}
                             >
-                                Share profile link
+                                {tUser("USER.SHARE_PROFILE")}
                             </DropdownItem>
                         </DropdownSection>
                         <DropdownItem
@@ -198,7 +201,7 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
                             key="block"
                             onPress={onOpen}
                         >
-                            {isBlocked ? "Unblock user" : "Block user"}
+                            {isBlocked ? tUser("USER.UNBLOCK_USER") : tUser("USER.BLOCK_USER")}
                         </DropdownItem>
                         <DropdownItem
                             color="danger"
@@ -206,7 +209,7 @@ export default function ProfileMenuDropdown({ children, user }: IProps) {
                             startContent={<FlagTriangleRightIcon size={16} />}
                             key="report"
                         >
-                            Report user
+                            {tUser("USER.REPORT_USER")}
                         </DropdownItem>
                     </DropdownMenu>
                 )}
