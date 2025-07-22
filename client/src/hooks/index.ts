@@ -10,3 +10,4 @@ export { default as useCopyToClipboard } from "./use-copy-to-clipboard";
 export { default as useIsBlocked } from "./use-is-blocked";
 export { default as useOtherUserConversation } from "./use-other-user-conversation";
 export { default as useIsBlockMode } from "./use-is-block-mode";
+export { default as useGetCallById } from "./use-get-call-by-id";

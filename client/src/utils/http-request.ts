@@ -1,12 +1,13 @@
+import { ENV } from "@/config/env";
 import axios from "axios";
 
 export async function fetchData(url: string, options: RequestInit = {}) {
-    const response = await fetch(process.env.NEXT_PUBLIC_API_BASE_URL + url, options);
+    const response = await fetch(ENV.API_BASE_URL + url, options);
     return await response.json();
 }
 
 const axiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    baseURL: ENV.API_BASE_URL,
     headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -23,7 +24,7 @@ axiosInstance.interceptors.response.use(
         // If error is 401 (Unauthorized) and request hasn't been retried
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
-            await axios.post(process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/refresh", {}, { withCredentials: true });
+            await axios.post(ENV.API_BASE_URL + "/auth/refresh", {}, { withCredentials: true });
 
             return axiosInstance(originalRequest);
         }

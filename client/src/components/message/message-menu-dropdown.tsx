@@ -1,18 +1,12 @@
 import { IMessage } from "@/types/message";
 import { showToast } from "@/utils/toast";
-import {
-    Dropdown,
-    DropdownItem,
-    DropdownMenu,
-    DropdownSection,
-    DropdownTrigger,
-    useDisclosure,
-} from "@heroui/react";
+import { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger, useDisclosure } from "@heroui/react";
 import { CopyIcon, PinIcon, RotateCcwIcon, Trash2Icon } from "lucide-react";
 import ConfirmationModal from "../confirmation-modal";
 import { useMessagesStore } from "@/hooks/store";
 import axiosInstance from "@/utils/http-request";
 import { useCopyToClipboard } from "@/hooks";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     message: IMessage;
@@ -27,31 +21,31 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
         onOpenChange: onOpenChangeDelete,
         onClose: onCloseDelete,
     } = useDisclosure();
+
     const {
         isOpen: isOpenRetract,
         onOpen: onOpenRetract,
         onOpenChange: onOpenChangeRetract,
         onClose: onCloseRetract,
     } = useDisclosure();
+
     const { messageList, setMessageList } = useMessagesStore();
     const copy = useCopyToClipboard();
+    const { t: tChat } = useTranslation("chat");
 
     const handleDeleteMessage = async (): Promise<void> => {
         try {
             if (!message._id) throw new Error("Message id is required");
 
-            const res = await axiosInstance.delete(`/message/delete/${message._id}`);
-
-            if (res.status !== 200) {
-                throw new Error("Delete message failed");
-            }
+            await axiosInstance.delete(`/message/delete/${message._id}`);
 
             const newMessageList = messageList.filter((msg) => msg._id !== message._id);
             setMessageList(newMessageList);
 
-            showToast("Deleted message", "success");
+            showToast(tChat("CHAT.MESSAGE.DELETED_MESSAGE_SUCCESS"), "success");
         } catch (err) {
-            showToast("Delete message failed", "error");
+            console.log("err: ", err);
+            showToast(tChat("CHAT.MESSAGE.DELETED_MESSAGE_FAILED"), "error");
         }
     };
 
@@ -75,9 +69,10 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
 
             setMessageList(newMessageList);
 
-            showToast("Retracted message", "success");
-        } catch (err: any) {
-            showToast("Retract message failed", err.message);
+            showToast(tChat("CHAT.MESSAGE.RETRACTED_MESSAGE_SUCCESS"), "success");
+        } catch (err) {
+            console.log("err: ", err);
+            showToast(tChat("CHAT.MESSAGE.RETRACTED_MESSAGE_FAILED"), "error");
         }
     };
 
@@ -111,7 +106,7 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                             key="copy"
                             onPress={() => copy(message.content)}
                         >
-                            Copy message
+                            {tChat("CHAT.MESSAGE_MENU.COPY")}
                         </DropdownItem>
                         <>
                             {!message?.isRetracted && (
@@ -121,7 +116,7 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                                     startContent={<PinIcon size={16} />}
                                     key="pin"
                                 >
-                                    Pin message
+                                    {tChat("CHAT.MESSAGE_MENU.PIN")}
                                 </DropdownItem>
                             )}
                         </>
@@ -137,7 +132,7 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                                 className="text-danger"
                                 onPress={onOpenChangeDelete}
                             >
-                                Delete message
+                                {tChat("CHAT.MESSAGE_MENU.DELETE")}
                             </DropdownItem>
                             <DropdownItem
                                 aria-label="retract"
@@ -148,7 +143,7 @@ export default function MessageMenuDropdown({ message, isOwnMessage, children }:
                                 className="text-danger"
                                 onPress={onOpenChangeRetract}
                             >
-                                Retract message
+                                {tChat("CHAT.MESSAGE_MENU.RETRACT")}
                             </DropdownItem>
                         </>
                     ) : (

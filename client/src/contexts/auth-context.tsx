@@ -7,11 +7,11 @@ import { IUser } from "../types/user";
 import PageLoading from "@/components/page-loading";
 import dynamic from "next/dynamic";
 import PageSlowLoading from "@/components/page-slow-loading";
+import { PUBLIC_ROUTES } from "@/constants/route";
+import { ENV } from "@/config/env";
 
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
-
-const publicRoutes = ["/login", "/register", "/otp", "/forgot", "/reset"];
 
 const AuthContextProvider = ({ children }: { children: any }) => {
     const [isInitializing, setIsInitializing] = useState<boolean>(true);
@@ -22,7 +22,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
     const router = useRouter();
 
     const logout = async () => {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/logout`, {
+        const response = await fetch(`${ENV.API_BASE_URL}/auth/logout`, {
             method: "POST",
             credentials: "include",
         });
@@ -40,7 +40,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
     const refreshToken = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh`, {
+            const response = await fetch(`${ENV.API_BASE_URL}/auth/refresh`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -64,6 +64,28 @@ const AuthContextProvider = ({ children }: { children: any }) => {
         }
     };
 
+    const handleAuthenticatedUser = (user: IUser) => {
+        useAuthStore.setState({ currentUser: user, isAuthenticated: true });
+
+        const isPublicRoute = PUBLIC_ROUTES.includes(pathName);
+
+        if (user.isAdmin && isPublicRoute) {
+            return router.push("/admin");
+        }
+
+        if (isPublicRoute) {
+            return router.push("/");
+        }
+    };
+
+    const handleUnauthenticatedUser = () => {
+        const isPublicRoute = PUBLIC_ROUTES.includes(pathName);
+
+        if (!isPublicRoute) {
+            return router.push("/login");
+        }
+    };
+
     useEffect(() => {
         const initializeAuth = async () => {
             let timeoutId: NodeJS.Timeout | null = null;
@@ -73,31 +95,19 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                     setIsShowSlowLoading(true);
                 }, 4000);
 
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/me`, {
+                const response = await fetch(`${ENV.API_BASE_URL}/auth/me`, {
                     credentials: "include",
                 });
                 const result = await response.json();
+                const user = result.data as IUser;
 
-                // If user is authenticated, set user to store
                 if (response.status === 200) {
-                    const user = result.data as IUser;
-                    useAuthStore.setState({ currentUser: user, isAuthenticated: true });
-
-                    // Redirect if user is authenticated and trying to access public routes
-                    if (publicRoutes.includes(pathName)) {
-                        setIsInitializing(false);
-                        router.push("/");
-                    }
-
-                    return;
+                    return handleAuthenticatedUser(user);
                 }
 
                 // If user is not authenticated, redirect to login page
                 if (response.status === 403) {
-                    if (!publicRoutes.includes(pathName)) {
-                        setIsInitializing(false);
-                        router.push("/login");
-                    }
+                    return handleUnauthenticatedUser();
                 }
 
                 // If user authenticated and token is expired, refresh token
@@ -108,6 +118,7 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                 console.error(error);
             } finally {
                 if (timeoutId) clearTimeout(timeoutId);
+
                 setLoading(false);
                 setIsInitializing(false);
                 setIsShowSlowLoading(false);
@@ -120,11 +131,16 @@ const AuthContextProvider = ({ children }: { children: any }) => {
     }, [pathName, router]);
 
     if (isInitializing) {
-        if (isShowSlowLoading) return <PageSlowLoading />;
+        if (isShowSlowLoading) {
+            return <PageSlowLoading />;
+        }
+
         return <PageLoading />;
     }
 
-    if (loading) return <PageLoading />;
+    if (loading) {
+        return <PageLoading />;
+    }
 
     return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
 };

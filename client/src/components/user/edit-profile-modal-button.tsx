@@ -3,7 +3,6 @@ import { CropIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import { toast } from "sonner";
 
 import AvatarCropper from "./avatar-cropper";
 
@@ -12,6 +11,8 @@ import { showToast } from "@/utils/toast";
 import { IUser } from "@/types/user";
 import { useAuthStore } from "@/hooks/store";
 import { useGlobalMutation, useLoading } from "@/hooks";
+import { ENV } from "@/config/env";
+import { useTranslation } from "react-i18next";
 
 interface IProps extends ButtonProps {}
 
@@ -26,6 +27,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
 
     const { currentUser } = useAuthStore();
     const mutate = useGlobalMutation();
+    const { t: tUser } = useTranslation("user");
 
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imageURL, setImageURL] = useState<string | null>(null);
@@ -70,6 +72,8 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
             removeImage();
         }
 
+        setIsCropped(false);
+
         onOpenChange();
     };
 
@@ -77,7 +81,6 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
         e?.preventDefault();
         if (!currentUser) return;
 
-        startLoading();
         const formData = new FormData();
 
         let isValid = false;
@@ -104,12 +107,14 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
         if (!isValid) {
             return setError("root.manual", {
                 type: "manual",
-                message: "You must change something to edit your profile",
+                message: tUser("USER.EDIT.REQUIRE_CHANGE"),
             });
         }
 
         try {
-            const res = await axios.put(`${process.env.NEXT_PUBLIC_API_BASE_URL}/user/edit`, formData, {
+            startLoading();
+
+            const res = await axios.put(`${ENV.API_BASE_URL}/user/edit`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -130,7 +135,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
                     },
                 }));
 
-                showToast("Profile edited successfully", "success");
+                showToast(tUser("USER.EDIT.PROFILE_UPDATED"), "success");
             }
         } catch (error) {
             showToast("An error occurred while editing your profile", "error");
@@ -184,7 +189,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
                                                         radius="full"
                                                         variant="light"
                                                     >
-                                                        Remove image
+                                                        {tUser("USER.REMOVE_IMAGE")}
                                                     </Button>
                                                     <Button
                                                         startContent={<CropIcon strokeWidth={1.5} size={16} />}
@@ -194,7 +199,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
                                                         variant="flat"
                                                         onPress={() => setIsCropped(true)}
                                                     >
-                                                        Crop image
+                                                        {tUser("USER.CROP_IMAGE")}
                                                     </Button>
                                                 </div>
                                             )}
@@ -216,7 +221,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
                                             <div>
                                                 <Input
                                                     type="text"
-                                                    label="User name"
+                                                    label={tUser("USER.USERNAME")}
                                                     defaultValue={currentUser?.username}
                                                     fullWidth
                                                     {...register("username", {
@@ -228,7 +233,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
                                             <div>
                                                 <Input
                                                     type="text"
-                                                    label="Bio"
+                                                    label={tUser("USER.BIO")}
                                                     defaultValue={currentUser?.bio}
                                                     fullWidth
                                                     {...register("bio", {
@@ -252,7 +257,7 @@ export default function EditProfileModalButton({ ...rest }: IProps) {
                                                 radius="md"
                                                 size="lg"
                                             >
-                                                Edit profile
+                                                {tUser("USER.EDIT_PROFILE")}
                                             </Button>
                                         </form>
                                     </div>

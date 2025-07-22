@@ -13,6 +13,7 @@ import { IMessageLink } from "@/types/message";
 import { formatDate } from "@/utils/datetime";
 import { LinkIcon } from "lucide-react";
 import ErrorMessage from "../error-message";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     conversationId: string;
@@ -21,6 +22,7 @@ interface IProps {
 
 export default function ConversationStorage({ conversationId, tab }: IProps) {
     const [storageTab, setStorageTab] = useState<string>(tab);
+    const { t: tChat } = useTranslation("chat");
 
     const {
         data: mediaFiles,
@@ -54,7 +56,7 @@ export default function ConversationStorage({ conversationId, tab }: IProps) {
         }
 
         if (mediaFiles.length === 0 && !isLoading && !error) {
-            return <p className="text-center">No media files yet</p>;
+            return <p className="text-center">{tChat("CHAT.STORAGE.NO_MEDIA_FILE")}</p>;
         }
 
         return (
@@ -119,7 +121,7 @@ export default function ConversationStorage({ conversationId, tab }: IProps) {
         }
 
         if (messageLinks.length === 0 && !linkIsLoading && !linkError) {
-            return <p className="text-center">No links yet</p>;
+            return <p className="text-center">{tChat("CHAT.STORAGE.NO_LINK")}</p>;
         }
 
         return (
@@ -191,11 +193,11 @@ export default function ConversationStorage({ conversationId, tab }: IProps) {
                     selectedKey={storageTab}
                     onSelectionChange={(key) => setStorageTab(key.toString() as typeof storageTab)}
                 >
-                    <Tab key="media" title="Media files">
+                    <Tab key="media" title={tChat("CHAT.STORAGE.MEDIA_FILE")}>
                         <div>{renderMediaFiles()}</div>
                     </Tab>
-                    <Tab key="file" title="Files" />
-                    <Tab key="link" title="Links">
+                    <Tab key="file" title={tChat("CHAT.STORAGE.FILE")} />
+                    <Tab key="link" title={tChat("CHAT.STORAGE.LINK")}>
                         <div>{renderLinks()}</div>
                     </Tab>
                 </Tabs>

@@ -13,6 +13,7 @@ import { useLoading } from "@/hooks";
 import { IUser } from "@/types/user";
 import { GoogleIcon } from "@/assets/icons";
 import { showToast } from "@/utils/toast";
+import { ENV } from "@/config/env";
 
 interface IUserLogin {
     password: string;
@@ -41,7 +42,7 @@ export default function LoginPage() {
         try {
             startLoading();
             const response = await axios.post(
-                process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/login",
+                ENV.API_BASE_URL + "/auth/login",
                 {
                     email: formData.email,
                     password: formData.password,
@@ -54,8 +55,6 @@ export default function LoginPage() {
                 useAuthStore.setState({
                     currentUser: user,
                     isAuthenticated: true,
-                    // accessToken: response.data?.accessToken,
-                    // refreshToken: response.data?.refreshToken,
                 });
             }
 
@@ -76,7 +75,7 @@ export default function LoginPage() {
     };
 
     const handleLoginWithGoogle = () => {
-        const googleLoginURL = process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/google";
+        const googleLoginURL = ENV.API_BASE_URL + "/auth/google";
         window.open(googleLoginURL, "_self");
     };
 

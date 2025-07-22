@@ -12,8 +12,8 @@ import FollowButton from "@/components/user/follow-button";
 import UserFollowInfoModal from "@/components/user/user-follow-info-modal";
 import UserName from "@/components/user/user-name";
 import { useAuthStore } from "@/hooks/store";
-import { useIsBlocked, useIsOwner, useLoading, usePagination } from "@/hooks";
-import { IPost } from "@/types/post";
+import { useIsBlocked, useIsOwner, useLoading, usePagination, useVisibility } from "@/hooks";
+import { IPost, ISelectMediaFile } from "@/types/post";
 import { IUser } from "@/types/user";
 import { EllipsisIcon, SendIcon } from "lucide-react";
 import axiosInstance from "@/utils/http-request";
@@ -22,6 +22,8 @@ import ProfileMenuDropdown from "@/components/user/profile-menu-dropdown";
 import ErrorMessage from "@/components/error-message";
 import ScreenCenterWrapper from "@/components/screen-center-wrapper";
 import PostModalButton from "@/components/post/post-modal-button";
+import { useTranslation } from "react-i18next";
+import FullScreenMediaSlider from "@/components/media/fullscreen-media-slider";
 
 export default function ProfilePage() {
     const params = useParams() as { id: string };
@@ -32,9 +34,18 @@ export default function ProfilePage() {
     const { data: user, isLoading, error } = useSWR<{ data: IUser }>(`/user/${params.id}`);
     const [followerCount, setFollowerCount] = useState(user?.data?.followers?.length ?? 0);
     const { loading, startLoading, stopLoading } = useLoading();
+    const { isVisible, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
+
     const isOwner = useIsOwner(user?.data?._id);
 
     const isBlocked = useIsBlocked(user?.data?._id);
+    const [mediaInfo, setMediaInfo] = useState<ISelectMediaFile>({
+        mediaFiles: [],
+        index: 0,
+    });
+
+    const { t: tUser } = useTranslation("user");
+    const { t: tPost } = useTranslation("post");
 
     useEffect(() => {
         if (user) {
@@ -109,6 +120,12 @@ export default function ProfilePage() {
 
     return (
         <div className="flex justify-center w-full">
+            <FullScreenMediaSlider
+                onHide={hideFullscreenSlider}
+                isOpen={isVisible}
+                activeSlideIndex={mediaInfo?.index ?? 0}
+                mediaFiles={mediaInfo?.mediaFiles ?? []}
+            />
             <div className="w-[calc(100vw_-_80px)] md:w-[630px]">
                 <main className="px-4 py-5">
                     <section className="flex flex-wrap justify-center items-center gap-10">
@@ -132,7 +149,9 @@ export default function ProfilePage() {
 
                                 <div className="flex items-center gap-2">
                                     {isOwner && (
-                                        <EditProfileModalButton variant="flat">Edit profile</EditProfileModalButton>
+                                        <EditProfileModalButton variant="flat">
+                                            {tUser("USER.EDIT_PROFILE")}
+                                        </EditProfileModalButton>
                                     )}
 
                                     <ProfileMenuDropdown user={user?.data}>
@@ -148,13 +167,14 @@ export default function ProfilePage() {
                                     <div className="flex gap-4 my-4">
                                         <UserFollowInfoModal type="follower" user={user?.data}>
                                             <p>
-                                                {followerCount} <span className="text-default-500">followers</span>
+                                                {followerCount}{" "}
+                                                <span className="text-default-500">{tUser("USER.FOLLOWER")}</span>
                                             </p>
                                         </UserFollowInfoModal>
                                         <UserFollowInfoModal type="following" user={user?.data}>
                                             <p>
                                                 {user?.data?.followings.length}{" "}
-                                                <span className="text-default-500">following</span>
+                                                <span className="text-default-500">{tUser("USER.FOLLOWING")}</span>
                                             </p>
                                         </UserFollowInfoModal>
                                     </div>
@@ -188,7 +208,7 @@ export default function ProfilePage() {
                                 fullWidth={true}
                                 onPress={handleNavigateToConversation}
                             >
-                                Send message
+                                {tUser("USER.SEND_MESSAGE")}
                             </Button>
                         </div>
                     )}
@@ -212,9 +232,9 @@ export default function ProfilePage() {
                                     tab: "h-12",
                                 }}
                             >
-                                <Tab key="post" title="Posts" />
-                                <Tab key="liked" title="Liked post" />
-                                <Tab key="repost" title="Reposts" />
+                                <Tab key="post" title={tPost("POST_FEED")} />
+                                <Tab key="liked" title={tPost("POST_LIKED")} />
+                                <Tab key="repost" title={tPost("POST_REPOSTED")} />
                             </Tabs>
 
                             <div className="mt-5">
@@ -222,7 +242,7 @@ export default function ProfilePage() {
                                     <ErrorMessage className="text-danger" error={postError} />
                                 )}
                                 {posts.length === 0 && !isPostLoading && !postError && (
-                                    <p className="text-center">No post yet</p>
+                                    <p className="text-center">{tPost("POST_EMPTY")}</p>
                                 )}
                                 {!postError && posts.length > 0 && (
                                     <InfiniteScroll
@@ -237,7 +257,13 @@ export default function ProfilePage() {
                                     >
                                         {posts.map((post) => (
                                             <Fragment key={post?._id}>
-                                                <PostItem post={post} />
+                                                <PostItem
+                                                    post={post}
+                                                    onSelectMediaFile={(mediaInfo) => {
+                                                        setMediaInfo(mediaInfo);
+                                                        showFullscreenSlider();
+                                                    }}
+                                                />
                                             </Fragment>
                                         ))}
                                     </InfiniteScroll>

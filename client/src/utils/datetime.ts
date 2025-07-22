@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import isToday from "dayjs/plugin/isToday";
 import isYesterday from "dayjs/plugin/isYesterday";
+import { t } from "i18next";
 
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
@@ -25,11 +26,11 @@ export const formatTimeStamp = (ISO8601String: string): string => {
 
 export const formatDate = (ISO8601String: string): string => {
     if (dayjs(ISO8601String).isToday()) {
-        return "Today";
+        return t("TODAY");
     }
 
     if (dayjs(ISO8601String).isYesterday()) {
-        return "Yesterday";
+        return t("YESTERDAY");
     }
 
     return dayjs(ISO8601String).format("DD-MM-YYYY");

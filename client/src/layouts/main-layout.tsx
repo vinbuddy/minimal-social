@@ -15,6 +15,7 @@ import { useLoading } from "@/hooks";
 import { HomeIcon, HeartIcon, ConversationIcon, SearchIcon } from "@/assets/icons";
 import { useSocketContext } from "@/contexts/socket-context";
 import NotificationToast from "@/components/notification/notification-toast";
+import { useTranslation } from "react-i18next";
 
 const navLinks = [
     {
@@ -44,10 +45,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     const [isNotification, setIsNotification] = useState<boolean>(false);
     const { theme, setTheme } = useTheme();
     const { currentUser } = useAuthStore();
-    const { startLoading, stopLoading, loading } = useLoading();
+    const { startLoading, stopLoading } = useLoading();
     const router = useRouter();
     const pathName = usePathname();
     const { socket } = useSocketContext();
+
+    const { t } = useTranslation("common");
 
     useEffect(() => setMounted(true), []);
 
@@ -168,7 +171,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                     href={navLink.href}
                                     radius="sm"
                                     isIconOnly
-                                    // color="danger"
                                     color="default"
                                     className={`${isActive ? activeColor : "text-default-400"}`}
                                     variant="light"
@@ -193,7 +195,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                         </DropdownTrigger>
                         <DropdownMenu aria-label="Profile Actions" variant="flat">
                             <DropdownItem textValue="" key="header" className="h-14 gap-2">
-                                <p className="font-semibold">Signed in as</p>
+                                <p className="font-semibold">{t("SIGN_IN_AS")}</p>
                                 <p className="font-semibold">{currentUser?.email}</p>
                             </DropdownItem>
                             <DropdownItem
@@ -203,7 +205,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 href={`/profile/${currentUser?._id}`}
                                 key="profile"
                             >
-                                Profile
+                                {t("PROFILE")}
                             </DropdownItem>
                             <DropdownItem
                                 textValue=""
@@ -220,10 +222,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                         {mounted && (
                                             <>
                                                 <option className="text-black" value="dark">
-                                                    Dark
+                                                    {t("THEME_DARK")}
                                                 </option>
                                                 <option className="text-black" value="light">
-                                                    Light
+                                                    {t("THEME_LIGHT")}
                                                 </option>
                                             </>
                                         )}
@@ -231,7 +233,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 }
                                 key="theme"
                             >
-                                Theme
+                                {t("THEME")}
                             </DropdownItem>
 
                             <DropdownItem
@@ -242,7 +244,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 className="text-danger"
                                 onPress={handleLogOut}
                             >
-                                Log out
+                                {t("LOGOUT")}
                             </DropdownItem>
                         </DropdownMenu>
                     </Dropdown>

@@ -8,6 +8,7 @@ import axios from "axios";
 import Link from "next/link";
 
 import { useLoading } from "@/hooks";
+import { ENV } from "@/config/env";
 
 interface IForgotPassword {
     email: string;
@@ -27,7 +28,7 @@ export default function ForgotPasswordPage() {
     const onSubmitHandler = async (formData: IForgotPassword, e?: React.BaseSyntheticEvent): Promise<void> => {
         try {
             startLoading();
-            const response = await axios.post(process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/forgot", {
+            const response = await axios.post(ENV.API_BASE_URL + "/auth/forgot", {
                 email: formData.email,
             });
 
@@ -48,7 +49,7 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        (<div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-12">
             <div className="mx-auto grid w-[350px] gap-6">
                 <div className="grid gap-2 text-center">
                     <h1 className="text-3xl font-bold">Forgot password</h1>
@@ -87,6 +88,6 @@ export default function ForgotPasswordPage() {
                     </Link>
                 </div>
             </div>
-        </div>)
+        </div>
     );
 }

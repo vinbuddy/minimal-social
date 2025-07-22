@@ -18,6 +18,8 @@ import FullScreenMediaSlider from "../media/fullscreen-media-slider";
 import PostActivitiesModalButton from "./post-activities-modal-button";
 
 import { useVisibility } from "@/hooks";
+import { useTranslation } from "react-i18next";
+import { TranslationNameSpace } from "@/types/translation";
 
 interface IProps {
     post: IPost;
@@ -27,6 +29,8 @@ export default function PostDetail({ post }: IProps) {
     const { isVisible: open, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
     const [activeIndex, setActiveIndex] = useState<number>(0);
     const [openEditModal, setOpenEditModal] = useState<boolean>(false);
+    const { t: tPost } = useTranslation<TranslationNameSpace>("post");
+
     const handleMediaFileClick = (index: number) => {
         setActiveIndex(index);
         showFullscreenSlider();
@@ -91,14 +95,14 @@ export default function PostDetail({ post }: IProps) {
 
                 <div className="flex items-center gap-3">
                     {post?.isEdited && (
-                        <Tooltip content="This post is edited" placement="bottom" showArrow>
+                        <Tooltip content={tPost("POST_IS_EDITED")} placement="bottom" showArrow>
                             <WandSparklesIcon className="cursor-pointer" size={16} />
                         </Tooltip>
                     )}
 
                     {/* Time */}
                     <div className="text-grey cursor-pointer">
-                        <TimeAgo date={post?.createdAt} />
+                        <TimeAgo className="text-sm" date={post?.createdAt} />
                     </div>
 
                     {/* Menu */}
@@ -115,7 +119,7 @@ export default function PostDetail({ post }: IProps) {
                 </div>
             </section>
             <section className="mt-4">
-                <div className="block">{parse(convertLinksToAnchors(post?.caption) ?? "", parserOptions)}</div>
+                <div className="block mb-2">{parse(convertLinksToAnchors(post?.caption) ?? "", parserOptions)}</div>
                 <MediaFileSlider
                     onMediaFileClick={handleMediaFileClick}
                     mediaFiles={post?.mediaFiles ?? []}
@@ -133,7 +137,7 @@ export default function PostDetail({ post }: IProps) {
                         radius="full"
                         className="text-default-500 text-sm px-3 cursor-pointer"
                     >
-                        See activities
+                        {tPost("POST_DETAIL.SEE_ACTIVITY")}
                     </PostActivitiesModalButton>
                 </div>
             </section>

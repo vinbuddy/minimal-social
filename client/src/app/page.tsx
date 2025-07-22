@@ -9,15 +9,23 @@ import PostItem from "@/components/post/post-item";
 import PostSkeletons from "@/components/post/post-skeletons";
 
 import { useAuthStore } from "@/hooks/store";
-import { usePagination } from "@/hooks";
-import { IPost } from "@/types/post";
-import { useSocketContext } from "@/contexts/socket-context";
+import { usePagination, useVisibility } from "@/hooks";
+import { IPost, ISelectMediaFile } from "@/types/post";
 import ErrorMessage from "@/components/error-message";
+import { useTranslation } from "react-i18next";
+import { TranslationNameSpace } from "@/types/translation";
+import FullScreenMediaSlider from "@/components/media/fullscreen-media-slider";
 
 function Home() {
     const [postType, setPostType] = useState<"feed" | "following" | "liked">("feed");
     const { currentUser } = useAuthStore();
-    const { socket } = useSocketContext();
+    const { t: tPost } = useTranslation<TranslationNameSpace>("post");
+    const { isVisible, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
+
+    const [mediaInfo, setMediaInfo] = useState<ISelectMediaFile>({
+        mediaFiles: [],
+        index: 0,
+    });
 
     const getURL = () => {
         switch (postType) {
@@ -43,6 +51,12 @@ function Home() {
 
     return (
         <MainLayout>
+            <FullScreenMediaSlider
+                onHide={hideFullscreenSlider}
+                isOpen={isVisible}
+                activeSlideIndex={mediaInfo?.index ?? 0}
+                mediaFiles={mediaInfo?.mediaFiles ?? []}
+            />
             <div className="flex justify-center w-full">
                 <div className="w-[calc(100vw_-_80px)] md:w-[630px]">
                     <header className="sticky top-0 z-10 p-4 flex justify-between items-center bg-background">
@@ -52,9 +66,9 @@ function Home() {
                             aria-label="Tabs colors"
                             radius="md"
                         >
-                            <Tab key="feed" title="Feed" />
-                            <Tab key="following" title="Following" />
-                            <Tab key="liked" title="Liked" />
+                            <Tab key="feed" title={tPost("POST_FEED")} />
+                            <Tab key="following" title={tPost("POST_FOLLOWING")} />
+                            <Tab key="liked" title={tPost("POST_LIKED")} />
                         </Tabs>
 
                         <PostModalButton />
@@ -76,7 +90,13 @@ function Home() {
                             >
                                 {posts.map((post) => (
                                     <Fragment key={post?._id}>
-                                        <PostItem post={post} />
+                                        <PostItem
+                                            post={post}
+                                            onSelectMediaFile={(mediaInfo) => {
+                                                setMediaInfo(mediaInfo);
+                                                showFullscreenSlider();
+                                            }}
+                                        />
                                     </Fragment>
                                 ))}
                             </InfiniteScroll>

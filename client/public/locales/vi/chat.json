@@ -1,0 +1,32 @@
+{
+    "CHAT.SEND_MESSAGE_BLOCKED": "Bạn không thể gửi tin nhắn cho người này",
+    "CHAT.NO_CONVERSATION": "Không tìm thấy cuộc trò chuyện nào",
+    "CHAT.SEARCH_MESSAGE": "Tìm kiếm tin nhắn",
+    "CHAT.SEARCH_MESSAGE_PLACEHOLDER": "Tìm kiếm tin nhắn trong cuộc trò chuyện này",
+
+    "CHAT.STORAGE": "Lưu trữ",
+    "CHAT.STORAGE.MEDIA_FILE": "Tệp phương tiện",
+    "CHAT.STORAGE.FILE": "Tệp",
+    "CHAT.STORAGE.LINK": "Liên kết",
+    "CHAT.STORAGE.NO_MEDIA_FILE": "Không có tệp phương tiện nào",
+    "CHAT.STORAGE.NO_LINK": "Không có liên kết nào",
+    "CHAT.SETTING": "Cài đặt",
+    "CHAT.SETTING.EMOJI": "Biểu tượng cảm xúc",
+    "CHAT.SECURITY": "Bảo mật",
+    "CHAT.SECURITY.DELETE_CONVERSATION": "Xóa cuộc trò chuyện",
+
+    "CHAT.MESSAGE_PLACEHOLDER": "Nhập tin nhắn của bạn",
+    "CHAT.MESSAGE.REPLY_TO": "Trả lời tin nhắn {{username}}",
+    "CHAT.MESSAGE_MENU.COPY": "Sao chép tin nhắn",
+    "CHAT.MESSAGE_MENU.DELETE": "Xóa tin nhắn",
+    "CHAT.MESSAGE_MENU.RETRACT": "Thu hồi tin nhắn",
+    "CHAT.MESSAGE_MENU.PIN": "Ghim tin nhắn",
+
+    "CHAT.MESSAGE.DELETED_MESSAGE_SUCCESS": "Xóa tin nhắn thành công",
+    "CHAT.MESSAGE.DELETED_MESSAGE_FAILED": "Xóa tin nhắn thất bại",
+    "CHAT.MESSAGE.RETRACTED_MESSAGE_SUCCESS": "Thu hồi tin nhắn thành công",
+    "CHAT.MESSAGE.RETRACTED_MESSAGE_FAILED": "Thu hồi tin nhắn thất bại",
+
+    "CHAT.MESSAGE.REACTION": "Biểu cảm",
+    "CHAT.MESSAGE.REACTION_EMPTY": "Tin nhắn này chưa có biểu cảm nào"
+}

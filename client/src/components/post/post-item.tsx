@@ -14,26 +14,28 @@ import UserName from "../user/user-name";
 import PostActions from "./post-actions";
 import PostModalButton from "./post-modal-button";
 
-import { IPost } from "@/types/post";
-import { useVisibility } from "@/hooks";
+import { IPost, ISelectMediaFile } from "@/types/post";
 import { RepostIcon } from "@/assets/icons";
+import { useTranslation } from "react-i18next";
+import { TranslationNameSpace } from "@/types/translation";
 
 interface IProps {
     post: IPost;
+    onSelectMediaFile?: (mediaInfo: ISelectMediaFile) => void;
 }
 
-export default function PostItem({ post: _post }: IProps) {
-    const { isVisible: open, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
-    const [activeIndex, setActiveIndex] = useState<number>(0);
+export default function PostItem({ post: _post, onSelectMediaFile }: IProps) {
     const [openEditModal, setOpenEditModal] = useState<boolean>(false);
+    const { t: tPost } = useTranslation<TranslationNameSpace>("post");
 
     const isReposted = _post?.originalPost?.caption || _post?.originalPost?.mediaFiles;
     const post: IPost = isReposted ? _post?.originalPost : _post;
     const repostedInfo = _post;
 
     const handleMediaFileClick = (index: number) => {
-        setActiveIndex(index);
-        showFullscreenSlider();
+        if (onSelectMediaFile) {
+            onSelectMediaFile({ mediaFiles: post?.mediaFiles ?? [], index });
+        }
     };
 
     const handleToggleEditModal = () => {
@@ -71,12 +73,6 @@ export default function PostItem({ post: _post }: IProps) {
 
     return (
         <div className="py-5 border-b border-divider last:border-none">
-            <FullScreenMediaSlider
-                onHide={hideFullscreenSlider}
-                isOpen={open}
-                activeSlideIndex={activeIndex}
-                mediaFiles={post?.mediaFiles ?? []}
-            />
             {isReposted && (
                 <div className="flex px-1 mb-5">
                     <section className="flex flex-col items-center">
@@ -107,7 +103,8 @@ export default function PostItem({ post: _post }: IProps) {
                                         {repostedInfo?.postBy?.username}
                                     </h4>
                                     <span>
-                                        &nbsp;reposted <TimeAgo className="!text-sm" date={repostedInfo?.createdAt} />
+                                        &nbsp;{tPost("POST_IS_REPOSTED")}{" "}
+                                        <TimeAgo className="!text-sm" date={repostedInfo?.createdAt} />
                                     </span>
                                 </div>
                             </div>
@@ -135,7 +132,7 @@ export default function PostItem({ post: _post }: IProps) {
 
                         <div className="flex items-center gap-3">
                             {post?.isEdited && (
-                                <Tooltip content="This post is edited" placement="bottom" showArrow>
+                                <Tooltip content={tPost("POST_IS_EDITED")} placement="bottom" showArrow>
                                     <WandSparklesIcon className="cursor-pointer" size={16} />
                                 </Tooltip>
                             )}

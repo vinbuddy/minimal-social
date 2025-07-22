@@ -11,6 +11,10 @@ import { streamTokenProvider } from "./actions";
 import PageLoading from "@/components/page-loading";
 import { useAuthStore } from "@/hooks/store";
 import { usePathname } from "next/navigation";
+import { PUBLIC_ROUTES } from "@/constants/route";
+
+import "../i18n";
+import { ENV } from "@/config/env";
 
 export function SWRConfigProvider({ children }: { children: React.ReactNode }) {
     return (
@@ -44,27 +48,35 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
     const { currentUser } = useAuthStore();
     const pathName = usePathname();
 
-    const publicRoutes = ["/login", "/register", "/otp", "/forgot", "/reset"];
-
     useEffect(() => {
         if (!currentUser) return;
 
-        const client = new StreamVideoClient({
-            apiKey: process.env.NEXT_PUBLIC_STREAM_API_KEY!,
-            user: {
-                id: currentUser._id,
-                name: currentUser.username,
-                image: currentUser.photo,
-            },
-            tokenProvider: streamTokenProvider,
-        });
-
-        setStreamVideoClient(client);
+        try {
+            const client = StreamVideoClient.getOrCreateInstance({
+                apiKey: ENV.STREAM_API_KEY!,
+                user: {
+                    id: currentUser._id,
+                    name: currentUser.username,
+                    image: currentUser.photo,
+                },
+                tokenProvider: streamTokenProvider,
+                options: {
+                    browser: false,
+                },
+            });
+            setStreamVideoClient(client);
+        } catch (error) {
+            console.log("error: ", error);
+        }
     }, [currentUser]);
 
-    if (publicRoutes.includes(pathName)) return <>{children}</>;
+    if (PUBLIC_ROUTES.includes(pathName)) return <>{children}</>;
 
     if (!streamVideoClient) return <PageLoading />;
 
     return <StreamVideo client={streamVideoClient}>{children}</StreamVideo>;
+}
+
+export function I18nProvider({ children }: { children: React.ReactNode }) {
+    return <>{children}</>;
 }

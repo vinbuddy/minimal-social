@@ -1,0 +1,14 @@
+{
+    "COMMENT_PLACEHOLDER": "Enter your comment",
+    "COMMENT_EMPTY": "No comments yet",
+    "COMMENT.VIEW_REPLY_COUNT": "View {{count}} replies",
+
+    "COMMENT_MENU.COPY_COMMENT": "Copy comment",
+    "COMMENT_MENU.DELETE_COMMENT": "Delete comment",
+    "COMMENT_MENU.DELETE_COMMENT_CONFIRM": "Are you sure you want to delete this comment?",
+
+    "COMMENT_MESSAGE.DELETE_COMMENT_SUCCESS": "Comment deleted successfully",
+    "COMMENT_MESSAGE.COMMENTED_SUCCESS": "Commented successfully",
+    "COMMENT_MESSAGE.COMMENTED_ON_YOUR_POST": "commented on your post",
+    "COMMENT_MESSAGE.REPLIED_TO_YOUR_COMMENT": "replied to your comment"
+}

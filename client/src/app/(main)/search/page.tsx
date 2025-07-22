@@ -12,14 +12,24 @@ import BackButton from "@/components/back-button";
 import PostItem from "@/components/post/post-item";
 import UserItem from "@/components/user/user-item";
 import UserSuggestionList from "@/components/user/user-suggetion-list";
-import { usePagination, useDebounce } from "@/hooks";
-import { IPost } from "@/types/post";
+import { usePagination, useDebounce, useVisibility } from "@/hooks";
+import { IPost, ISelectMediaFile } from "@/types/post";
 import { IUser } from "@/types/user";
 import ErrorMessage from "@/components/error-message";
+import { useTranslation } from "react-i18next";
+import FullScreenMediaSlider from "@/components/media/fullscreen-media-slider";
 
 export default function SearchPage() {
     const [searchValue, setSearchValue] = useState("");
     const debouncedSearch = useDebounce(searchValue, 800);
+
+    const { isVisible, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
+    const [mediaInfo, setMediaInfo] = useState<ISelectMediaFile>({
+        mediaFiles: [],
+        index: 0,
+    });
+
+    const { t } = useTranslation("common");
 
     const searchParams = useSearchParams();
     const query = searchParams.get("query");
@@ -48,6 +58,12 @@ export default function SearchPage() {
 
     return (
         <div className="flex justify-center w-full">
+            <FullScreenMediaSlider
+                onHide={hideFullscreenSlider}
+                isOpen={isVisible}
+                activeSlideIndex={mediaInfo?.index ?? 0}
+                mediaFiles={mediaInfo?.mediaFiles ?? []}
+            />
             <div className="w-[calc(100vw_-_80px)] md:w-[630px]">
                 <header className="sticky top-0 z-10 p-4 bg-background">
                     {!query && (
@@ -59,7 +75,7 @@ export default function SearchPage() {
                             }}
                             defaultValue={""}
                             value={searchValue}
-                            placeholder="Search..."
+                            placeholder={t("SEARCH") + "..."}
                             size="md"
                             variant="flat"
                             radius="full"
@@ -78,7 +94,7 @@ export default function SearchPage() {
                                 className="bg-content2 rounded-full py-1.5 ps-2 pe-5"
                                 name={
                                     <div className="flex items-center">
-                                        <p className="text-default-400">Searching for: &nbsp;</p>
+                                        <p className="text-default-400">{t("SEARCHING_FOR")}: &nbsp;</p>
                                         <span className="text-link">{query}</span>
                                     </div>
                                 }
@@ -135,7 +151,7 @@ export default function SearchPage() {
                             )}
 
                             {posts.length === 0 && !isSearchLoading && !searchError && (
-                                <p className="text-center">Result not found</p>
+                                <p className="text-center">{t("NO_RESULT")}</p>
                             )}
                             {!searchError && posts.length > 0 && (
                                 <InfiniteScroll
@@ -150,7 +166,13 @@ export default function SearchPage() {
                                 >
                                     {posts.map((post) => (
                                         <Fragment key={post?._id}>
-                                            <PostItem post={post} />
+                                            <PostItem
+                                                post={post}
+                                                onSelectMediaFile={(mediaInfo) => {
+                                                    setMediaInfo(mediaInfo);
+                                                    showFullscreenSlider();
+                                                }}
+                                            />
                                         </Fragment>
                                     ))}
                                 </InfiniteScroll>

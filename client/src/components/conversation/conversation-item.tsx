@@ -9,6 +9,7 @@ import TimeAgo from "../time-ago";
 import UserName from "../user/user-name";
 import { useConversationContext } from "@/contexts/conversation-context";
 import { useBreakpoint } from "@/hooks";
+import { useTranslation } from "react-i18next";
 
 interface IProps {
     conversation: IConversation;
@@ -19,6 +20,7 @@ export default function ConversationItem({ conversation }: IProps): ReactNode {
     const pathname = usePathname();
     const { conversationItem } = useConversationContext();
     const breakpoint = useBreakpoint();
+    const { t } = useTranslation("common");
 
     const isActive = useMemo(() => {
         const isDesktopActive = breakpoint !== "mobile" && pathname.includes(conversation._id);
@@ -54,7 +56,7 @@ export default function ConversationItem({ conversation }: IProps): ReactNode {
                     </h3>
                     <div className="text-default-600 flex items-center justify-between">
                         <p className="flex-1 text-sm max-w-full truncate">
-                            {conversation?.lastMessage?.sender === currentUser?._id && "You: "}
+                            {conversation?.lastMessage?.sender === currentUser?._id && `${t("YOU")}: `}
                             {conversation?.lastMessage?.content ?? ""}
                         </p>
                         <div className="me-2 text-tiny text-default-400">

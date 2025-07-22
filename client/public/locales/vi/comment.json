@@ -1,0 +1,14 @@
+{
+    "COMMENT_PLACEHOLDER": "Nhập bình luận của bạn",
+    "COMMENT_EMPTY": "Chưa có bình luận nào",
+    "COMMENT.VIEW_REPLY_COUNT": "Xem {{count}} trả lời",
+
+    "COMMENT_MENU.COPY_COMMENT": "Sao chép bình luận",
+    "COMMENT_MENU.DELETE_COMMENT": "Xoá bình luận",
+    "COMMENT_MENU.DELETE_COMMENT_CONFIRM": "Bạn có chắc chắn muốn xoá bình luận này không?",
+
+    "COMMENT_MESSAGE.DELETE_COMMENT_SUCCESS": "Đã xoá bình luận thành công",
+    "COMMENT_MESSAGE.COMMENTED_SUCCESS": "Đã bình luận thành công",
+    "COMMENT_MESSAGE.COMMENTED_ON_YOUR_POST": "đã bình luận về bài viết của bạn",
+    "COMMENT_MESSAGE.REPLIED_TO_YOUR_COMMENT": "đã trả lời bình luận của bạn"
+}
