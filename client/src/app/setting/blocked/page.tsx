@@ -1,10 +1,8 @@
 "use client";
 
-import ConfirmationModal from "@/components/confirmation-modal";
-import ErrorMessage from "@/components/error-message";
-import ScreenCenterWrapper from "@/components/screen-center-wrapper";
-import UserItem from "@/components/user/user-item";
-import UserSkeletons from "@/components/user/user-skeletons";
+import { ConfirmationModal, ErrorMessage, ScreenCenterWrapper } from "@/components";
+
+import { UserItem, UserSkeletons } from "@/components/user";
 import { useGlobalMutation, usePagination } from "@/hooks";
 import { useAuthStore } from "@/hooks/store";
 import { IUser } from "@/types/user";

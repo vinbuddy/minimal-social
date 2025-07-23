@@ -5,7 +5,7 @@ import { BanIcon, LanguagesIcon, LockIcon } from "lucide-react";
 import { Button } from "@heroui/react";
 import cn from "classnames";
 
-import BackButton from "../components/back-button";
+import { BackButton } from "../components";
 import Link from "next/link";
 import { useAuthStore } from "@/hooks/store";
 import { useTranslation } from "react-i18next";

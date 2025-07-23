@@ -4,15 +4,13 @@ import { Fragment } from "react";
 import useSWR from "swr";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-import BackButton from "@/components/back-button";
-import CommentForm from "@/components/comment/comment-form";
-import CommentItem from "@/components/comment/comment-item";
-import PostDetail from "@/components/post/post-detail";
+import { BackButton, ErrorMessage } from "@/components";
+import { CommentForm, CommentItem } from "@/components/comment";
+import { PostDetail } from "@/components/post";
 
 import { usePagination } from "@/hooks";
 import { IComment } from "@/types/comment";
 import { IPost } from "@/types/post";
-import ErrorMessage from "@/components/error-message";
 
 export default function PostPage({ params }: { params: { id: string } }) {
     const { data, error } = useSWR(`/post/${params.id}`);

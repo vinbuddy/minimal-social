@@ -14,7 +14,7 @@ import axiosInstance from "@/utils/http-request";
 import { useLoading } from "@/hooks";
 import { HomeIcon, HeartIcon, ConversationIcon, SearchIcon } from "@/assets/icons";
 import { useSocketContext } from "@/contexts/socket-context";
-import NotificationToast from "@/components/notification/notification-toast";
+import { NotificationToast } from "@/components/notification";
 import { useTranslation } from "react-i18next";
 
 const navLinks = [

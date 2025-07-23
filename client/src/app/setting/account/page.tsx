@@ -5,10 +5,10 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useState } from "react";
 
-import UserName from "@/components/user/user-name";
+import { UserName } from "@/components/user";
 import { useAuthStore } from "@/hooks/store";
 import { GoogleIcon, VerifiedIcon } from "@/assets/icons";
-import OtpVerification from "@/components/otp-verification";
+import { OtpVerification } from "@/components";
 import { useLoading } from "@/hooks";
 import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
