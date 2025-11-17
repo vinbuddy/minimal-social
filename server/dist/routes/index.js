@@ -1,0 +1,31 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const auth_route_1 = __importDefault(require("./auth.route"));
+const user_route_1 = __importDefault(require("./user.route"));
+const post_route_1 = __importDefault(require("./post.route"));
+const comment_route_1 = __importDefault(require("./comment.route"));
+const notification_route_1 = __importDefault(require("./notification.route"));
+const search_route_1 = __importDefault(require("./search.route"));
+const message_route_1 = __importDefault(require("./message.route"));
+const conversation_route_1 = __importDefault(require("./conversation.route"));
+const sticker_route_1 = __importDefault(require("./sticker.route"));
+const theme_route_1 = __importDefault(require("./theme.route"));
+const account_route_1 = __importDefault(require("./account.route"));
+const router = express_1.default.Router();
+router.use("/auth", auth_route_1.default);
+router.use("/user", user_route_1.default);
+router.use("/post", post_route_1.default);
+router.use("/comment", comment_route_1.default);
+router.use("/notification", notification_route_1.default);
+router.use("/search", search_route_1.default);
+router.use("/message", message_route_1.default);
+router.use("/conversation", conversation_route_1.default);
+router.use("/sticker", sticker_route_1.default);
+router.use("/theme", theme_route_1.default);
+router.use("/account", account_route_1.default);
+exports.default = router;
+//# sourceMappingURL=index.js.map
