@@ -16,7 +16,7 @@ i18n.use(Backend)
         backend: {
             loadPath: "/locales/{{lng}}/{{ns}}.json",
         },
-        debug: true,
+        debug: false,
         detection: {
             order: ["querystring", "cookie", "localStorage", "navigator"],
             caches: ["localStorage"],

@@ -47,7 +47,7 @@ export default function PostItem({ post: _post, onSelectMediaFile }: IProps) {
         const urlRegex = /(https?:\/\/(?:www\.)?[^\s/$.?#].[^\s]*)/gi;
 
         // Replace URL -> `<a>`
-        return content.replace(
+        return content?.replace(
             urlRegex,
             (url) =>
                 `<a class="text-link hover:underline font-medium" href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
