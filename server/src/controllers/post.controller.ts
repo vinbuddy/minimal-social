@@ -298,6 +298,11 @@ export async function getPostDetailHandler(req: Request, res: Response, next: Ne
                 },
             },
         ]);
+
+        if (!post || post.length === 0) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
         return res.status(200).json({ message: "Get post detail successfully", data: post[0] });
     } catch (error) {
         next(error);
