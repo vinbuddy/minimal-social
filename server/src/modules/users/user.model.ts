@@ -4,8 +4,15 @@ import mongoose from "mongoose";
 
 export const USER_MODEL_HIDDEN_FIELDS: string = "-password -refreshToken";
 
+const BCRYPT_HASH_REGEX = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
+
 @pre<User>("save", async function () {
     if (!this.isModified("password")) {
+        return;
+    }
+
+    // Already hashed (e.g. copied from a pending OTP registration)
+    if (BCRYPT_HASH_REGEX.test(this.password)) {
         return;
     }
 

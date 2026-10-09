@@ -1,3 +1,4 @@
+import { escapeRegex } from "../../shared/helpers/regex";
 import { NextFunction, Request, Response } from "express";
 import ConversationModel from "./conversation.model";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../users/user.model";
@@ -127,7 +128,7 @@ export async function searchConversationsByNameHandler(_req: Request, res: Respo
             return res.status(400).json({ error: "Search name is required" });
         }
 
-        const users = await UserModel.find({ username: { $regex: search, $options: "i" } })
+        const users = await UserModel.find({ username: { $regex: escapeRegex(search), $options: "i" } })
             .limit(10)
             .select(USER_MODEL_HIDDEN_FIELDS)
             .lean();
@@ -162,7 +163,7 @@ export async function searchConversationsByNameHandler(_req: Request, res: Respo
         // Get group conversations
         const groupConversations = await ConversationModel.find({
             isGroup: true,
-            "groupInfo.name": { $regex: search, $options: "i" },
+            "groupInfo.name": { $regex: escapeRegex(search), $options: "i" },
         }).populate({ path: "participants", select: USER_MODEL_HIDDEN_FIELDS });
 
         return res.status(200).json({

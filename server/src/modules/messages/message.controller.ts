@@ -1,3 +1,4 @@
+import { escapeRegex } from "../../shared/helpers/regex";
 import { NextFunction, Request, Response } from "express";
 import logger from "../../shared/configs/logger";
 import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../users/user.model";
@@ -660,7 +661,7 @@ export async function searchMessagesHandler(_req: Request, res: Response, next: 
             content: {
                 $ne: null,
                 $nin: ["", " "],
-                $regex: search.toString().trim(),
+                $regex: escapeRegex(search.toString().trim()),
                 $options: "i",
             },
         };

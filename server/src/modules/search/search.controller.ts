@@ -1,3 +1,4 @@
+import { escapeRegex } from "../../shared/helpers/regex";
 import { NextFunction, Request, Response } from "express";
 import PostModel from "../posts/post.model";
 import UserModel from "../users/user.model";
@@ -11,7 +12,7 @@ export async function autocompleteHandler(req: Request, res: Response, next: Nex
             return res.status(400).json({ error: 'Query parameter "query" is required' });
         }
 
-        const users = await UserModel.find({ username: { $regex: query, $options: "i" } }).limit(10);
+        const users = await UserModel.find({ username: { $regex: escapeRegex(query), $options: "i" } }).limit(10);
 
         return res.status(200).json({ message: "Success", data: users });
     } catch (error) {

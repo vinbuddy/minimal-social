@@ -1,3 +1,4 @@
+import { escapeRegex } from "../../shared/helpers/regex";
 import { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 
@@ -71,7 +72,7 @@ export async function searchUserHandler(req: Request, res: Response, next: NextF
         const query = req.query.query as string;
 
         const users = await UserModel.find({
-            $or: [{ username: { $regex: query, $options: "i" } }],
+            $or: [{ username: { $regex: escapeRegex(query), $options: "i" } }],
         }).select(USER_MODEL_HIDDEN_FIELDS);
 
         return res.status(200).json({ statusCode: 200, data: users });
@@ -252,7 +253,7 @@ export async function getFollowingsHandler(req: Request, res: Response, next: Ne
             .populate({
                 path: "following",
                 select: USER_MODEL_HIDDEN_FIELDS,
-                match: search.trim() ? { username: { $regex: search, $options: "i" } } : undefined
+                match: search.trim() ? { username: { $regex: escapeRegex(search), $options: "i" } } : undefined
             });
 
         // Filter out nulls if populated match failed
@@ -295,7 +296,7 @@ export async function getFollowersHandler(req: Request, res: Response, next: Nex
             .populate({
                 path: "follower",
                 select: USER_MODEL_HIDDEN_FIELDS,
-                match: search.trim() ? { username: { $regex: search, $options: "i" } } : undefined
+                match: search.trim() ? { username: { $regex: escapeRegex(search), $options: "i" } } : undefined
             });
 
         const followerUsers = follows.map(f => f.follower).filter(u => u);

@@ -1,15 +1,15 @@
-import { Server, Socket } from "socket.io";
-// Imports removed
+import { Socket } from "socket.io";
+import logger from "../shared/configs/logger";
 import ConversationModel from "../modules/messages/conversation.model";
 
 export default function userSocketHandler(socket: Socket) {
-    socket.on("online", async (data) => {
-        const userId = data?.userId as string;
+    socket.on("online", async () => {
+        // Set by the auth middleware in sockets/index.ts — any userId sent by the client is ignored
+        const userId = socket.data.userId as string;
         if (!userId) return;
 
         // User joins their personal room for direct notifications
         socket.join(userId);
-        console.log(`User ${userId} is online and joined personal room`);
 
         try {
             // Join conversation rooms
@@ -17,18 +17,15 @@ export default function userSocketHandler(socket: Socket) {
                 participants: {
                     $in: [userId],
                 },
-            }).lean();
+            })
+                .select("_id")
+                .lean();
 
-            if (conversations.length > 0) {
-                conversations.forEach((conversation) => {
-                    socket.join(conversation._id.toString());
-                    console.log(`User ${userId} joined room ${conversation._id}`);
-                });
-            } else {
-                console.log(`User ${userId} has no conversations`);
-            }
+            conversations.forEach((conversation) => {
+                socket.join(conversation._id.toString());
+            });
         } catch (error) {
-            console.error("Error fetching conversations:", error);
+            logger.error("Error fetching conversations:", error);
         }
 
         socket.emit("online", { message: "User online successfully" });

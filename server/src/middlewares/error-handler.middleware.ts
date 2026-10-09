@@ -3,12 +3,24 @@ import { ZodError } from "zod";
 import { AppError } from "../shared/errors/app-error";
 import logger from "../shared/configs/logger";
 
+const SENSITIVE_FIELDS = ["password", "otp", "refreshToken", "accessToken"];
+
+function redactBody(body: unknown) {
+    if (!body || typeof body !== "object") return body;
+
+    const redacted: Record<string, unknown> = { ...(body as Record<string, unknown>) };
+    for (const field of SENSITIVE_FIELDS) {
+        if (field in redacted) redacted[field] = "[REDACTED]";
+    }
+    return redacted;
+}
+
 export function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction) {
     // Log the error
     if (err instanceof Error) {
         logger.error(`${req.method} ${req.originalUrl} — ${err.message}`, {
             stack: err.stack,
-            body: req.body,
+            body: redactBody(req.body),
             params: req.params,
             query: req.query,
         });

@@ -16,11 +16,42 @@ import { generateToken } from "../../shared/helpers/jwt";
 import bcrypt from "bcrypt";
 import { sendEmail } from "../../shared/helpers/email-sender";
 import otpGenerator from "otp-generator";
-import { OTPModel } from "./otp.model";
+import { OTPModel, OTP_MAX_ATTEMPTS } from "./otp.model";
 import jwt from "jsonwebtoken";
 import env from "dotenv";
 
 env.config();
+
+/**
+ * Check an OTP and count failed attempts. After OTP_MAX_ATTEMPTS wrong guesses the OTP
+ * is deleted so it can't be brute-forced; the user must request a new one.
+ * Returns the OTP document on success, or an error message on failure.
+ */
+async function checkOTP(email: string | undefined, type: "register" | "forgot", otp: string) {
+    if (!email) return { error: "Invalid or expired OTP" } as const;
+
+    const otpData = await OTPModel.findOne({ email, type });
+    if (!otpData) return { error: "Invalid or expired OTP" } as const;
+
+    const isMatch = await bcrypt.compare(otp, otpData.otp);
+
+    if (!isMatch) {
+        const updated = await OTPModel.findByIdAndUpdate(otpData._id, { $inc: { attempts: 1 } }, { new: true });
+
+        if (!updated || updated.attempts >= OTP_MAX_ATTEMPTS) {
+            await OTPModel.findByIdAndDelete(otpData._id);
+            return { error: "Too many failed attempts, please request a new OTP" } as const;
+        }
+
+        return { error: "Invalid OTP" } as const;
+    }
+
+    return { otpData } as const;
+}
+
+function clearAuthCookies(res: Response) {
+    return res.clearCookie("accessToken", cookieOptions).clearCookie("refreshToken", cookieOptions);
+}
 
 interface RequestWithUser extends Request {
     user: User;
@@ -69,8 +100,8 @@ export async function registerHandler(req: Request, res: Response, next: NextFun
 
         // Create otp and save it to the database
         const otpModel = new OTPModel({
-            username: userInput.email,
-            password: userInput.password,
+            username: userInput.username,
+            password: userInput.password, // hashed by the OTP model pre-save hook
             email: userInput.email,
             otp,
             type: "register",
@@ -89,21 +120,26 @@ export async function verifyOTPHandler(req: Request, res: Response, next: NextFu
         const otpInput: OTPInput = otpSchema.parse(req.body);
         const { email, otp } = otpInput;
 
-        const otpData = await OTPModel.findOne({ email });
-        if (!otpData) {
-            return res.status(400).json({ message: "Invalid or expired OTP" });
+        const result = await checkOTP(email, "register", otp);
+        if ("error" in result) {
+            return res.status(400).json({ message: result.error });
         }
 
-        const isMatch = await bcrypt.compare(otp, otpData.otp);
+        const { otpData } = result;
+        await OTPModel.findByIdAndDelete(otpData._id);
 
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid OTP" });
+        // The email/username may have been taken while the OTP was pending
+        const isExists = await UserModel.exists({ $or: [{ email: otpData.email }, { username: otpData.username }] });
+        if (isExists) {
+            return res.status(400).json({ message: "Email or username is already exists" });
         }
 
         const newUser = new UserModel({ email: otpData.email, username: otpData.username, password: otpData.password });
         await newUser.save();
 
-        return res.status(200).json({ message: "User registered successfully", data: newUser });
+        const { password: _password, refreshToken: _refreshToken, ...userInfo } = newUser.toObject();
+
+        return res.status(200).json({ message: "User registered successfully", data: userInfo });
     } catch (error) {
         next(error);
     }
@@ -152,7 +188,7 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
                 maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             })
             .status(200)
-            .json({ statusCode: 200, data: userInfo, accessToken, refreshToken });
+            .json({ statusCode: 200, data: userInfo });
     } catch (error) {
         next(error);
     }
@@ -185,25 +221,27 @@ export async function logoutHandler(_req: Request, res: Response, next: NextFunc
 }
 
 export async function refreshTokenHandler(req: Request, res: Response, next: NextFunction) {
-    // TODO: Implement refresh token logic
     try {
-        let refreshToken = null;
-
-        refreshToken = req.cookies.refreshToken;
+        const refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
-            return res.status(404).json({ statusCode: 401, message: "Refresh token not found" });
+            return res.status(401).json({ statusCode: 401, message: "Refresh token not found" });
         }
 
-        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY as string) as User & {
-            exp: number;
-            iat: number;
-        };
+        let decoded: User & { exp: number; iat: number };
+        try {
+            decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY as string) as typeof decoded;
+        } catch {
+            return clearAuthCookies(res).status(401).json({ statusCode: 401, message: "Invalid refresh token" });
+        }
 
         const user = await UserModel.findById(decoded._id);
 
-        if (!user) {
-            return res.status(404).json({ statusCode: 404, message: "User not found" });
+        // Only the latest issued refresh token is valid: a token that was rotated out,
+        // revoked by logout or by a password reset is rejected.
+        // Cookies are not cleared here: a parallel refresh may have just set fresh ones.
+        if (!user || !user.refreshToken || user.refreshToken !== refreshToken) {
+            return res.status(401).json({ statusCode: 401, message: "Invalid refresh token" });
         }
 
         const newAccessToken = generateToken(user, "access");
@@ -211,6 +249,8 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
 
         user.refreshToken = newRefreshToken;
         await user.save({ validateBeforeSave: false });
+
+        const { password: _password, refreshToken: _refreshToken, ...userInfo } = user.toObject();
 
         return res
             .cookie("accessToken", newAccessToken, {
@@ -222,7 +262,7 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
                 maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
             })
             .status(200)
-            .json({ statusCode: 200, data: user, accessToken: newAccessToken, refreshToken: newRefreshToken });
+            .json({ statusCode: 200, data: userInfo });
     } catch (error) {
         logger.error("Refresh token error:", error);
         next(error);
@@ -287,18 +327,13 @@ export async function verifyForgotPasswordOTPHandler(req: Request, res: Response
         const otpInput: OTPInput = otpSchema.parse(req.body);
         const { email, otp } = otpInput;
 
-        const otpData = await OTPModel.findOne({ email, type: "forgot" });
-        if (!otpData) {
-            return res.status(400).json({ message: "Invalid or expired OTP" });
+        // Only checks the OTP; it is consumed by resetPasswordHandler
+        const result = await checkOTP(email, "forgot", otp);
+        if ("error" in result) {
+            return res.status(400).json({ message: result.error });
         }
 
-        const isMatch = await bcrypt.compare(otp, otpData.otp);
-
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid OTP" });
-        }
-
-        return res.status(200).json({ message: "User registered successfully" });
+        return res.status(200).json({ message: "OTP verified successfully" });
     } catch (error) {
         next(error);
     }
@@ -307,12 +342,21 @@ export async function verifyForgotPasswordOTPHandler(req: Request, res: Response
 export async function resetPasswordHandler(req: Request, res: Response, next: NextFunction) {
     try {
         const otpInput: OTPResetPasswordInput = otpResetPasswordSchema.parse(req.body);
-        const { email, password } = otpInput;
+        const { email, otp, password } = otpInput;
+
+        // Resetting requires the OTP that was emailed — the email alone is not proof of ownership
+        const result = await checkOTP(email, "forgot", otp);
+        if ("error" in result) {
+            return res.status(400).json({ message: result.error });
+        }
+
+        await OTPModel.findByIdAndDelete(result.otpData._id);
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        await UserModel.findOneAndUpdate({ email }, { password: hashedPassword });
+        // Also revoke existing sessions
+        await UserModel.findOneAndUpdate({ email }, { password: hashedPassword, refreshToken: null });
 
         return res.status(200).json({ message: "Password reset successfully" });
     } catch (error) {

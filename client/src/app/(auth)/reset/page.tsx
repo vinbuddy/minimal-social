@@ -53,6 +53,7 @@ export default function ResetPage({ searchParams }: { searchParams: { toEmail: s
                 (ENV.API_BASE_URL as string) + "/auth/reset",
                 {
                     email: searchParams?.toEmail,
+                    otp: forgotPasswordOTP,
                     password: data.password,
                 },
                 { withCredentials: true }

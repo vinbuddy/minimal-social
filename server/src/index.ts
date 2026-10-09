@@ -71,13 +71,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.disable("etag");
 
-// ─── Routes ─────────────────────────────────────────────────
-app.use(router);
-
-// ─── Passport ───────────────────────────────────────────────
+// ─── Passport (must run before routes) ────────────────────────────────────────────
 initializeLoginWithGoogleService();
 app.use(passport.initialize());
 app.use(passport.session());
+
+// ─── Routes ─────────────────────────────────────────────────
+app.use(router);
 
 // ─── Error handling ─────────────────────────────────────────
 app.use(errorHandler);
