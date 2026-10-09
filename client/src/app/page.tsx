@@ -4,17 +4,15 @@ import { Fragment, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import MainLayout from "@/layouts/main-layout";
-import PostModalButton from "@/components/post/post-modal-button";
-import PostItem from "@/components/post/post-item";
-import PostSkeletons from "@/components/post/post-skeletons";
+import { PostModalButton, PostItem, PostSkeletons } from "@/components/post";
 
 import { useAuthStore } from "@/hooks/store";
 import { usePagination, useVisibility } from "@/hooks";
 import { IPost, ISelectMediaFile } from "@/types/post";
-import ErrorMessage from "@/components/error-message";
+import { ErrorMessage } from "@/components";
 import { useTranslation } from "react-i18next";
 import { TranslationNameSpace } from "@/types/translation";
-import FullScreenMediaSlider from "@/components/media/fullscreen-media-slider";
+import { FullScreenMediaSlider } from "@/components/media";
 
 function Home() {
     const [postType, setPostType] = useState<"feed" | "following" | "liked">("feed");

@@ -5,12 +5,18 @@ import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import useSWR from "swr";
 
-import PostItem from "@/components/post/post-item";
-import PostSkeletons from "@/components/post/post-skeletons";
-import EditProfileModalButton from "@/components/user/edit-profile-modal-button";
-import FollowButton from "@/components/user/follow-button";
-import UserFollowInfoModal from "@/components/user/user-follow-info-modal";
-import UserName from "@/components/user/user-name";
+import { PostItem, PostSkeletons, PostModalButton } from "@/components/post";
+import {
+    EditProfileModalButton,
+    FollowButton,
+    UserFollowInfoModal,
+    UserName,
+    ProfileMenuDropdown,
+} from "@/components/user";
+
+import { ErrorMessage, ScreenCenterWrapper } from "@/components";
+import { FullScreenMediaSlider } from "@/components/media";
+
 import { useAuthStore } from "@/hooks/store";
 import { useIsBlocked, useIsOwner, useLoading, usePagination, useVisibility } from "@/hooks";
 import { IPost, ISelectMediaFile } from "@/types/post";
@@ -18,12 +24,8 @@ import { IUser } from "@/types/user";
 import { EllipsisIcon, SendIcon } from "lucide-react";
 import axiosInstance from "@/utils/http-request";
 import { showToast } from "@/utils/toast";
-import ProfileMenuDropdown from "@/components/user/profile-menu-dropdown";
-import ErrorMessage from "@/components/error-message";
-import ScreenCenterWrapper from "@/components/screen-center-wrapper";
-import PostModalButton from "@/components/post/post-modal-button";
+
 import { useTranslation } from "react-i18next";
-import FullScreenMediaSlider from "@/components/media/fullscreen-media-slider";
 
 export default function ProfilePage() {
     const params = useParams() as { id: string };

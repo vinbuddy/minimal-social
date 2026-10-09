@@ -1,7 +1,7 @@
 "use client";
 import cn from "classnames";
 
-import ConversationList from "@/components/conversation/conversation-list";
+import { ConversationList } from "@/components/conversation";
 import MainLayout from "@/layouts/main-layout";
 import { useBreakpoint, useItemClick } from "@/hooks";
 import { IConversation } from "@/types/conversation";

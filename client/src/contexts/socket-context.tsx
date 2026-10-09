@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { refreshAccessToken } from "@/utils/http-request";
 
 import { useAuthStore } from "@/hooks/store";
 import { ENV } from "@/config/env";
@@ -22,7 +23,21 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             withCredentials: true,
         });
 
-        newSocket.emit("online", { userId: currentUser?._id });
+        // Server identifies the user from the accessToken cookie; re-join rooms on every (re)connect
+        newSocket.on("connect", () => {
+            newSocket.emit("online");
+        });
+
+        newSocket.on("connect_error", async (error) => {
+            if (error.message !== "Token expired") return;
+
+            try {
+                await refreshAccessToken();
+                newSocket.connect();
+            } catch {
+                // Refresh failed — the HTTP interceptor / auth flow handles logging out
+            }
+        });
 
         setSocket(newSocket);
 

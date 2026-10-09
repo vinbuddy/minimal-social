@@ -6,10 +6,9 @@ import { useState } from "react";
 import useSWR from "swr";
 import { FileRejection, useDropzone } from "react-dropzone";
 
-import ConversationInfo from "@/components/conversation/conversation-info";
-import MessageForm from "@/components/message/message-form";
-import MessageList from "@/components/message/message-list";
-import UserName from "@/components/user/user-name";
+import { ConversationInfo } from "@/components/conversation";
+import { MessageForm, MessageList } from "@/components/message";
+import { UserName } from "@/components/user";
 
 import { IConversation } from "@/types/conversation";
 import { useConversationContext } from "@/contexts/conversation-context";

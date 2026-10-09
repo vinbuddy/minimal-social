@@ -1,22 +1,21 @@
 import axios from "axios";
-import dotenv from "dotenv";
+import envConfig from "../configs/env";
+import logger from "../configs/logger";
 import { NuditySafetyValue, SightEngineResponse } from "../types/media-moderation";
 
-dotenv.config();
-
 export const moderateImage = async (url: string): Promise<boolean> => {
-    if (!process.env.SIGHT_ENGINE_API_USER || !process.env.SIGHT_ENGINE_API_KEY || !process.env.SIGHT_ENGINE_API_URL) {
+    if (!envConfig.SIGHT_ENGINE_API_USER || !envConfig.SIGHT_ENGINE_API_KEY || !envConfig.SIGHT_ENGINE_API_URL) {
         throw new Error("Sight Engine API credentials are missing");
     }
 
     const params = {
         url: url,
         models: "nudity-2.1",
-        api_user: process.env.SIGHT_ENGINE_API_USER,
-        api_secret: process.env.SIGHT_ENGINE_API_KEY,
+        api_user: envConfig.SIGHT_ENGINE_API_USER,
+        api_secret: envConfig.SIGHT_ENGINE_API_KEY,
     };
 
-    const apiURL = process.env.SIGHT_ENGINE_API_URL;
+    const apiURL = envConfig.SIGHT_ENGINE_API_URL;
     try {
         const response = await axios.get(apiURL, { params });
         const data = response.data as SightEngineResponse;
@@ -29,7 +28,7 @@ export const moderateImage = async (url: string): Promise<boolean> => {
             return false;
         }
     } catch (error) {
-        console.error(error);
+        logger.error("Image moderation request failed", { url, error });
     }
 
     return true;
