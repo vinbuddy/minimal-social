@@ -1,25 +1,25 @@
 import jwt from "jsonwebtoken";
+import { randomUUID } from "node:crypto";
 
-import dotenv from "dotenv";
-import { User } from "../../models/user.model";
-
-dotenv.config();
+import envConfig from "../configs/env";
+import { User } from "../../modules/users/user.model";
 
 const generateToken = (user: User, type: "access" | "refresh" = "access"): string => {
-    const key = type == "access" ? (process.env.JWT_ACCESS_KEY as string) : (process.env.JWT_REFRESH_KEY as string);
+    const key = type == "access" ? envConfig.JWT_ACCESS_KEY : envConfig.JWT_REFRESH_KEY;
 
-    const accessToken = jwt.sign(
+    return jwt.sign(
         {
             _id: user._id,
             isAdmin: user.isAdmin,
         },
         key,
         {
-            expiresIn: type == "access" ? process.env.JWT_ACCESS_EXPIRATION : process.env.JWT_REFRESH_EXPIRATION,
+            expiresIn: type == "access" ? envConfig.JWT_ACCESS_EXPIRATION : envConfig.JWT_REFRESH_EXPIRATION,
+            // Unique per token: without it, two tokens issued in the same second are identical,
+            // so a rotated-out refresh token would still match the stored one
+            jwtid: randomUUID(),
         }
     );
-
-    return accessToken;
 };
 
 export { generateToken };

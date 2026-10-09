@@ -13,10 +13,8 @@ export interface IPost {
     _id: string;
     postBy: IUser;
     caption: string;
-    originalPost: IPost;
+    originalPost: IPost | null;
     mediaFiles: IMediaFile[];
-    likes: any[];
-    reposts: any[];
     tags: any[];
     mentions: IUser[];
     isEdited: boolean;
@@ -25,6 +23,9 @@ export interface IPost {
     likeCount?: number;
     commentCount?: number;
     repostCount?: number;
+    // Computed by the API for the current user
+    isLiked?: boolean;
+    isReposted?: boolean;
 }
 
 export interface ISelectMediaFile {
