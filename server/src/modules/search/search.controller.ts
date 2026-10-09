@@ -1,8 +1,8 @@
 import { escapeRegex } from "../../shared/helpers/regex";
 import { NextFunction, Request, Response } from "express";
-import PostModel from "../posts/post.model";
-import UserModel from "../users/user.model";
-import { getPostQueryHelper } from "../posts/post.service";
+import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../users/user.model";
+import { searchPosts } from "../posts/post.service";
+import { RequestWithUser } from "../../shared/types/request";
 
 export async function autocompleteHandler(req: Request, res: Response, next: NextFunction) {
     try {
@@ -12,7 +12,9 @@ export async function autocompleteHandler(req: Request, res: Response, next: Nex
             return res.status(400).json({ error: 'Query parameter "query" is required' });
         }
 
-        const users = await UserModel.find({ username: { $regex: escapeRegex(query), $options: "i" } }).limit(10);
+        const users = await UserModel.find({ username: { $regex: escapeRegex(query), $options: "i" } })
+            .select(USER_MODEL_HIDDEN_FIELDS)
+            .limit(10);
 
         return res.status(200).json({ message: "Success", data: users });
     } catch (error) {
@@ -20,8 +22,9 @@ export async function autocompleteHandler(req: Request, res: Response, next: Nex
     }
 }
 
-export async function searchPostsHandler(req: Request, res: Response, next: NextFunction) {
+export async function searchPostsHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const query = req.query.query as string;
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 15;
@@ -30,24 +33,7 @@ export async function searchPostsHandler(req: Request, res: Response, next: Next
             return res.status(400).json({ error: 'Query parameter "query" is required' });
         }
 
-        const skip = (Number(page) - 1) * limit;
-        const totalPosts = await PostModel.countDocuments({ $text: { $search: query } });
-        const totalPages = Math.ceil(totalPosts / limit);
-
-        const posts = await PostModel.aggregate([
-            { $match: { $text: { $search: query.trim() } } },
-            { $sort: { createdAt: -1 } },
-            { $skip: skip },
-            { $limit: limit },
-            ...getPostQueryHelper.postLookups,
-            ...getPostQueryHelper.originalPostLookups,
-            {
-                $project: {
-                    ...getPostQueryHelper.projectFields,
-                    comment: 0,
-                },
-            },
-        ]);
+        const { posts, totalPosts, totalPages } = await searchPosts(req.user._id, query, page, limit);
 
         return res.status(200).json({ message: "Success", data: posts, totalPosts, totalPages, page, limit });
     } catch (error) {

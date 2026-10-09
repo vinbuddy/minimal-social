@@ -1,6 +1,5 @@
 import express, { Router } from "express";
 import passport from "passport";
-import env from "dotenv";
 import {
     loginHandler,
     registerHandler,
@@ -15,8 +14,7 @@ import {
 } from "./auth.controller";
 import { verifyToken } from "../../middlewares/verify-token.middleware";
 import { authLimiter, otpLimiter } from "../../middlewares/rate-limiter.middleware";
-
-env.config();
+import envConfig from "../../shared/configs/env";
 
 const router: Router = express.Router();
 
@@ -38,7 +36,7 @@ router.get("/google", passport.authenticate("google", { scope: ["profile", "emai
 
 router.get(
     "/google/callback",
-    passport.authenticate("google", { failureRedirect: process.env.CLIENT_BASE_URL, session: true }),
+    passport.authenticate("google", { failureRedirect: envConfig.CLIENT_BASE_URL, session: true }),
     googleAuthCallbackHandler
 );
 export default router;

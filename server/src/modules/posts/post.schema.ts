@@ -2,7 +2,7 @@ import { z } from "zod";
 import { mediaFileSchema } from "../../schemas/mediaFile.schema";
 
 export const createPostSchema = z.object({
-    postBy: z.string(),
+    postBy: z.string().optional(), // ignored — the author is the authenticated user
     caption: z.string(),
 });
 

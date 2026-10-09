@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 import { AppError } from "../shared/errors/app-error";
 import logger from "../shared/configs/logger";
+import envConfig from "../shared/configs/env";
 
 const SENSITIVE_FIELDS = ["password", "otp", "refreshToken", "accessToken"];
 
@@ -91,7 +92,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, next: Ne
             statusCode,
             status: "error",
             message: err.message,
-            ...(process.env.ENVIRONMENT !== "production" && { stack: err.stack }),
+            ...(envConfig.ENVIRONMENT !== "production" && { stack: err.stack }),
         });
     }
 

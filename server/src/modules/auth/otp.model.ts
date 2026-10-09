@@ -1,5 +1,6 @@
 import { Severity, getModelForClass, modelOptions, pre, prop } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
+import envConfig from "../../shared/configs/env";
 
 export const OTP_MAX_ATTEMPTS = 5;
 
@@ -33,7 +34,7 @@ class OTP {
     @prop({ default: 0 })
     attempts: number;
 
-    @prop({ default: Date.now, expires: process.env.OTP_EXPIRATION ?? "5m" })
+    @prop({ default: Date.now, expires: envConfig.OTP_EXPIRATION })
     createdAt: Date;
 }
 

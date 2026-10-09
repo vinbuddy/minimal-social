@@ -35,7 +35,8 @@ export class User {
     @prop({ required: true, unique: true })
     public email: string;
 
-    @prop({ required: false, default: null })
+    // select: false — never returned by queries/populates unless explicitly requested with .select("+password")
+    @prop({ required: false, default: null, select: false })
     public password: string;
 
     @prop({
@@ -62,7 +63,7 @@ export class User {
     @prop({ required: true, default: false })
     isVerified: boolean;
 
-    @prop({ required: false, default: null })
+    @prop({ required: false, default: null, select: false })
     refreshToken: string | null;
 }
 

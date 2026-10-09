@@ -2,7 +2,7 @@ import { z } from "zod";
 import { paginationQuerySchema } from "../../schemas/base.schema";
 
 export const createMessageSchema = z.object({
-    senderId: z.string(),
+    senderId: z.string().optional(), // ignored — the sender is the authenticated user
     conversationId: z.string().optional(),
     content: z.string().optional(),
     replyTo: z.string().optional(),

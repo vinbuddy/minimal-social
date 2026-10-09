@@ -81,9 +81,11 @@ export async function searchUserHandler(req: Request, res: Response, next: NextF
     }
 }
 
-export async function followUserHandler(req: Request, res: Response, next: NextFunction) {
+export async function followUserHandler(_req: Request, res: Response, next: NextFunction) {
     try {
-        const { userId, currentUserId } = followUserSchema.parse(req.body) as FollowUserInput;
+        const req = _req as RequestWithUser;
+        const { userId } = followUserSchema.parse(req.body) as FollowUserInput;
+        const currentUserId = req.user._id.toString();
 
         if (currentUserId === userId) {
             return res.status(400).json({ message: "You cannot follow yourself" });
@@ -109,9 +111,11 @@ export async function followUserHandler(req: Request, res: Response, next: NextF
     }
 }
 
-export async function unfollowUserHandler(req: Request, res: Response, next: NextFunction) {
+export async function unfollowUserHandler(_req: Request, res: Response, next: NextFunction) {
     try {
-        const { userId, currentUserId } = followUserSchema.parse(req.body) as FollowUserInput;
+        const req = _req as RequestWithUser;
+        const { userId } = followUserSchema.parse(req.body) as FollowUserInput;
+        const currentUserId = req.user._id.toString();
 
         if (currentUserId === userId) {
             return res.status(400).json({ message: "You cannot unfollow yourself" });

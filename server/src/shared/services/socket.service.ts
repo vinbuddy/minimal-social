@@ -1,28 +1,15 @@
-// We no longer need in-memory socketClients and onlineUsers 
-// because we are using Socket.IO Redis Adapter and rooms.
-// Each user joins a room named by their userId.
+import { Server } from "socket.io";
 
-export function addSocketClient(socketId: string, userId: string) {
-    // Deprecated. Use socket.join(userId) instead.
+// Holds the Socket.IO server so modules outside the request cycle (e.g. queue workers)
+// can emit without importing the app entry point (which would create an import cycle).
+// Each user joins a room named by their userId; conversations use their conversationId.
+let io: Server | null = null;
+
+export function setSocketServer(server: Server) {
+    io = server;
 }
 
-export function removeSocketClient(socketId: string) {
-    // Deprecated.
-}
-
-export function getSocketClientsByUserId(userId: string): string[] {
-    // Deprecated. Use io.to(userId).emit(...) instead.
-    return [userId]; // Return userId itself so io.to(socketId) becomes io.to(userId)
-}
-
-// ONLINE USER
-export interface OnlineUser {
-    userId: string;
-    socketId: string;
-    roomIds: string[];
-    currentRoomId: string | null;
-}
-
-export function addOnlineUser(userId: string, userInfo: OnlineUser) {
-    // Deprecated.
+export function getSocketServer(): Server {
+    if (!io) throw new Error("Socket.IO server has not been initialized");
+    return io;
 }

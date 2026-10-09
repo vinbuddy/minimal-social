@@ -4,7 +4,7 @@ import PostModel from "../../modules/posts/post.model";
 import { moderateImage } from "../helpers/media-moderation";
 import cloudinary from "../configs/cloudinary";
 import logger from "../configs/logger";
-import { io } from "../../index"; // to emit notification to user
+import { getSocketServer } from "../services/socket.service";
 
 const QUEUE_NAME = "image-moderation";
 
@@ -34,7 +34,7 @@ export const imageModerationWorker = new Worker(
                 
                 if (post) {
                     // Notify user
-                    io.to(post.postBy.toString()).emit("notification", {
+                    getSocketServer().to(post.postBy.toString()).emit("notification", {
                         notification: {
                             type: "system",
                             content: "Your recent post was removed because it contains inappropriate content.",

@@ -7,7 +7,7 @@ export const createNotificationSchema = z.object({
     photo: z.string().optional(),
     message: z.string(),
     url: z.string().optional(),
-    sender: z.string(),
+    sender: z.string().optional(), // ignored — the sender is the authenticated user
     receivers: z.string().array(),
 });
 

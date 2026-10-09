@@ -4,7 +4,7 @@ export const createCommentSchema = z.object({
     target: z.string(),
     targetType: z.string(),
     content: z.string(),
-    commentBy: z.string(),
+    commentBy: z.string().optional(), // ignored — the author is the authenticated user
     rootComment: z.string().optional(),
     replyTo: z.string().optional(),
 });

@@ -5,11 +5,13 @@ import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../users/user.model";
 import { BlockModel } from "../users/block.model";
 import mongoose from "mongoose";
 import CommentModel from "./comment.model";
+import PostModel from "../posts/post.model";
 import { RequestWithUser } from "../../shared/types/request";
 
-export async function createCommentHandler(req: Request, res: Response, next: NextFunction) {
+export async function createCommentHandler(_req: Request, res: Response, next: NextFunction) {
     try {
-        const { commentBy, content, rootComment, replyTo, target, targetType } = createCommentSchema.parse(
+        const req = _req as RequestWithUser;
+        const { content, rootComment, replyTo, target, targetType } = createCommentSchema.parse(
             req.body
         ) as CreateCommentInput;
 
@@ -31,7 +33,7 @@ export async function createCommentHandler(req: Request, res: Response, next: Ne
         const comment = await CommentModel.create({
             targetType: targetType ?? "Post",
             target: new mongoose.Types.ObjectId(target),
-            commentBy: new mongoose.Types.ObjectId(commentBy),
+            commentBy: new mongoose.Types.ObjectId(req.user._id),
             rootComment: rootComment ? new mongoose.Types.ObjectId(rootComment) : null,
             replyTo: replyTo ? new mongoose.Types.ObjectId(replyTo) : null,
             content: formatContent,
@@ -227,19 +229,20 @@ export async function getRepliesHandler(_req: Request, res: Response, next: Next
     }
 }
 
-export async function likeCommentHandler(req: Request, res: Response, next: NextFunction) {
+export async function likeCommentHandler(_req: Request, res: Response, next: NextFunction) {
     try {
-        const { commentId, userId } = req.body;
+        const req = _req as RequestWithUser;
+        const { commentId } = req.body;
 
-        if (!commentId || !userId) {
-            return res.status(400).json({
-                message: "commentId or userId is required",
-            });
+        if (!commentId) {
+            return res.status(400).json({ message: "commentId is required" });
         }
 
-        const updatedComment = await CommentModel.findByIdAndUpdate(commentId, {
-            $push: { likes: userId },
-        });
+        const updatedComment = await CommentModel.findByIdAndUpdate(
+            commentId,
+            { $addToSet: { likes: new mongoose.Types.ObjectId(req.user._id) } },
+            { new: true }
+        );
 
         if (!updatedComment) {
             return res.status(404).json({ message: "Comment not found" });
@@ -256,19 +259,20 @@ export async function likeCommentHandler(req: Request, res: Response, next: Next
     }
 }
 
-export async function unlikeCommentHandler(req: Request, res: Response, next: NextFunction) {
+export async function unlikeCommentHandler(_req: Request, res: Response, next: NextFunction) {
     try {
-        const { commentId, userId } = req.body;
+        const req = _req as RequestWithUser;
+        const { commentId } = req.body;
 
-        if (!commentId || !userId) {
-            return res.status(400).json({
-                message: "commentId or userId is required",
-            });
+        if (!commentId) {
+            return res.status(400).json({ message: "commentId is required" });
         }
 
-        const updatedComment = await CommentModel.findByIdAndUpdate(commentId, {
-            $pull: { likes: userId },
-        });
+        const updatedComment = await CommentModel.findByIdAndUpdate(
+            commentId,
+            { $pull: { likes: new mongoose.Types.ObjectId(req.user._id) } },
+            { new: true }
+        );
 
         if (!updatedComment) {
             return res.status(404).json({ message: "Comment not found" });
@@ -285,8 +289,9 @@ export async function unlikeCommentHandler(req: Request, res: Response, next: Ne
     }
 }
 
-export async function deleteCommentHandler(req: Request, res: Response, next: NextFunction) {
+export async function deleteCommentHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const commentId = req.params.id;
 
         if (!commentId) {
@@ -299,6 +304,16 @@ export async function deleteCommentHandler(req: Request, res: Response, next: Ne
 
         if (!comment) {
             return res.status(404).json({ message: "Comment not found" });
+        }
+
+        // Only the comment author, the author of the commented post, or an admin can delete it
+        const userId = req.user._id.toString();
+        const isCommentAuthor = comment.commentBy.toString() === userId;
+        const isPostAuthor =
+            comment.targetType === "Post" && (await PostModel.exists({ _id: comment.target, postBy: userId })) !== null;
+
+        if (!isCommentAuthor && !isPostAuthor && !req.user.isAdmin) {
+            return res.status(403).json({ message: "You are not allowed to delete this comment" });
         }
 
         const isRootComment = comment.replyTo == null;

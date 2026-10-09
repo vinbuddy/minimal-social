@@ -5,6 +5,7 @@ import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "../users/user.model";
 import mongoose from "mongoose";
 import MessageModel from "./message.model";
 import { RequestWithUser } from "../../shared/types/request";
+import { getConversationForMember } from "./message.service";
 
 export async function createPrivateConversationHandler(_req: Request, res: Response, next: NextFunction) {
     try {
@@ -178,9 +179,11 @@ export async function searchConversationsByNameHandler(_req: Request, res: Respo
     }
 }
 
-export async function getConversationDetailHandler(req: Request, res: Response, next: NextFunction) {
+export async function getConversationDetailHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const conversationId = req.params.id;
+        await getConversationForMember(conversationId, (_req as RequestWithUser).user._id);
 
         const conversation = await ConversationModel.findById(conversationId)
             .populate({
@@ -204,13 +207,15 @@ export async function getConversationDetailHandler(req: Request, res: Response, 
     }
 }
 
-export async function getConversationMediaFilesHandler(req: Request, res: Response, next: NextFunction) {
+export async function getConversationMediaFilesHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const conversationId = req.query.conversationId as string;
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
 
         if (!conversationId) return res.status(400).json({ message: "Conversation ID is required" });
+        await getConversationForMember(conversationId, (_req as RequestWithUser).user._id);
 
         const skip = (Number(page) - 1) * limit;
 
@@ -245,9 +250,11 @@ export async function getConversationMediaFilesHandler(req: Request, res: Respon
     }
 }
 
-export async function changeConversationEmojiHandler(req: Request, res: Response, next: NextFunction) {
+export async function changeConversationEmojiHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const conversationId = req.params.id;
+        await getConversationForMember(conversationId, (_req as RequestWithUser).user._id);
         const emoji = req.body.emoji;
 
         const conversation = await ConversationModel.findByIdAndUpdate(conversationId, {
@@ -269,9 +276,11 @@ export async function changeConversationEmojiHandler(req: Request, res: Response
     }
 }
 
-export async function changeThemeConversationHandler(req: Request, res: Response, next: NextFunction) {
+export async function changeThemeConversationHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const conversationId = req.params.id;
+        await getConversationForMember(conversationId, (_req as RequestWithUser).user._id);
         const themeId = req.body.themeId as string;
 
         const conversation = await ConversationModel.findByIdAndUpdate(conversationId, {
@@ -293,9 +302,11 @@ export async function changeThemeConversationHandler(req: Request, res: Response
     }
 }
 
-export async function getConversationLinksHandler(req: Request, res: Response, next: NextFunction) {
+export async function getConversationLinksHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const conversationId = req.query.conversationId as string;
+        await getConversationForMember(conversationId, (_req as RequestWithUser).user._id);
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
 
@@ -349,6 +360,8 @@ export async function deleteConversationHandler(_req: Request, res: Response, ne
         const req = _req as RequestWithUser;
         const conversationId = req.params.id;
         const userId = req.user._id?.toString();
+
+        await getConversationForMember(conversationId, (_req as RequestWithUser).user._id);
 
         // Push userId to excluded
         await MessageModel.updateMany(

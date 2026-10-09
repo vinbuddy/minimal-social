@@ -1,3 +1,4 @@
+import { RequestWithUser } from "../../shared/types/request";
 import { NextFunction, Request, Response } from "express";
 import logger from "../../shared/configs/logger";
 import UserModel, { User, USER_MODEL_HIDDEN_FIELDS } from "../users/user.model";
@@ -61,14 +62,14 @@ const helpers = {
     },
 };
 
-export async function createNotificationHandler(req: Request, res: Response, next: NextFunction) {
+export async function createNotificationHandler(_req: Request, res: Response, next: NextFunction) {
     try {
-        const { targetType, target, action, photo, message, url, sender, receivers } = createNotificationSchema.parse(
+        const req = _req as RequestWithUser;
+        const { targetType, target, action, photo, message, url, receivers } = createNotificationSchema.parse(
             req.body
         ) as CreateNotificationInput;
-        logger.debug("Creating notification from sender:", { sender });
 
-        const senderId = new mongoose.Types.ObjectId(sender);
+        const senderId = new mongoose.Types.ObjectId(req.user._id);
         const receiverIds = receivers.map((receiver: string) => new mongoose.Types.ObjectId(receiver));
 
         // Check exist
@@ -112,13 +113,13 @@ export async function createNotificationHandler(req: Request, res: Response, nex
             { path: "receivers.receiver", select: USER_MODEL_HIDDEN_FIELDS },
         ]);
 
-        const senderInfo = await UserModel.findById(sender).select(USER_MODEL_HIDDEN_FIELDS);
+        const senderInfo = await UserModel.findById(senderId).select(USER_MODEL_HIDDEN_FIELDS);
 
         // Send notification to receivers
-        const { io } = await import("../../index");
+        const io = req.app.get("io") as Server;
 
         receivers.forEach((receiver: string) => {
-            if (receiver !== sender) {
+            if (receiver !== senderId.toString()) {
                 io.to(receiver).emit("notification", {
                     notification,
                     sender: senderInfo,
@@ -189,8 +190,9 @@ export async function getUserNotificationsHandler(req: Request, res: Response, n
     }
 }
 
-export async function deleteNotificationHandler(req: Request, res: Response, next: NextFunction) {
+export async function deleteNotificationHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const notificationId = req.params.id;
 
         if (!notificationId) {
@@ -199,7 +201,11 @@ export async function deleteNotificationHandler(req: Request, res: Response, nex
             });
         }
 
-        const deleted = await NotificationModel.findByIdAndDelete(notificationId);
+        // Only a receiver can delete a notification
+        const deleted = await NotificationModel.findOneAndDelete({
+            _id: notificationId,
+            "receivers.receiver": new mongoose.Types.ObjectId(req.user._id),
+        });
 
         if (!deleted) {
             return res.status(404).json({
@@ -213,14 +219,13 @@ export async function deleteNotificationHandler(req: Request, res: Response, nex
     }
 }
 
-export async function readAllNotificationsHandler(req: Request, res: Response, next: NextFunction) {
+export async function readAllNotificationsHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const userId = req.params.userId;
 
-        if (!userId) {
-            return res.status(400).json({
-                message: "User id is required",
-            });
+        if (userId !== req.user._id.toString()) {
+            return res.status(403).json({ message: "You can only update your own notifications" });
         }
 
         const updated = await UserModel.findByIdAndUpdate(userId, { isNotification: false });

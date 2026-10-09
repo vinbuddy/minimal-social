@@ -42,6 +42,9 @@ const envSchema = z.object({
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     GOOGLE_CALLBACK_URL: z.string().optional(),
 
+    // OTP
+    OTP_EXPIRATION: z.string().default("5m"),
+
     // Optional
     COOKIE_MODE: z.string().optional(),
     SIGHT_ENGINE_API_USER: z.string().optional(),

@@ -1,9 +1,10 @@
 import winston from "winston";
 import path from "path";
+import envConfig from "./env";
 
 const { combine, timestamp, printf, colorize, errors, json } = winston.format;
 
-const isProduction = process.env.ENVIRONMENT === "production";
+const isProduction = envConfig.ENVIRONMENT === "production";
 
 // Custom format for development console
 const devFormat = printf(({ level, message, timestamp, stack, ...meta }) => {

@@ -18,6 +18,7 @@ import { errorHandler } from "./middlewares/error-handler.middleware";
 import { apiLimiter } from "./middlewares/rate-limiter.middleware";
 import router from "./routes";
 import socketHandlers from "./sockets";
+import { setSocketServer } from "./shared/services/socket.service";
 import { initializeLoginWithGoogleService } from "./modules/auth/google.service";
 import "./shared/queues/image-moderation.queue"; // Initialize worker
 
@@ -26,7 +27,7 @@ const app: Application = express();
 const httpServer = createServer(app);
 const PORT = envConfig.PORT;
 
-export const io = new Server(httpServer, {
+const io = new Server(httpServer, {
     cors: {
         origin: envConfig.CLIENT_BASE_URL,
         credentials: true,
@@ -35,6 +36,7 @@ export const io = new Server(httpServer, {
 });
 
 io.adapter(createAdapter(pubClient, subClient));
+setSocketServer(io);
 
 // ─── Security middlewares ────────────────────────────────────
 app.use(helmet());

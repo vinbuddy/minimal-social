@@ -1,5 +1,4 @@
 import express, { Router } from "express";
-import env from "dotenv";
 import { verifyToken } from "../../middlewares/verify-token.middleware";
 import {
     blockUserHandler,
@@ -8,8 +7,6 @@ import {
     unblockUserHandler,
     verifyChangePasswordOTPHandler,
 } from "./account.controller";
-
-env.config();
 
 const router: Router = express.Router();
 

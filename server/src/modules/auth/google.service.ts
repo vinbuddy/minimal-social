@@ -2,16 +2,21 @@ import passport from "passport";
 import { Strategy } from "passport-google-oauth20";
 import UserModel, { User } from "../users/user.model";
 
-import env from "dotenv";
-env.config();
+import envConfig from "../../shared/configs/env";
+import logger from "../../shared/configs/logger";
 
 export function initializeLoginWithGoogleService() {
+    if (!envConfig.GOOGLE_CLIENT_ID || !envConfig.GOOGLE_CLIENT_SECRET || !envConfig.GOOGLE_CALLBACK_URL) {
+        logger.warn("Google OAuth is not configured — login with Google is disabled");
+        return;
+    }
+
     passport.use(
         new Strategy(
             {
-                clientID: process.env.GOOGLE_CLIENT_ID as string,
-                clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-                callbackURL: process.env.GOOGLE_CALLBACK_URL as string,
+                clientID: envConfig.GOOGLE_CLIENT_ID,
+                clientSecret: envConfig.GOOGLE_CLIENT_SECRET,
+                callbackURL: envConfig.GOOGLE_CALLBACK_URL,
             },
             async (accessToken, refreshToken, profile, done) => {
                 try {
@@ -21,7 +26,7 @@ export function initializeLoginWithGoogleService() {
 
                     // Login
                     if (userFound && userFound.googleId === profile.id) {
-                        console.log("USER LOGIN WITH GOOGLE");
+                        logger.debug("User logged in with Google", { userId: userFound._id });
                         return done(null, userFound);
                     }
 
@@ -35,7 +40,7 @@ export function initializeLoginWithGoogleService() {
                             { new: true }
                         );
 
-                        console.log("USER LOGIN AND UPDATE GOOGLE ID");
+                        logger.debug("User logged in with Google and linked googleId", { userId: userFound._id });
                         if (user) return done(null, user);
                     }
 
@@ -53,7 +58,7 @@ export function initializeLoginWithGoogleService() {
                             photo: profile.photos?.[0].value,
                         });
 
-                        console.log("USER REGISTER WITH GOOGLE");
+                        logger.debug("User registered with Google", { userId: user._id });
 
                         return done(null, user);
                     }
