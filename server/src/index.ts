@@ -38,6 +38,10 @@ const io = new Server(httpServer, {
 io.adapter(createAdapter(pubClient, subClient));
 setSocketServer(io);
 
+// ─── Proxy ───────────────────────────────────────────────────
+// Behind a proxy, req.ip (used by rate limiting) would otherwise be the proxy IP for every user
+app.set("trust proxy", envConfig.TRUST_PROXY_HOPS ?? (envConfig.ENVIRONMENT === "production" ? 1 : 0));
+
 // ─── Security middlewares ────────────────────────────────────
 app.use(helmet());
 app.use(apiLimiter);
