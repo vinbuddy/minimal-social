@@ -16,14 +16,12 @@ interface IProps {
 
 export default function PostActions({ post }: IProps) {
     const { currentUser } = useAuthStore();
-    const [isLiked, setIsLiked] = useState<boolean>(() => post?.likes?.includes(currentUser?._id) || false);
+    // Reposting always targets the original post, so repost state comes from it when this is a repost
+    const repostTarget = post?.originalPost?._id ? post.originalPost : post;
+    const [isLiked, setIsLiked] = useState<boolean>(post?.isLiked ?? false);
     const [likeCount, setLikeCount] = useState<number>(post?.likeCount ?? 0);
-    const [isReposted, setIsReposted] = useState<boolean>(
-        () => post?.originalPost?.reposts?.includes(currentUser?._id) || false
-    );
-    const [repostCount, setRepostCount] = useState<number>(
-        post?.originalPost?._id ? post?.originalPost?.repostCount ?? 0 : 0
-    );
+    const [isReposted, setIsReposted] = useState<boolean>(repostTarget?.isReposted ?? false);
+    const [repostCount, setRepostCount] = useState<number>(repostTarget?.repostCount ?? 0);
     const mutate = useGlobalMutation();
     const handleUnLike = async (): Promise<void> => {
         setIsLiked(false);

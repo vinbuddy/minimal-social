@@ -5,16 +5,14 @@ import { Fragment, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import { CommentIcon, HeartIcon, RepostIcon } from "@/assets/icons";
-import MainLayout from "@/layouts/main-layout";
-import NotificationItem from "@/components/notification/notification-item";
-import NotificationSkeletons from "@/components/notification/notification-skeletons";
+import { NotificationItem, NotificationSkeletons } from "@/components/notification";
 
 import { useAuthStore } from "@/hooks/store";
 import { usePagination } from "@/hooks";
 import { INotification } from "@/types/notification";
 import { IUser } from "@/types/user";
 import axiosInstance from "@/utils/http-request";
-import ErrorMessage from "@/components/error-message";
+import { ErrorMessage } from "@/components";
 
 type NotificationActionType = "all" | "like" | "follow" | "comment" | "mention" | "repost";
 

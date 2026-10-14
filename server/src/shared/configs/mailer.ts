@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import envConfig from "./env";
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -6,8 +7,8 @@ const transporter = nodemailer.createTransport({
     port: 587,
     secure: false,
     auth: {
-        user: process.env.EMAIL_APP_USER,
-        pass: process.env.EMAIL_APP_PASSWORD,
+        user: envConfig.EMAIL_APP_USER,
+        pass: envConfig.EMAIL_APP_PASSWORD,
     },
 });
 

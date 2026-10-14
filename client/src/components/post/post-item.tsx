@@ -29,7 +29,7 @@ export default function PostItem({ post: _post, onSelectMediaFile }: IProps) {
     const { t: tPost } = useTranslation<TranslationNameSpace>("post");
 
     const isReposted = _post?.originalPost?.caption || _post?.originalPost?.mediaFiles;
-    const post: IPost = isReposted ? _post?.originalPost : _post;
+    const post: IPost = (isReposted && _post?.originalPost) || _post;
     const repostedInfo = _post;
 
     const handleMediaFileClick = (index: number) => {

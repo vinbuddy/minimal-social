@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 import { fetcher } from "@/utils/http-request";
 import { streamTokenProvider } from "./actions";
-import PageLoading from "@/components/page-loading";
+import { PageLoading } from "@/components";
 import { useAuthStore } from "@/hooks/store";
 import { usePathname } from "next/navigation";
 import { PUBLIC_ROUTES } from "@/constants/route";

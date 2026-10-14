@@ -1,17 +1,25 @@
-import { CookieOptions } from "express";
-import env from "dotenv";
+import { CookieOptions, Response } from "express";
+import envConfig from "./env";
 
-env.config();
+const isProduction = envConfig.ENVIRONMENT === "production";
 
-const cookieMode = {
-    options: {
-        httpOnly: true,
-        secure: process.env.ENVIRONMENT === "production",
-        path: "/",
-        sameSite: "none",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    } as CookieOptions,
-    isCookieMode: process.env.COOKIE_MODE === "true",
+// Client and API are on different origins in production, so cookies must be SameSite=None + Secure there
+export const authCookieOptions: CookieOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    path: "/",
+    sameSite: isProduction ? "none" : "strict",
 };
 
-export default cookieMode;
+const ACCESS_TOKEN_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days (the JWT itself may expire sooner)
+const REFRESH_TOKEN_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+export function setAuthCookies(res: Response, tokens: { accessToken: string; refreshToken: string }) {
+    return res
+        .cookie("accessToken", tokens.accessToken, { ...authCookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE })
+        .cookie("refreshToken", tokens.refreshToken, { ...authCookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE });
+}
+
+export function clearAuthCookies(res: Response) {
+    return res.clearCookie("accessToken", authCookieOptions).clearCookie("refreshToken", authCookieOptions);
+}

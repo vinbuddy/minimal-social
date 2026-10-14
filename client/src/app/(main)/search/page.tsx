@@ -8,16 +8,14 @@ import { Fragment, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import useSWR from "swr";
 
-import BackButton from "@/components/back-button";
-import PostItem from "@/components/post/post-item";
-import UserItem from "@/components/user/user-item";
-import UserSuggestionList from "@/components/user/user-suggetion-list";
+import { BackButton, ErrorMessage } from "@/components";
+import { PostItem } from "@/components/post";
+import { UserItem, UserSuggestionList } from "@/components/user";
 import { usePagination, useDebounce, useVisibility } from "@/hooks";
 import { IPost, ISelectMediaFile } from "@/types/post";
 import { IUser } from "@/types/user";
-import ErrorMessage from "@/components/error-message";
 import { useTranslation } from "react-i18next";
-import FullScreenMediaSlider from "@/components/media/fullscreen-media-slider";
+import { FullScreenMediaSlider } from "@/components/media";
 
 export default function SearchPage() {
     const [searchValue, setSearchValue] = useState("");

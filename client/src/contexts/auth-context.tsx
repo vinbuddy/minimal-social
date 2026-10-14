@@ -4,9 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 
 import useAuthStore from "../hooks/store/use-auth-store";
 import { IUser } from "../types/user";
-import PageLoading from "@/components/page-loading";
+import { PageLoading, PageSlowLoading } from "@/components";
 import dynamic from "next/dynamic";
-import PageSlowLoading from "@/components/page-slow-loading";
 import { PUBLIC_ROUTES } from "@/constants/route";
 import { ENV } from "@/config/env";
 

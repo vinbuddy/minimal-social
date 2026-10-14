@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { RedoIcon, SendHorizontalIcon, SmileIcon, XIcon } from "lucide-react";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 
-import RichTextEditor from "@/components/rich-text-editor";
+import { RichTextEditor } from "@/components";
 import EmojiPicker from "../emoji-picker";
 import axiosInstance from "@/utils/http-request";
 import { useAuthStore, useReplyStore } from "@/hooks/store";

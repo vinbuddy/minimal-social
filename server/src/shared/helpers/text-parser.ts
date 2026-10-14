@@ -1,4 +1,5 @@
-import UserModel from "../../models/user.model";
+import UserModel from "../../modules/users/user.model";
+import logger from "../configs/logger";
 
 export const extractMentionsAndTags = (html: string) => {
     const mentionRegex = /@(\w+)/g;
@@ -42,6 +43,7 @@ export const replaceHrefs = async (caption: string) => {
 
         return updatedCaption;
     } catch (error) {
-        console.error(error);
+        logger.error("Failed to resolve mentions in caption", { error });
+        return caption;
     }
 };
