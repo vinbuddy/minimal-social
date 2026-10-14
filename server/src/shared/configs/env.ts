@@ -47,6 +47,10 @@ const envSchema = z.object({
 
     // Optional
     COOKIE_MODE: z.string().optional(),
+
+    // Number of reverse proxies in front of the app (Render, load balancers…), so req.ip is the real client IP.
+    // Never use `true`: it trusts any X-Forwarded-For value and lets clients spoof their IP.
+    TRUST_PROXY_HOPS: z.coerce.number().int().min(0).optional(),
     SIGHT_ENGINE_API_USER: z.string().optional(),
     SIGHT_ENGINE_API_KEY: z.string().optional(),
     SIGHT_ENGINE_API_URL: z.string().optional(),
