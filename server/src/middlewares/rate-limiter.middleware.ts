@@ -33,6 +33,21 @@ export const otpLimiter = rateLimit({
 });
 
 /**
+ * Rate limiter for reel uploads (signature + publish): 30 requests per hour per IP
+ */
+export const reelUploadLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 30,
+    message: {
+        statusCode: 429,
+        status: "fail",
+        message: "Too many reel uploads, please try again later",
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+/**
  * General API rate limiter: 1000 requests per 15 minutes per IP.
  * A single page load of the SPA makes 10–20 requests, so this must stay generous;
  * sensitive endpoints have their own stricter limiters above.

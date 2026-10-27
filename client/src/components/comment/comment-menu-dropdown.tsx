@@ -37,7 +37,7 @@ export default function CommentMenuDropdown({ children, comment }: IProps) {
             await axiosInstance.delete(`/comment/${comment._id}`);
 
             mutate((key) => typeof key === "string" && key.includes("/comment"));
-            mutate((key) => typeof key === "string" && key.includes("/post"));
+            if (comment.targetType !== "Reel") mutate((key) => typeof key === "string" && key.includes("/post"));
 
             showToast(tComment("COMMENT_MESSAGE.DELETE_COMMENT_SUCCESS"), "success");
         } catch (error: any) {

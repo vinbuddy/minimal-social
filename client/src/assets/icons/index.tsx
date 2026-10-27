@@ -332,3 +332,43 @@ export const GoogleIcon = ({ className = "", size = 24 }) => {
         </svg>
     );
 };
+
+export const ReelsIcon = ({ className = "", size = 24, isFilled = false }) => {
+    // The filled variant cuts the band and play mark out of a solid tile, so they show the ground colour
+    const maskId = `reels-icon-mask-${size}`;
+
+    return (
+        <svg
+            aria-label="Reels"
+            role="img"
+            viewBox="0 0 24 24"
+            className={className}
+            style={{ height: size, width: size }}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <title>Reels</title>
+            {isFilled ? (
+                <>
+                    <defs>
+                        <mask id={maskId}>
+                            <rect x="0" y="0" width="24" height="24" fill="white" stroke="none" />
+                            <path d="M2.5 8h19M8.5 2.5 11 8M14.5 2.5 17 8" stroke="black" />
+                            <path d="M10 11.25v6.5l5.5-3.25z" fill="black" stroke="black" strokeWidth="1" />
+                        </mask>
+                    </defs>
+                    <rect x="1.5" y="1.5" width="21" height="21" rx="5.5" fill="currentColor" stroke="none" mask={`url(#${maskId})`} />
+                </>
+            ) : (
+                <>
+                    <rect x="2.5" y="2.5" width="19" height="19" rx="5" />
+                    <path d="M2.5 8h19M8.5 2.5 11 8M14.5 2.5 17 8" />
+                    <path d="M10 11.25v6.5l5.5-3.25z" fill="currentColor" strokeWidth="1" />
+                </>
+            )}
+        </svg>
+    );
+};

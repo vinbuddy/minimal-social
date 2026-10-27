@@ -10,5 +10,6 @@
     "COMMENT_MESSAGE.DELETE_COMMENT_SUCCESS": "Comment deleted successfully",
     "COMMENT_MESSAGE.COMMENTED_SUCCESS": "Commented successfully",
     "COMMENT_MESSAGE.COMMENTED_ON_YOUR_POST": "commented on your post",
+    "COMMENT_MESSAGE.COMMENTED_ON_YOUR_REEL": "commented on your reel",
     "COMMENT_MESSAGE.REPLIED_TO_YOUR_COMMENT": "replied to your comment"
 }
