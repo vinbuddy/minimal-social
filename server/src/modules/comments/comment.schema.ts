@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const createCommentSchema = z.object({
     target: z.string(),
-    targetType: z.string(),
+    targetType: z.enum(["Post", "Reel"]).default("Post"),
     content: z.string(),
     commentBy: z.string().optional(), // ignored — the author is the authenticated user
     rootComment: z.string().optional(),

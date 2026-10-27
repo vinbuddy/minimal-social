@@ -23,7 +23,7 @@ export class Notification {
     public target: Ref<Post | Comment | User>;
 
     @prop({ required: true })
-    public targetType: "Comment" | "Post" | "User";
+    public targetType: "Comment" | "Post" | "Reel" | "User";
 
     @prop({ required: true, enum: ["like", "comment", "follow", "mention", "repost"] })
     public action: "like" | "comment" | "follow" | "mention" | "repost";

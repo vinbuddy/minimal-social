@@ -5,7 +5,7 @@ export interface IComment {
     _id: string;
     rootComment: string;
     replyTo: string;
-    targetType: "Post" | "Video";
+    targetType: "Post" | "Reel";
     target: string;
     content: string;
     commentBy: IUser;
