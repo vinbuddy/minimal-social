@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import envConfig from "../shared/configs/env";
 import logger from "../shared/configs/logger";
+import { getBearerToken } from "../shared/helpers/request-auth";
 import userSocketHandler from "./user.socket";
 
 function getCookie(cookieHeader: string | undefined, name: string): string | undefined {
@@ -16,10 +17,14 @@ function getCookie(cookieHeader: string | undefined, name: string): string | und
 }
 
 const socketHandlers = (io: Server) => {
-    // Authenticate every connection with the accessToken cookie.
+    // Authenticate every connection with the access token: `auth.token` from mobile, the accessToken cookie from web.
     // The userId is taken from the verified token, never from client payloads.
     io.use((socket, next) => {
-        const accessToken = getCookie(socket.handshake.headers.cookie, "accessToken");
+        const authToken = socket.handshake.auth?.token;
+        const accessToken =
+            (typeof authToken === "string" && authToken) ||
+            getBearerToken(socket.handshake.headers.authorization) ||
+            getCookie(socket.handshake.headers.cookie, "accessToken");
 
         if (!accessToken) {
             return next(new Error("Unauthorized"));

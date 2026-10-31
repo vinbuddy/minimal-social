@@ -27,6 +27,10 @@ export const otpResetPasswordSchema = z.object({
         .max(15),
 });
 
+export const googleIdTokenSchema = z.object({
+    idToken: z.string({ required_error: "ID token is required" }).min(1, "ID token is required"),
+});
+
 export type CreateUserInput = z.infer<typeof registerSchema>;
 export type LoginUserInput = z.infer<typeof loginSchema>;
 export type OTPInput = z.infer<typeof otpSchema>;

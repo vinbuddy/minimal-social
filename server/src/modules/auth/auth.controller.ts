@@ -1,11 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import envConfig from "../../shared/configs/env";
 import logger from "../../shared/configs/logger";
-import { clearAuthCookies, setAuthCookies } from "../../shared/configs/cookie";
+import { clearAuthCookies, sendAuthTokens, setAuthCookies } from "../../shared/configs/cookie";
+import { getRefreshToken, isMobileClient } from "../../shared/helpers/request-auth";
 import { RequestWithUser } from "../../shared/types/request";
 import { User } from "../users/user.model";
-import { loginSchema, otpResetPasswordSchema, otpSchema, registerSchema } from "./auth.schema";
+import { googleIdTokenSchema, loginSchema, otpResetPasswordSchema, otpSchema, registerSchema } from "./auth.schema";
 import * as authService from "./auth.service";
+
+const getSessionClient = (req: Request) => (isMobileClient(req) ? "mobile" : "web");
 
 export async function registerHandler(req: Request, res: Response, next: NextFunction) {
     try {
@@ -33,9 +36,21 @@ export async function verifyOTPHandler(req: Request, res: Response, next: NextFu
 
 export async function loginHandler(req: Request, res: Response, next: NextFunction) {
     try {
-        const { user, tokens } = await authService.login(loginSchema.parse(req.body));
+        const { user, tokens } = await authService.login(loginSchema.parse(req.body), getSessionClient(req));
 
-        return setAuthCookies(res, tokens).status(200).json({ statusCode: 200, data: user });
+        return sendAuthTokens(req, res, tokens, { statusCode: 200, data: user });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function googleMobileLoginHandler(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { idToken } = googleIdTokenSchema.parse(req.body);
+
+        const { user, tokens } = await authService.loginWithGoogleIdToken(idToken, getSessionClient(req));
+
+        return sendAuthTokens(req, res, tokens, { statusCode: 200, data: user });
     } catch (error) {
         next(error);
     }
@@ -45,7 +60,7 @@ export async function logoutHandler(_req: Request, res: Response, next: NextFunc
     try {
         const req = _req as RequestWithUser;
 
-        await authService.logout(req.user._id);
+        await authService.logout(req.user._id, getRefreshToken(req));
 
         return clearAuthCookies(res).status(200).json({ statusCode: 200, message: "Logged out successfully" });
     } catch (error) {
@@ -55,9 +70,9 @@ export async function logoutHandler(_req: Request, res: Response, next: NextFunc
 
 export async function refreshTokenHandler(req: Request, res: Response, next: NextFunction) {
     try {
-        const { user, tokens } = await authService.rotateRefreshToken(req.cookies.refreshToken);
+        const { user, tokens } = await authService.rotateRefreshToken(getRefreshToken(req));
 
-        return setAuthCookies(res, tokens).status(200).json({ statusCode: 200, data: user });
+        return sendAuthTokens(req, res, tokens, { statusCode: 200, data: user });
     } catch (error) {
         if (error instanceof authService.RefreshTokenError && error.clearCookies) {
             clearAuthCookies(res);
