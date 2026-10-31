@@ -5,10 +5,10 @@ import { StyleProp, View, ViewStyle } from "react-native";
 import { borderWidth, radius, useTheme } from "@/theme";
 import { Text } from "./text";
 
-type Size = "sm" | "md" | "lg" | "xl";
+type Size = "xs" | "sm" | "md" | "lg" | "xl";
 
-/** HeroUI's sm/md/lg, plus xl for the profile header */
-const SIZES: Record<Size, number> = { sm: 32, md: 40, lg: 56, xl: 80 };
+/** HeroUI's sm/md/lg, plus xs for the tab bar and xl for the profile header */
+const SIZES: Record<Size, number> = { xs: 24, sm: 32, md: 40, lg: 56, xl: 80 };
 
 export type AvatarProps = {
     src?: string | null;
@@ -49,7 +49,7 @@ export function Avatar({ src, name, size = "md", isBordered = false, style }: Av
                     onError={() => setHasError(true)}
                 />
             ) : (
-                <Text variant={size === "sm" ? "tiny" : "small"} weight={600} color="default600">
+                <Text variant={size === "xs" || size === "sm" ? "tiny" : "small"} weight={600} color="default600">
                     {name?.trim().charAt(0).toUpperCase() ?? ""}
                 </Text>
             )}
