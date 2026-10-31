@@ -41,6 +41,11 @@ const envSchema = z.object({
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     GOOGLE_CALLBACK_URL: z.string().optional(),
+    // Extra OAuth client IDs (comma-separated, e.g. the iOS client) whose ID tokens the mobile app may send
+    GOOGLE_MOBILE_CLIENT_IDS: z
+        .string()
+        .optional()
+        .transform((value) => value?.split(",").map((id) => id.trim()).filter(Boolean)),
 
     // OTP
     OTP_EXPIRATION: z.string().default("5m"),

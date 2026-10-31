@@ -26,6 +26,7 @@
         "express": "^4.19.2",
         "express-rate-limit": "^8.6.2",
         "express-session": "^1.18.0",
+        "google-auth-library": "^9.15.1",
         "helmet": "^8.3.0",
         "i": "^0.3.7",
         "ioredis": "^6.0.0",

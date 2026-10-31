@@ -1,5 +1,6 @@
-import { CookieOptions, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 import envConfig from "./env";
+import { isMobileClient } from "../helpers/request-auth";
 
 const isProduction = envConfig.ENVIRONMENT === "production";
 
@@ -18,6 +19,20 @@ export function setAuthCookies(res: Response, tokens: { accessToken: string; ref
     return res
         .cookie("accessToken", tokens.accessToken, { ...authCookieOptions, maxAge: ACCESS_TOKEN_MAX_AGE })
         .cookie("refreshToken", tokens.refreshToken, { ...authCookieOptions, maxAge: REFRESH_TOKEN_MAX_AGE });
+}
+
+/** Web gets httpOnly cookies; mobile can't use them, so it gets the tokens in the JSON body instead */
+export function sendAuthTokens(
+    req: Request,
+    res: Response,
+    tokens: { accessToken: string; refreshToken: string },
+    body: Record<string, unknown>
+) {
+    if (isMobileClient(req)) {
+        return res.status(200).json({ ...body, tokens });
+    }
+
+    return setAuthCookies(res, tokens).status(200).json(body);
 }
 
 export function clearAuthCookies(res: Response) {

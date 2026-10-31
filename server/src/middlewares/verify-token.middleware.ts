@@ -2,9 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { User } from "../modules/users/user.model";
 import envConfig from "../shared/configs/env";
+import { getAccessToken } from "../shared/helpers/request-auth";
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    const accessToken = req.cookies["accessToken"];
+    const accessToken = getAccessToken(req);
 
     if (!accessToken) {
         return res.status(403).json({ message: "No access token provided" });

@@ -11,6 +11,7 @@ import {
     getMeHandler,
     verifyForgotPasswordOTPHandler,
     googleAuthCallbackHandler,
+    googleMobileLoginHandler,
 } from "./auth.controller";
 import { verifyToken } from "../../middlewares/verify-token.middleware";
 import { authLimiter, otpLimiter } from "../../middlewares/rate-limiter.middleware";
@@ -39,4 +40,7 @@ router.get(
     passport.authenticate("google", { failureRedirect: envConfig.CLIENT_BASE_URL, session: true }),
     googleAuthCallbackHandler
 );
+
+// Native Google Sign-In: the app sends the ID token it got from the Google SDK
+router.post("/google/mobile", authLimiter, googleMobileLoginHandler);
 export default router;
