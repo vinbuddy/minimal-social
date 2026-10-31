@@ -8,6 +8,7 @@ import { PageLoading, PageSlowLoading } from "@/components";
 import dynamic from "next/dynamic";
 import { PUBLIC_ROUTES } from "@/constants/route";
 import { ENV } from "@/config/env";
+import { refreshAccessToken } from "@/utils/http-request";
 
 export const AuthContext = createContext({});
 export const useAuthContext = () => useContext(AuthContext);
@@ -15,7 +16,6 @@ export const useAuthContext = () => useContext(AuthContext);
 const AuthContextProvider = ({ children }: { children: any }) => {
     const [isInitializing, setIsInitializing] = useState<boolean>(true);
     const [isShowSlowLoading, setIsShowSlowLoading] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
 
     const pathName = usePathname();
     const router = useRouter();
@@ -36,30 +36,14 @@ const AuthContextProvider = ({ children }: { children: any }) => {
         }
     };
 
-    const refreshToken = async () => {
+    // Returns the refreshed user, or null when the refresh token is missing/invalid/revoked
+    const refreshToken = async (): Promise<IUser | null> => {
         try {
-            setLoading(true);
-            const response = await fetch(`${ENV.API_BASE_URL}/auth/refresh`, {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-            });
-            const result = await response.json();
-
-            if (response.status === 200) {
-                const user = result.data as IUser;
-                useAuthStore.setState({ currentUser: user, isAuthenticated: true });
-            }
+            const response = await refreshAccessToken();
+            return response.data.data as IUser;
         } catch (error: any) {
             console.error(error);
-            useAuthStore.setState({ currentUser: null, isAuthenticated: false });
-
-            await logout();
-        } finally {
-            setLoading(false);
+            return null;
         }
     };
 
@@ -109,16 +93,22 @@ const AuthContextProvider = ({ children }: { children: any }) => {
                     return handleUnauthenticatedUser();
                 }
 
-                // If user authenticated and token is expired, refresh token
+                // If the access token is expired, try to refresh it; if that fails the session is over
                 if (response.status === 401) {
-                    await refreshToken();
+                    const refreshedUser = await refreshToken();
+
+                    if (refreshedUser) {
+                        return handleAuthenticatedUser(refreshedUser);
+                    }
+
+                    useAuthStore.setState({ currentUser: null, isAuthenticated: false });
+                    return handleUnauthenticatedUser();
                 }
             } catch (error: any) {
                 console.error(error);
             } finally {
                 if (timeoutId) clearTimeout(timeoutId);
 
-                setLoading(false);
                 setIsInitializing(false);
                 setIsShowSlowLoading(false);
             }
@@ -134,10 +124,6 @@ const AuthContextProvider = ({ children }: { children: any }) => {
             return <PageSlowLoading />;
         }
 
-        return <PageLoading />;
-    }
-
-    if (loading) {
         return <PageLoading />;
     }
 

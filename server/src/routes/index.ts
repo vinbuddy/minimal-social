@@ -11,6 +11,7 @@ import conversationRoutes from "../modules/messages/conversation.route";
 import stickerRoutes from "../modules/stickers/sticker.route";
 import themeRoutes from "../modules/themes/theme.route";
 import accountRoutes from "../modules/users/account.route";
+import reelRoutes from "../modules/reels/reel.route";
 
 const router = express.Router();
 
@@ -25,5 +26,6 @@ router.use("/conversation", conversationRoutes);
 router.use("/sticker", stickerRoutes);
 router.use("/theme", themeRoutes);
 router.use("/account", accountRoutes);
+router.use("/reel", reelRoutes);
 
 export default router;

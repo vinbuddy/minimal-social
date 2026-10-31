@@ -6,6 +6,8 @@ import { BlockModel } from "../users/block.model";
 import mongoose from "mongoose";
 import CommentModel from "./comment.model";
 import PostModel from "../posts/post.model";
+import ReelModel from "../reels/reel.model";
+import { incrementCommentCount } from "../reels/reel.service";
 import { RequestWithUser } from "../../shared/types/request";
 
 export async function createCommentHandler(_req: Request, res: Response, next: NextFunction) {
@@ -30,8 +32,12 @@ export async function createCommentHandler(_req: Request, res: Response, next: N
             mentionUserIds.push(userId);
         });
 
+        if (targetType === "Reel" && !(await ReelModel.exists({ _id: target }))) {
+            return res.status(404).json({ message: "Reel not found" });
+        }
+
         const comment = await CommentModel.create({
-            targetType: targetType ?? "Post",
+            targetType: targetType,
             target: new mongoose.Types.ObjectId(target),
             commentBy: new mongoose.Types.ObjectId(req.user._id),
             rootComment: rootComment ? new mongoose.Types.ObjectId(rootComment) : null,
@@ -42,6 +48,8 @@ export async function createCommentHandler(_req: Request, res: Response, next: N
         });
 
         await CommentModel.populate(comment, [{ path: "commentBy", select: USER_MODEL_HIDDEN_FIELDS }]);
+
+        if (targetType === "Reel") await incrementCommentCount(target, 1);
 
         return res.json({
             message: "Create comment successfully",
@@ -142,6 +150,69 @@ export async function getCommentsByTargetHandler(_req: Request, res: Response, n
             totalComments,
             totalPages,
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+/** One comment in the list shape (author, mentions, counts): lets a notification link open that exact comment */
+export async function getCommentByIdHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+        const commentId = req.params.id;
+
+        if (!mongoose.isValidObjectId(commentId)) {
+            return res.status(404).json({ message: "Comment not found" });
+        }
+
+        const [comment] = await CommentModel.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(commentId) } },
+            { $lookup: { from: "users", localField: "commentBy", foreignField: "_id", as: "commentBy" } },
+            { $unwind: "$commentBy" },
+            { $lookup: { from: "users", localField: "mentions", foreignField: "_id", as: "mentions" } },
+            {
+                $lookup: {
+                    from: "comments",
+                    let: { commentId: "$_id" },
+                    pipeline: [{ $match: { $expr: { $eq: ["$rootComment", "$$commentId"] } } }, { $count: "count" }],
+                    as: "replyStats",
+                },
+            },
+            {
+                $addFields: {
+                    replyCount: { $ifNull: [{ $arrayElemAt: ["$replyStats.count", 0] }, 0] },
+                    likeCount: { $size: "$likes" },
+                },
+            },
+            {
+                $project: {
+                    "commentBy.password": 0,
+                    "commentBy.refreshToken": 0,
+                    "commentBy.__v": 0,
+                    "mentions.password": 0,
+                    "mentions.refreshToken": 0,
+                    "mentions.__v": 0,
+                    replyStats: 0,
+                },
+            },
+        ]);
+
+        if (!comment) {
+            return res.status(404).json({ message: "Comment not found" });
+        }
+
+        const blocked = await BlockModel.exists({
+            $or: [
+                { blocker: req.user._id, blocked: comment.commentBy._id },
+                { blocker: comment.commentBy._id, blocked: req.user._id },
+            ],
+        });
+
+        if (blocked) {
+            return res.status(404).json({ message: "Comment not found" });
+        }
+
+        return res.json({ message: "Get comment successfully", data: comment });
     } catch (error) {
         next(error);
     }
@@ -311,19 +382,27 @@ export async function deleteCommentHandler(_req: Request, res: Response, next: N
         const isCommentAuthor = comment.commentBy.toString() === userId;
         const isPostAuthor =
             comment.targetType === "Post" && (await PostModel.exists({ _id: comment.target, postBy: userId })) !== null;
+        const isReelAuthor =
+            comment.targetType === "Reel" && (await ReelModel.exists({ _id: comment.target, reelBy: userId })) !== null;
 
-        if (!isCommentAuthor && !isPostAuthor && !req.user.isAdmin) {
+        if (!isCommentAuthor && !isPostAuthor && !isReelAuthor && !req.user.isAdmin) {
             return res.status(403).json({ message: "You are not allowed to delete this comment" });
         }
 
         const isRootComment = comment.replyTo == null;
+        let deletedReplies = 0;
 
         if (isRootComment) {
             // Delete all replies of root comment
-            await CommentModel.deleteMany({ rootComment: new mongoose.Types.ObjectId(commentId) });
+            const { deletedCount } = await CommentModel.deleteMany({
+                rootComment: new mongoose.Types.ObjectId(commentId),
+            });
+            deletedReplies = deletedCount;
         }
 
         await CommentModel.findByIdAndDelete(commentId);
+
+        if (comment.targetType === "Reel") await incrementCommentCount(String(comment.target),-(deletedReplies + 1));
 
         return res.status(200).json({ message: "Comment deleted successfully" });
     } catch (error) {

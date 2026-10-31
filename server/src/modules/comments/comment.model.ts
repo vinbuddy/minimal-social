@@ -2,18 +2,18 @@ import { prop, getModelForClass, modelOptions, Ref, Severity } from "@typegoose/
 import mongoose from "mongoose";
 import { User } from "../users/user.model";
 import { Post } from "../posts/post.model";
+import type { Reel } from "../reels/reel.model";
 
 @modelOptions({ schemaOptions: { collection: "comments", timestamps: true }, options: { allowMixed: Severity.ALLOW } })
 export class Comment {
     @prop({ auto: true })
     public _id?: mongoose.Types.ObjectId;
 
-    @prop({ required: true, enum: ["Post", "Video"] })
-    public targetType: "Post" | "Video";
+    @prop({ required: true, enum: ["Post", "Reel"] })
+    public targetType: "Post" | "Reel";
 
     @prop({ refPath: "targetType", required: true })
-    public target: Ref<Post>;
-    // public target: Ref<Post | Video>;
+    public target: Ref<Post | Reel>;
 
     @prop({ default: null })
     public content: string | null;

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import parse, { domToReact, HTMLReactParserOptions } from "html-react-parser";
 import { ChevronDownIcon, EllipsisIcon, LoaderIcon } from "lucide-react";
 import { Avatar, Button, Tooltip } from "@heroui/react";
@@ -22,17 +22,26 @@ import { useTranslation } from "react-i18next";
 interface IProps {
     comment: IComment;
     isReply?: boolean;
+    // Opened from a notification link: that comment is highlighted and scrolled into view
+    highlightId?: string;
+    defaultOpenReplies?: boolean;
 }
 
-export default function CommentItem({ comment, isReply = false }: IProps) {
+export default function CommentItem({ comment, isReply = false, highlightId, defaultOpenReplies = false }: IProps) {
     const { currentUser } = useAuthStore();
     const { replyTo, reply, unReply } = useReplyStore();
     const params: { id: string } = useParams();
+    const itemRef = useRef<HTMLDivElement | null>(null);
+    const isHighlighted = highlightId !== undefined && highlightId === comment?._id;
 
     const [isLiked, setIsLiked] = useState<boolean>(() => comment?.likes.includes(currentUser?._id) || false);
     const [likeCount, setLikeCount] = useState<number>(comment?.likeCount ?? 0);
 
-    const [isOpenReply, setIsOpenReply] = useState<boolean>(false);
+    const [isOpenReply, setIsOpenReply] = useState<boolean>(defaultOpenReplies);
+
+    useEffect(() => {
+        if (isHighlighted) itemRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, [isHighlighted]);
 
     const { t } = useTranslation("common");
     const { t: tComment } = useTranslation("comment");
@@ -111,7 +120,9 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                 message: `liked your comment`,
                 sender: currentUser?._id,
                 receivers: [comment?.commentBy?._id],
-                url: `/post/${params?.id}?commentId=${comment?._id}`,
+                url: `${
+                    comment?.targetType === "Reel" ? `/reels/${comment?.target}` : `/post/${params?.id}`
+                }?commentId=${comment?._id}`,
             });
 
             toast.success("Liked post successfully", {
@@ -135,7 +146,10 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
 
     return (
         <div className="mb-5 last:mb-0">
-            <div className="flex group ">
+            <div
+                ref={itemRef}
+                className={`flex group ${isHighlighted ? "-mx-2 px-2 py-2 rounded-medium bg-content2" : ""}`}
+            >
                 <section>
                     <Avatar src={comment?.commentBy?.photo} size={isReply ? "sm" : "md"} />
                 </section>
@@ -227,7 +241,7 @@ export default function CommentItem({ comment, isReply = false }: IProps) {
                     {/* COMMENT ITEMS */}
                     <div className="flex-1 ms-4">
                         {replies.map((reply) => (
-                            <CommentItem key={reply._id} isReply={true} comment={reply} />
+                            <CommentItem key={reply._id} isReply={true} comment={reply} highlightId={highlightId} />
                         ))}
 
                         {/* IF REPLIES FETCHED */}

@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import useAuthStore from "@/hooks/store/use-auth-store";
 import axiosInstance from "@/utils/http-request";
 import { useLoading } from "@/hooks";
-import { HomeIcon, HeartIcon, ConversationIcon, SearchIcon } from "@/assets/icons";
+import { HomeIcon, HeartIcon, ConversationIcon, SearchIcon, ReelsIcon } from "@/assets/icons";
 import { useSocketContext } from "@/contexts/socket-context";
 import { NotificationToast } from "@/components/notification";
 import { useTranslation } from "react-i18next";
@@ -32,6 +32,11 @@ const navLinks = [
         content: "search",
         href: "/search",
         icon: (isFilled: boolean = false) => <SearchIcon isFilled={isFilled} />,
+    },
+    {
+        content: "Reels",
+        href: "/reels",
+        icon: (isFilled: boolean = false) => <ReelsIcon isFilled={isFilled} />,
     },
     {
         content: "Notification",
@@ -110,7 +115,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
     return (
         <div className="flex w-full bg-muted/40">
-            <aside className="w-[80px] fixed top-0 left-0 bottom-0 flex flex-col justify-between h-full border-r-1 border-divider bg-background">
+            <aside className="w-[80px] fixed top-0 left-0 bottom-0 z-20 flex flex-col justify-between h-full border-r-1 border-divider bg-background">
                 <nav className="flex flex-col items-center p-4">
                     <header className="h-[40px] flex items-center mb-5">
                         <Link

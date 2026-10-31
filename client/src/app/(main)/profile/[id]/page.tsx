@@ -16,6 +16,8 @@ import {
 
 import { ErrorMessage, ScreenCenterWrapper } from "@/components";
 import { FullScreenMediaSlider } from "@/components/media";
+import { ReelGrid, ReelUploadModalButton } from "@/components/reel";
+import { ReelsIcon } from "@/assets/icons";
 
 import { useAuthStore } from "@/hooks/store";
 import { useIsBlocked, useIsOwner, useLoading, usePagination, useVisibility } from "@/hooks";
@@ -31,7 +33,7 @@ export default function ProfilePage() {
     const params = useParams() as { id: string };
     const router = useRouter();
     const { currentUser } = useAuthStore();
-    const [postType, setPostType] = useState<"post" | "repost" | "liked">("post");
+    const [postType, setPostType] = useState<"post" | "repost" | "liked" | "reels">("post");
 
     const { data: user, isLoading, error } = useSWR<{ data: IUser }>(`/user/${params.id}`);
     const [followerCount, setFollowerCount] = useState(user?.data?.followers?.length ?? 0);
@@ -48,6 +50,7 @@ export default function ProfilePage() {
 
     const { t: tUser } = useTranslation("user");
     const { t: tPost } = useTranslation("post");
+    const { t: tReel } = useTranslation("reel");
 
     useEffect(() => {
         if (user) {
@@ -74,7 +77,7 @@ export default function ProfilePage() {
         isLoading: isPostLoading,
         error: postError,
         setSize: setPage,
-    } = usePagination<IPost>(getURL());
+    } = usePagination<IPost>(postType === "reels" ? null : getURL());
 
     const handleNavigateToConversation = async () => {
         try {
@@ -237,9 +240,32 @@ export default function ProfilePage() {
                                 <Tab key="post" title={tPost("POST_FEED")} />
                                 <Tab key="liked" title={tPost("POST_LIKED")} />
                                 <Tab key="repost" title={tPost("POST_REPOSTED")} />
+                                <Tab key="reels" title={tReel("REELS")} />
                             </Tabs>
 
-                            <div className="mt-5">
+                            {postType === "reels" && (
+                                <div className="mt-5">
+                                    {isOwner && (
+                                        <div className="flex justify-end mb-3">
+                                            <ReelUploadModalButton>
+                                                {(open) => (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="flat"
+                                                        onPress={open}
+                                                        startContent={<ReelsIcon size={16} />}
+                                                    >
+                                                        {tReel("REEL_CREATE")}
+                                                    </Button>
+                                                )}
+                                            </ReelUploadModalButton>
+                                        </div>
+                                    )}
+                                    <ReelGrid url={`/reel/user/${params.id}`} />
+                                </div>
+                            )}
+
+                            <div className={`mt-5 ${postType === "reels" ? "hidden" : ""}`}>
                                 {postError && !isPostLoading && (
                                     <ErrorMessage className="text-danger" error={postError} />
                                 )}

@@ -141,3 +141,46 @@ html.scrollbar::-webkit-scrollbar {
     object-fit: cover;
     vertical-align: bottom;
 }
+
+/* Reels: snap feed without a visible scrollbar */
+.no-scrollbar {
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Reels: heart that pops on double tap */
+@keyframes reel-heart-pop {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.4);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.15);
+    }
+    30% {
+        transform: translate(-50%, -50%) scale(0.95);
+    }
+    45%,
+    75% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -80%) scale(0.9);
+    }
+}
+
+.reel-heart-pop {
+    animation: reel-heart-pop 0.9s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reel-heart-pop {
+        animation-duration: 0.01s;
+    }
+}

@@ -146,7 +146,7 @@ async function paginatePosts(match: Record<string, unknown>, viewerId: Id, page:
 }
 
 /** Users the viewer blocked plus users who blocked the viewer */
-async function getBlockedUserIds(userId: Id) {
+export async function getBlockedUserIds(userId: Id) {
     const blocks = await BlockModel.find({ $or: [{ blocker: userId }, { blocked: userId }] }).select("blocker blocked");
 
     return blocks.map((block) => (block.blocker.toString() === userId.toString() ? block.blocked : block.blocker));

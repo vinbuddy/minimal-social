@@ -13,19 +13,21 @@ import { useGlobalMutation, useLoading } from "@/hooks";
 import { showToast } from "@/utils/toast";
 import { IComment } from "@/types/comment";
 import { IPost } from "@/types/post";
+import { IReel } from "@/types/reel";
 import { useTranslation } from "react-i18next";
 
-// type TargetType = IPost | IVideo;
-type CommentTargetType = IPost;
+type CommentTargetType = IPost | IReel;
 
 interface IProps<T extends CommentTargetType, TT> {
     target: T;
     targetType: TT;
+    onCommented?: (comment: IComment) => void;
 }
 
-export default function CommentForm<T extends CommentTargetType, TT extends "Post" | "Video">({
+export default function CommentForm<T extends CommentTargetType, TT extends "Post" | "Reel">({
     targetType,
     target,
+    onCommented,
 }: IProps<T, TT>) {
     const params: { id: string } = useParams();
     const { currentUser } = useAuthStore();
@@ -50,6 +52,12 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
         },
     };
 
+    // Reels open their comments in a drawer, so the target comes from props rather than the route
+    const isReel = targetType === "Reel";
+    const targetId = target?._id ?? params.id;
+    const targetOwnerId = isReel ? (target as IReel)?.reelBy?._id : (target as IPost)?.postBy?._id;
+    const targetUrl = isReel ? `/reels/${targetId}` : `/post/${targetId}`;
+
     const handleSubmit = async () => {
         if (!comment.trim()) return;
 
@@ -59,7 +67,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
             const data = {
                 commentBy: currentUser?._id,
                 content: comment,
-                target: params.id,
+                target: targetId,
                 targetType: targetType,
                 replyTo: replyTo?._id ?? undefined,
                 rootComment: replyTo?.rootComment === null ? replyTo?._id : replyTo?.rootComment,
@@ -74,10 +82,12 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                     targetType: "Comment",
                     action: "comment",
                     photo: currentUser?.photo,
-                    message: tComment("COMMENT_MESSAGE.COMMENTED_ON_YOUR_POST"),
+                    message: tComment(
+                        isReel ? "COMMENT_MESSAGE.COMMENTED_ON_YOUR_REEL" : "COMMENT_MESSAGE.COMMENTED_ON_YOUR_POST"
+                    ),
                     sender: currentUser?._id,
-                    receivers: [target?.postBy?._id],
-                    url: `/post/${params?.id}?commentId=${commentResponse?._id}`,
+                    receivers: [targetOwnerId],
+                    url: `${targetUrl}?commentId=${commentResponse?._id}`,
                 });
             } else {
                 await axiosInstance.post("/notification", {
@@ -88,7 +98,7 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                     message: tComment("COMMENT_MESSAGE.REPLIED_TO_YOUR_COMMENT"),
                     sender: currentUser?._id,
                     receivers: [replyTo?.commentBy?._id],
-                    url: `/post/${params?.id}?commentId=${commentResponse?._id}&rootComment=${
+                    url: `${targetUrl}?commentId=${commentResponse?._id}&rootComment=${
                         replyTo?.rootComment ?? replyTo?._id
                     }&replyToId=${replyTo?._id}`,
                 });
@@ -102,10 +112,10 @@ export default function CommentForm<T extends CommentTargetType, TT extends "Pos
                 unReply();
             }
 
-            if (targetType === "Post") {
-                mutate((key) => typeof key === "string" && key.includes("/post"));
-                mutate((key) => typeof key === "string" && key.includes("/comment"));
-            }
+            // Revalidating the reel feed would re-rank it under the viewer, so reels update their count locally
+            if (!isReel) mutate((key) => typeof key === "string" && key.includes("/post"));
+            mutate((key) => typeof key === "string" && key.includes("/comment"));
+            onCommented && onCommented(commentResponse);
 
             showToast(tComment("COMMENT_MESSAGE.COMMENTED_SUCCESS"), "success");
         } catch (error: any) {
