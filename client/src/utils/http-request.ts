@@ -1,5 +1,5 @@
 import { ENV } from "@/config/env";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 export async function fetchData(url: string, options: RequestInit = {}) {
     const response = await fetch(ENV.API_BASE_URL + url, options);
@@ -17,7 +17,7 @@ const axiosInstance = axios.create({
 
 // Share one in-flight refresh between concurrent 401s: the server rotates the refresh
 // token on each call, so parallel refreshes would invalidate each other
-let refreshPromise: Promise<unknown> | null = null;
+let refreshPromise: Promise<AxiosResponse> | null = null;
 
 export function refreshAccessToken() {
     if (!refreshPromise) {
