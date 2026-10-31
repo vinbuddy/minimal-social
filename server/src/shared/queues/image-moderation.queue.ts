@@ -85,3 +85,6 @@ export const imageModerationWorker = new Worker(
     async (job) => (job.name === "moderate-reel" ? moderateReelJob(job) : moderatePostJob(job)),
     { connection: redisClient }
 );
+
+imageModerationWorker.on("error", (error) => logger.error(`Image moderation worker error: ${error.message}`));
+imageModerationWorker.on("failed", (job, error) => logger.error(`Image moderation job ${job?.id} failed: ${error.message}`));
