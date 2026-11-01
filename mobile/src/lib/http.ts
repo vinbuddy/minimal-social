@@ -13,7 +13,7 @@ const http = axios.create({
 
 http.interceptors.request.use(async (config) => {
     const accessToken = await getAccessToken();
-    if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
+    if (accessToken && !config.headers.Authorization) config.headers.Authorization = `Bearer ${accessToken}`;
 
     return config;
 });
@@ -57,13 +57,15 @@ http.interceptors.response.use(
     async (error: AxiosError) => {
         const originalRequest = error.config as RetriableConfig | undefined;
 
-        if (error.response?.status !== 401 || !originalRequest || originalRequest._retry) {
+        // Signed out (e.g. a rejected Google ID token on the sign-in screen): nothing to refresh, keep the server's error
+        if (error.response?.status !== 401 || !originalRequest || originalRequest._retry || !(await getTokens())) {
             return Promise.reject(error);
         }
         originalRequest._retry = true;
 
         try {
-            await refreshTokens();
+            const tokens = await refreshTokens();
+            originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
         } catch (refreshError) {
             // Only a rejected refresh token ends the session; a network error must not sign the user out
             const status = isAxiosError(refreshError) ? refreshError.response?.status : undefined;
