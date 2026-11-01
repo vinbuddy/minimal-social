@@ -61,7 +61,18 @@ export async function getUserHandler(_req: Request, res: Response, next: NextFun
             return res.status(403).json({ message: "You are blocked by this user" });
         }
 
-        return res.status(200).json({ statusCode: 200, data: user });
+        if (!user) {
+            return res.status(200).json({ statusCode: 200, data: user });
+        }
+
+        // Follow stats change on every follow and isFollowing depends on the viewer, so neither is cached
+        const [followerCount, followingCount, isFollowing] = await Promise.all([
+            FollowModel.countDocuments({ following: id }),
+            FollowModel.countDocuments({ follower: id }),
+            currentUserId ? FollowModel.exists({ follower: currentUserId, following: id }) : null,
+        ]);
+
+        return res.status(200).json({ statusCode: 200, data: { ...user, followerCount, followingCount, isFollowing: !!isFollowing } });
     } catch (error) {
         next(error);
     }
@@ -233,7 +244,8 @@ export async function getFollowingsHandler(req: Request, res: Response, next: Ne
         const userId = req.query.userId as string;
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 15;
-        const search = req.query.search as string;
+        // Optional: a missing search used to throw on .trim() and return 500
+        const search = (req.query.search as string | undefined) ?? "";
 
         if (!userId) {
             return res.status(400).json({ statusCode: 400, message: "Id is required" });
@@ -261,7 +273,10 @@ export async function getFollowingsHandler(req: Request, res: Response, next: Ne
             });
 
         // Filter out nulls if populated match failed
-        const followingUsers = follows.map(f => f.following).filter(u => u);
+        const followingUsers = await withFollowState(
+            follows.map((f) => f.following).filter((u) => u),
+            (req as RequestWithUser).user?._id?.toString()
+        );
 
         return res
             .status(200)
@@ -271,12 +286,24 @@ export async function getFollowingsHandler(req: Request, res: Response, next: Ne
     }
 }
 
+/** Marks which of `users` the viewer follows, so list rows can show Follow or Unfollow */
+async function withFollowState(users: any[], viewerId: string | undefined) {
+    const docs = users.map((user) => (typeof user.toObject === "function" ? user.toObject() : user));
+    if (!viewerId || docs.length === 0) return docs.map((user) => ({ ...user, isFollowing: false }));
+
+    const follows = await FollowModel.find({ follower: viewerId, following: { $in: docs.map((user) => user._id) } }).select("following").lean();
+    const followed = new Set(follows.map((follow) => String(follow.following)));
+
+    return docs.map((user) => ({ ...user, isFollowing: followed.has(String(user._id)) }));
+}
+
 export async function getFollowersHandler(req: Request, res: Response, next: NextFunction) {
     try {
         const userId = req.query.userId as string;
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 15;
-        const search = req.query.search as string;
+        // Optional: a missing search used to throw on .trim() and return 500
+        const search = (req.query.search as string | undefined) ?? "";
 
         if (!userId) {
             return res.status(400).json({ statusCode: 400, message: "Id is required" });
@@ -303,7 +330,10 @@ export async function getFollowersHandler(req: Request, res: Response, next: Nex
                 match: search.trim() ? { username: { $regex: escapeRegex(search), $options: "i" } } : undefined
             });
 
-        const followerUsers = follows.map(f => f.follower).filter(u => u);
+        const followerUsers = await withFollowState(
+            follows.map((f) => f.follower).filter((u) => u),
+            (req as RequestWithUser).user?._id?.toString()
+        );
 
         return res
             .status(200)

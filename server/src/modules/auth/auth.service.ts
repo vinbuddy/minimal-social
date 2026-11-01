@@ -107,7 +107,7 @@ export async function logout(userId: UserId, refreshToken: string | undefined) {
 }
 
 /** Revokes every session, e.g. after a password reset */
-async function revokeAllSessions(userId: UserId) {
+export async function revokeAllSessions(userId: UserId) {
     await SessionModel.deleteMany({ user: userId });
     await UserModel.findByIdAndUpdate(userId, { $set: { refreshToken: null } });
 }

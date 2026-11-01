@@ -13,6 +13,14 @@ export interface IUser {
 
     followers: string[];
 
+    /** From GET /user/:id only */
+    followerCount?: number;
+
+    followingCount?: number;
+
+    /** Whether the viewer follows this user (GET /user/:id only) */
+    isFollowing?: boolean;
+
     bio: string;
 
     isVerified: boolean;

@@ -36,7 +36,7 @@ export default function ProfilePage() {
     const [postType, setPostType] = useState<"post" | "repost" | "liked" | "reels">("post");
 
     const { data: user, isLoading, error } = useSWR<{ data: IUser }>(`/user/${params.id}`);
-    const [followerCount, setFollowerCount] = useState(user?.data?.followers?.length ?? 0);
+    const [followerCount, setFollowerCount] = useState(user?.data?.followerCount ?? 0);
     const { loading, startLoading, stopLoading } = useLoading();
     const { isVisible, show: showFullscreenSlider, hide: hideFullscreenSlider } = useVisibility();
 
@@ -54,7 +54,7 @@ export default function ProfilePage() {
 
     useEffect(() => {
         if (user) {
-            setFollowerCount(user.data.followers.length);
+            setFollowerCount(user.data.followerCount ?? 0);
         }
     }, [user]);
 
@@ -178,7 +178,7 @@ export default function ProfilePage() {
                                         </UserFollowInfoModal>
                                         <UserFollowInfoModal type="following" user={user?.data}>
                                             <p>
-                                                {user?.data?.followings.length}{" "}
+                                                {user?.data?.followingCount ?? 0}{" "}
                                                 <span className="text-default-500">{tUser("USER.FOLLOWING")}</span>
                                             </p>
                                         </UserFollowInfoModal>
