@@ -75,7 +75,14 @@ function ThemedNavigation() {
                     <Stack.Protected guard={status === "authenticated"} redirectTo="/login">
                         <Stack.Screen name="(tabs)" />
                         <Stack.Screen name="post/[id]" />
-                        <Stack.Screen name="profile/[id]" />
+                        <Stack.Screen name="profile/[id]/index" />
+                        <Stack.Screen name="profile/[id]/follows" />
+                        <Stack.Screen name="edit-profile" options={{ presentation: "modal" }} />
+                        <Stack.Screen name="settings/index" />
+                        <Stack.Screen name="settings/account" />
+                        <Stack.Screen name="settings/blocked" />
+                        <Stack.Screen name="settings/language" />
+                        <Stack.Screen name="settings/theme" />
                         <Stack.Screen name="compose" options={{ presentation: "modal", gestureEnabled: false }} />
                         <Stack.Screen name="kitchen-sink" />
                     </Stack.Protected>
