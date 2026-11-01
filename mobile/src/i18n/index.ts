@@ -5,7 +5,8 @@ import { initReactI18next } from "react-i18next";
 import { getItem, setItem, STORAGE_KEYS } from "@/lib/storage";
 
 // Copied from client/public/locales: the web loads them over HTTP, the app bundles them.
-// `auth` is mobile-only: the web's auth pages hardcode English.
+// `auth` and `app` are mobile-only: the web's auth pages hardcode English, `app` holds strings only the app has.
+import enApp from "./locales/en/app.json";
 import enAuth from "./locales/en/auth.json";
 import enChat from "./locales/en/chat.json";
 import enComment from "./locales/en/comment.json";
@@ -13,6 +14,7 @@ import enCommon from "./locales/en/common.json";
 import enPost from "./locales/en/post.json";
 import enReel from "./locales/en/reel.json";
 import enUser from "./locales/en/user.json";
+import viApp from "./locales/vi/app.json";
 import viAuth from "./locales/vi/auth.json";
 import viChat from "./locales/vi/chat.json";
 import viComment from "./locales/vi/comment.json";
@@ -37,13 +39,13 @@ function getDeviceLanguage(): Language {
 
 i18n.use(initReactI18next).init({
     resources: {
-        en: { common: enCommon, auth: enAuth, post: enPost, comment: enComment, user: enUser, chat: enChat, reel: enReel },
-        vi: { common: viCommon, auth: viAuth, post: viPost, comment: viComment, user: viUser, chat: viChat, reel: viReel },
+        en: { common: enCommon, app: enApp, auth: enAuth, post: enPost, comment: enComment, user: enUser, chat: enChat, reel: enReel },
+        vi: { common: viCommon, app: viApp, auth: viAuth, post: viPost, comment: viComment, user: viUser, chat: viChat, reel: viReel },
     },
     lng: getDeviceLanguage(),
     fallbackLng: "en",
     supportedLngs: SUPPORTED_LANGUAGES,
-    ns: ["common", "auth", "post", "comment", "user", "chat", "reel"],
+    ns: ["common", "app", "auth", "post", "comment", "user", "chat", "reel"],
     defaultNS: "common",
     interpolation: { escapeValue: false },
     react: { useSuspense: false },

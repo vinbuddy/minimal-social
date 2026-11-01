@@ -4,6 +4,8 @@
  */
 export const ENV = {
     API_BASE_URL: process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://localhost:5000",
+    /** The web client's origin, for shareable post links. Unset hides "Copy link" */
+    WEB_URL: process.env.EXPO_PUBLIC_WEB_URL,
     /** OAuth client of type "Web" (the server's GOOGLE_CLIENT_ID): the audience of the ID token */
     GOOGLE_WEB_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
     /** OAuth client of type "iOS" */

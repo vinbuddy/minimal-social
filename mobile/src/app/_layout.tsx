@@ -74,6 +74,9 @@ function ThemedNavigation() {
                 <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
                     <Stack.Protected guard={status === "authenticated"} redirectTo="/login">
                         <Stack.Screen name="(tabs)" />
+                        <Stack.Screen name="post/[id]" />
+                        <Stack.Screen name="profile/[id]" />
+                        <Stack.Screen name="compose" options={{ presentation: "modal", gestureEnabled: false }} />
                         <Stack.Screen name="kitchen-sink" />
                     </Stack.Protected>
                     <Stack.Protected guard={status !== "authenticated"} redirectTo="/">

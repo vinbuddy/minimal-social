@@ -1,0 +1,29 @@
+import http from "@/lib/http";
+import { IComment } from "@/types/comment";
+
+export const commentsUrl = (postId: string) => `/comment?targetType=Post&target=${postId}`;
+export const repliesUrl = (rootCommentId: string) => `/comment/reply?rootComment=${rootCommentId}`;
+
+/** A reply carries the comment it answers and its thread's root, as the web sends them */
+export async function createComment(input: { postId: string; content: string; replyTo?: IComment | null }) {
+    const { postId, content, replyTo } = input;
+    const res = await http.post<{ data: IComment }>("/comment", {
+        target: postId,
+        targetType: "Post",
+        content,
+        ...(replyTo ? { replyTo: replyTo._id, rootComment: replyTo.rootComment ?? replyTo._id } : {}),
+    });
+    return res.data.data;
+}
+
+export async function likeComment(commentId: string) {
+    await http.put("/comment/like", { commentId });
+}
+
+export async function unlikeComment(commentId: string) {
+    await http.put("/comment/unlike", { commentId });
+}
+
+export async function deleteComment(commentId: string) {
+    await http.delete(`/comment/${commentId}`);
+}
