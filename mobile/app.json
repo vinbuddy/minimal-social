@@ -40,7 +40,13 @@
         }
       ],
       "expo-secure-store",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-notifications",
+        {
+          "color": "#18181b"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

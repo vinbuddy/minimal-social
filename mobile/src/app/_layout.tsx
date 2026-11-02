@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { RealtimeProvider } from "@/components/realtime-provider";
 import { Button, Logo, Text, ToastHost } from "@/components/ui";
 import { restoreLanguage } from "@/i18n";
 import useAuthStore from "@/stores/auth-store";
@@ -37,7 +38,9 @@ export default function RootLayout() {
     return (
         <SafeAreaProvider>
             <ThemeProvider>
-                <ThemedNavigation />
+                <RealtimeProvider>
+                    <ThemedNavigation />
+                </RealtimeProvider>
             </ThemeProvider>
         </SafeAreaProvider>
     );

@@ -39,5 +39,17 @@
     "SIGNED_IN_WITH_GOOGLE": "Đăng nhập bằng Google",
     "ACCOUNT_VERIFIED": "Tài khoản đã xác minh",
     "CHANGE_PASSWORD": "Đổi mật khẩu",
-    "CURRENT_PASSWORD": "Mật khẩu hiện tại"
+    "CURRENT_PASSWORD": "Mật khẩu hiện tại",
+    "UNREAD_NOTIFICATIONS": "Có thông báo chưa đọc",
+    "NO_NOTIFICATIONS": "Chưa có thông báo",
+    "DELETE_NOTIFICATION": "Xoá thông báo",
+    "NOTIFICATION_AND_OTHERS_one": "và {{count}} người khác",
+    "NOTIFICATION_AND_OTHERS_other": "và {{count}} người khác",
+    "NOTIFICATION_FILTER_ALL": "Tất cả",
+    "NOTIFICATION_FILTER_LIKE": "Lượt thích",
+    "NOTIFICATION_FILTER_FOLLOW": "Theo dõi",
+    "NOTIFICATION_FILTER_COMMENT": "Bình luận",
+    "NOTIFICATION_FILTER_MENTION": "Nhắc đến",
+    "NOTIFICATION_FILTER_REPOST": "Đăng lại",
+    "DELETE_NOTIFICATION_HINT": "Nhấn giữ để xoá"
 }

@@ -3,6 +3,7 @@ import { create } from "zustand";
 
 import { signOutOfGoogle } from "@/lib/google-sign-in";
 import { setSessionExpiredHandler } from "@/lib/http";
+import { unregisterPush } from "@/lib/push";
 import { AuthTokens, clearTokens, getTokens, saveTokens } from "@/lib/token-storage";
 import * as authService from "@/services/auth";
 import { IUser } from "@/types/user";
@@ -73,6 +74,7 @@ const useAuthStore = create<AuthState>((set) => ({
         const tokens = await getTokens();
         if (tokens) {
             // Best effort: the local sign-out must not wait on, or fail with, the network
+            unregisterPush(tokens.accessToken).catch(() => {});
             authService.logout(tokens).catch(() => {});
         }
 

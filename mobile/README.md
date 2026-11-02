@@ -11,11 +11,15 @@ cp .env.example .env.local   # set EXPO_PUBLIC_API_BASE_URL
 npx expo start
 ```
 
-On a physical device or the Android emulator, `localhost` is the device itself: use your machine's LAN IP, or `http://10.0.2.2:5000` on the Android emulator.
+In development the app reaches the API on the machine running Metro, port 5000 (the host it loaded the bundle from, so it follows LAN IP changes). Set `EXPO_PUBLIC_API_BASE_URL` to use another server.
 
 ### Google Sign-In
 
 Google Sign-In uses a native module, so it only works in a development build (`npx expo run:android` / `run:ios`, or EAS), not in Expo Go or the web preview, where the button is hidden. Set `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` (the server's `GOOGLE_CLIENT_ID`), and for iOS `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` and `GOOGLE_IOS_URL_SCHEME` (see `.env.example`). The app sends the ID token to `POST /auth/google/mobile`.
+
+### Push notifications
+
+Live notifications reach the app over Socket.IO everywhere (Expo Go included): the unread dot and an in-app toast. System push notifications need a development or store build on a real device and an EAS project id: run `npx eas-cli@latest init` once (it writes `extra.eas.projectId` to the app config), then build with EAS. The app registers its Expo push token with `POST /notification/push-token` after sign-in and removes it on sign-out; the server sends through Expo's push service whenever a notification is created. Without a project id, or in Expo Go, push registration is skipped.
 
 ## Structure
 
