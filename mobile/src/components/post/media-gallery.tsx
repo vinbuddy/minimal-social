@@ -2,27 +2,28 @@ import { Image } from "expo-image";
 import { StatusBar } from "expo-status-bar";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { X } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { FlatList, Modal, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Text } from "@/components/ui";
 import { radius, spacing } from "@/theme";
-import { IMediaFile, IPost } from "@/types/post";
-import { PostActions } from "./post-actions";
+import { IMediaFile } from "@/types/post";
 
 type MediaGalleryProps = {
-    post: IPost;
+    mediaFiles: IMediaFile[];
     /** Index of the item tapped; null when closed */
     initialIndex: number | null;
     onClose: () => void;
+    /** Shown at the bottom on the black ground, e.g. a post's actions */
+    footer?: ReactNode;
 };
 
 /**
- * Threads' fullscreen viewer: black ground, round close button, swipe between items, the post's actions
- * at the bottom. Photos pinch to zoom on iOS; videos play with native controls while on screen.
+ * Threads' fullscreen viewer: black ground, round close button, swipe between items, an optional footer
+ * (a post's actions) at the bottom. Photos pinch to zoom on iOS; videos play with native controls while on screen.
  */
-export function MediaGallery({ post, initialIndex, onClose }: MediaGalleryProps) {
+export function MediaGallery({ mediaFiles, initialIndex, onClose, footer }: MediaGalleryProps) {
     return (
         <Modal
             visible={initialIndex !== null}
@@ -33,16 +34,15 @@ export function MediaGallery({ post, initialIndex, onClose }: MediaGalleryProps)
             onRequestClose={onClose}
         >
             {/* Mounted per opening, so it starts on the item tapped */}
-            {initialIndex !== null ? <GalleryContent post={post} initialIndex={initialIndex} onClose={onClose} /> : null}
+            {initialIndex !== null ? <GalleryContent mediaFiles={mediaFiles} initialIndex={initialIndex} onClose={onClose} footer={footer} /> : null}
         </Modal>
     );
 }
 
-function GalleryContent({ post, initialIndex, onClose }: { post: IPost; initialIndex: number; onClose: () => void }) {
+function GalleryContent({ mediaFiles: files, initialIndex, onClose, footer }: Omit<MediaGalleryProps, "initialIndex"> & { initialIndex: number }) {
     const { width, height } = useWindowDimensions();
     const insets = useSafeAreaInsets();
     const [index, setIndex] = useState(initialIndex);
-    const files = post.mediaFiles;
 
     const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => setIndex(Math.round(event.nativeEvent.contentOffset.x / width));
 
@@ -114,7 +114,7 @@ function GalleryContent({ post, initialIndex, onClose }: { post: IPost; initialI
             </View>
 
             <View style={{ position: "absolute", left: 0, right: 0, bottom: insets.bottom + spacing[3], alignItems: "center" }}>
-                <PostActions post={post} onMedia onBeforeNavigate={onClose} />
+                {footer}
             </View>
         </View>
     );
