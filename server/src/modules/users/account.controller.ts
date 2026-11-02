@@ -9,8 +9,9 @@ import UserModel, { USER_MODEL_HIDDEN_FIELDS } from "./user.model";
 import { BlockModel } from "./block.model";
 import { FollowModel } from "./follow.model";
 import { consumeOTP, issueOTP } from "../auth/otp.service";
-import { issueTokens } from "../auth/auth.service";
-import { setAuthCookies } from "../../shared/configs/cookie";
+import { issueTokens, revokeAllSessions } from "../auth/auth.service";
+import { sendAuthTokens } from "../../shared/configs/cookie";
+import { isMobileClient } from "../../shared/helpers/request-auth";
 import { changePasswordSchema } from "./account.schema";
 
 export async function changePasswordHandler(_req: Request, res: Response, next: NextFunction) {
@@ -58,10 +59,11 @@ export async function verifyChangePasswordOTPHandler(_req: Request, res: Respons
         // otpData.password is already a bcrypt hash — store it as is (hashing again would lock the user out)
         await UserModel.findByIdAndUpdate(user._id, { password: otpData.password });
 
-        // Issuing a new refresh token revokes other sessions; this one keeps working with fresh cookies
-        const tokens = await issueTokens(userExists);
+        // Sign out every device, then keep this one signed in with fresh tokens (cookies on web, the body on mobile)
+        await revokeAllSessions(userExists._id);
+        const tokens = await issueTokens(userExists, isMobileClient(req) ? "mobile" : "web");
 
-        return setAuthCookies(res, tokens).status(200).json({ message: "OTP verified successfully" });
+        return sendAuthTokens(req, res, tokens, { message: "OTP verified successfully" });
     } catch (error) {
         next(error);
     }
