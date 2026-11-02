@@ -24,5 +24,20 @@
     "BACK": "Quay lại",
     "FEEDS": "Bảng feed",
     "PUBLISH": "Đăng",
-    "ADD_TO_POST": "Thêm vào bài viết"
+    "ADD_TO_POST": "Thêm vào bài viết",
+    "PROFILE_UNAVAILABLE": "Không thể xem trang cá nhân này",
+    "BLOCKED_NOTICE": "Bạn đã chặn người dùng này. Bạn không thể xem bài viết của họ.",
+    "NO_FOLLOWERS": "Chưa có người theo dõi",
+    "NO_FOLLOWING": "Chưa theo dõi ai",
+    "CHANGE_PHOTO": "Đổi ảnh đại diện",
+    "SUGGESTED_FOR_YOU": "Gợi ý cho bạn",
+    "SEARCH_POSTS_FOR": "Tìm bài viết cho \"{{query}}\"",
+    "THEME_SYSTEM": "Tự động",
+    "LOGOUT_CONFIRM": "Đăng xuất khỏi Minimal Social?",
+    "NO_BLOCKED_USERS": "Bạn chưa chặn ai",
+    "PASSWORD_CHANGED": "Đã đổi mật khẩu. Các thiết bị khác đã bị đăng xuất",
+    "SIGNED_IN_WITH_GOOGLE": "Đăng nhập bằng Google",
+    "ACCOUNT_VERIFIED": "Tài khoản đã xác minh",
+    "CHANGE_PASSWORD": "Đổi mật khẩu",
+    "CURRENT_PASSWORD": "Mật khẩu hiện tại"
 }

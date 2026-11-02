@@ -14,4 +14,9 @@ export interface IUser {
     googleId?: string;
     createdAt: string;
     updatedAt: string;
+    // Only on GET /user/:id; isFollowing also on follower/following list rows
+    followerCount?: number;
+    followingCount?: number;
+    /** Whether the signed-in user follows this user */
+    isFollowing?: boolean;
 }

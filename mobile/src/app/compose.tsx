@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { Play, X } from "lucide-react-native";
 import { ComponentRef, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -13,6 +13,7 @@ import { useKeyboardHeight } from "@/hooks/use-keyboard-height";
 import { useMentionInput } from "@/hooks/use-mention-input";
 import { confirm } from "@/lib/confirm";
 import { MAX_MEDIA_FILES, pickMedia } from "@/lib/media-picker";
+import { goBack } from "@/lib/navigation";
 import { richTextToPlain } from "@/lib/rich-text";
 import { invalidate } from "@/lib/invalidate";
 import { getErrorMessage } from "@/services/auth";
@@ -34,7 +35,7 @@ export default function ComposeScreen() {
             .then(setEditing)
             .catch((error) => {
                 toast.error(getErrorMessage(error));
-                leave();
+                goBack();
             })
             .finally(() => setIsLoadingPost(false));
     }, [postId]);
@@ -74,7 +75,7 @@ function Composer({ editing }: { editing: IPost | null }) {
             const isConfirmed = await confirm({ title: t("DISCARD_TITLE"), confirmLabel: t("DISCARD"), cancelLabel: t("KEEP_EDITING"), destructive: true });
             if (!isConfirmed) return;
         }
-        leave();
+        goBack();
     };
 
     const addMedia = async () => {
@@ -111,7 +112,7 @@ function Composer({ editing }: { editing: IPost | null }) {
                 receivers: post.mentions.map((user) => user._id).filter((id) => !alreadyMentioned.has(id)),
                 url: `/post/${post._id}`,
             });
-            leave();
+            goBack();
         } catch (error) {
             toast.error(getErrorMessage(error));
         } finally {
@@ -286,8 +287,3 @@ function MediaThumb({ uri, isVideo }: { uri: string; isVideo: boolean }) {
     );
 }
 
-/** Back to where the composer was opened from; home when opened directly (deep link, web reload) */
-function leave() {
-    if (router.canGoBack()) router.back();
-    else router.replace("/");
-}

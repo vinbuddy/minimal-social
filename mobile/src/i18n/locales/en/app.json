@@ -24,5 +24,20 @@
     "BACK": "Back",
     "FEEDS": "Feeds",
     "PUBLISH": "Post",
-    "ADD_TO_POST": "Add to your post"
+    "ADD_TO_POST": "Add to your post",
+    "PROFILE_UNAVAILABLE": "This profile isn't available",
+    "BLOCKED_NOTICE": "You blocked this user. You can't see their posts.",
+    "NO_FOLLOWERS": "No followers yet",
+    "NO_FOLLOWING": "Not following anyone yet",
+    "CHANGE_PHOTO": "Change photo",
+    "SUGGESTED_FOR_YOU": "Suggested for you",
+    "SEARCH_POSTS_FOR": "Search posts for \"{{query}}\"",
+    "THEME_SYSTEM": "Automatic",
+    "LOGOUT_CONFIRM": "Log out of Minimal Social?",
+    "NO_BLOCKED_USERS": "You haven't blocked anyone",
+    "PASSWORD_CHANGED": "Password changed. Other devices were signed out",
+    "SIGNED_IN_WITH_GOOGLE": "Signed in with Google",
+    "ACCOUNT_VERIFIED": "Verified account",
+    "CHANGE_PASSWORD": "Change password",
+    "CURRENT_PASSWORD": "Current password"
 }
