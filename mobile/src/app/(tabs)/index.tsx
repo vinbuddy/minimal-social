@@ -41,8 +41,7 @@ export default function HomeScreen() {
                 <Button isIconOnly variant="light" color="default" radius="full" accessibilityLabel={t("app:NEW_POST")} onPress={() => router.push("/compose")}>
                     <Plus size={26} color={colors.foreground} />
                 </Button>
-                {/* Conversations land in Phase 6 */}
-                <Button isIconOnly variant="light" color="default" radius="full" accessibilityLabel="Direct" isDisabled>
+                <Button isIconOnly variant="light" color="default" radius="full" accessibilityLabel={t("app:MESSAGES")} onPress={() => router.push("/conversations")}>
                     <ConversationIcon size={24} />
                 </Button>
 

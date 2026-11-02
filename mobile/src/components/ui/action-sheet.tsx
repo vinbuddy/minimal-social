@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react-native";
+import { ReactNode } from "react";
 import { Modal, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -19,10 +20,12 @@ type ActionSheetProps = {
     onClose: () => void;
     options: ActionSheetOption[];
     title?: string;
+    /** Above the options, e.g. a row of reactions */
+    header?: ReactNode;
 };
 
 /** A bottom sheet of actions: the phone version of the web's dropdown menus (post menu, comment menu) */
-export function ActionSheet({ isOpen, onClose, options, title }: ActionSheetProps) {
+export function ActionSheet({ isOpen, onClose, options, title, header }: ActionSheetProps) {
     const { colors, shadows } = useTheme();
     const insets = useSafeAreaInsets();
 
@@ -49,6 +52,7 @@ export function ActionSheet({ isOpen, onClose, options, title }: ActionSheetProp
                         {title}
                     </Text>
                 ) : null}
+                {header}
                 {options.map((option, index) => {
                     const Icon = option.icon;
                     const color = option.destructive ? colors.danger : colors.foreground;

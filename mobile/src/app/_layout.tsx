@@ -86,6 +86,10 @@ function ThemedNavigation() {
                         <Stack.Screen name="settings/blocked" />
                         <Stack.Screen name="settings/language" />
                         <Stack.Screen name="settings/theme" />
+                        <Stack.Screen name="conversations/index" />
+                        <Stack.Screen name="conversations/[id]/index" />
+                        <Stack.Screen name="conversations/[id]/info" />
+                        <Stack.Screen name="conversations/[id]/search" />
                         <Stack.Screen name="compose" options={{ presentation: "modal", gestureEnabled: false }} />
                         <Stack.Screen name="kitchen-sink" />
                     </Stack.Protected>

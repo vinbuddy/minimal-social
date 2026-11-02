@@ -15,6 +15,7 @@ import { fetcher } from "@/lib/http";
 import { invalidate } from "@/lib/invalidate";
 import { goBack } from "@/lib/navigation";
 import { getErrorMessage } from "@/services/auth";
+import { openConversationWith } from "@/services/chat";
 import { blockUser, unblockUser, userUrl } from "@/services/users";
 import useAuthStore from "@/stores/auth-store";
 import { useFollowStore } from "@/stores/follow-store";
@@ -41,6 +42,7 @@ export function ProfileView({ userId, isOwnTab = false }: { userId: string; isOw
     const [tab, setTab] = useState<ProfileTab>("post");
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [followerDelta, setFollowerDelta] = useState(0);
+    const [isOpeningChat, setIsOpeningChat] = useState(false);
 
     const { data, error, isLoading } = useSWR<{ data: IUser | null }>(userUrl(userId), fetcher, {
         // Fresh counts replace the optimistic ones
@@ -82,6 +84,19 @@ export function ProfileView({ userId, isOwnTab = false }: { userId: string; isOw
             invalidate("/account/blocked");
         } catch (blockError) {
             toast.error(getErrorMessage(blockError));
+        }
+    };
+
+    const openChat = async () => {
+        if (!currentUser) return;
+        setIsOpeningChat(true);
+        try {
+            const id = await openConversationWith(currentUser._id, userId);
+            router.push({ pathname: "/conversations/[id]", params: { id } });
+        } catch (chatError) {
+            toast.error(getErrorMessage(chatError));
+        } finally {
+            setIsOpeningChat(false);
         }
     };
 
@@ -208,8 +223,7 @@ export function ProfileView({ userId, isOwnTab = false }: { userId: string; isOw
                     ) : (
                         <>
                             <FollowButton user={user} size="sm" style={{ flex: 1 }} onChange={(delta) => setFollowerDelta((value) => value + delta)} />
-                            {/* Conversations land in Phase 6 */}
-                            <Button variant="bordered" color="default" size="sm" style={{ flex: 1 }} isDisabled>
+                            <Button variant="bordered" color="default" size="sm" style={{ flex: 1 }} isLoading={isOpeningChat} onPress={openChat}>
                                 {t("USER.SEND_MESSAGE")}
                             </Button>
                         </>

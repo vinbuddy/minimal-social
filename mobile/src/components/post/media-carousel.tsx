@@ -7,6 +7,7 @@ import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 import { radius, spacing, useTheme } from "@/theme";
 import { IMediaFile, IPost } from "@/types/post";
 import { MediaGallery } from "./media-gallery";
+import { PostActions } from "./post-actions";
 
 /** A single item fills the column, between portrait 4:5 and landscape 1.91:1 (Instagram's bounds) */
 const SINGLE_MIN_ASPECT = 4 / 5;
@@ -42,7 +43,15 @@ export function MediaCarousel({ post, bleed = { start: 0, end: 0 } }: MediaCarou
 
     if (files.length === 0) return null;
 
-    const gallery = <MediaGallery post={post} initialIndex={galleryIndex} onClose={() => setGalleryIndex(null)} />;
+    const closeGallery = () => setGalleryIndex(null);
+    const gallery = (
+        <MediaGallery
+            mediaFiles={files}
+            initialIndex={galleryIndex}
+            onClose={closeGallery}
+            footer={<PostActions post={post} onMedia onBeforeNavigate={closeGallery} />}
+        />
+    );
 
     if (files.length === 1) {
         const aspect = clamp(aspectOf(files[0]), SINGLE_MIN_ASPECT, SINGLE_MAX_ASPECT);

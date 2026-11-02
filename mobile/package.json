@@ -10,6 +10,7 @@
     "axios": "^1.21.0",
     "dayjs": "^1.11.23",
     "expo": "~58.0.22",
+    "expo-clipboard": "~58.0.4",
     "expo-constants": "~58.0.14",
     "expo-device": "~58.0.5",
     "expo-font": "~58.0.11",
