@@ -14,32 +14,30 @@ import { invalidate } from "@/lib/invalidate";
 import { getErrorMessage } from "@/services/auth";
 import { deleteComment, likeComment, repliesUrl, unlikeComment } from "@/services/comments";
 import useAuthStore from "@/stores/auth-store";
-import { usePostStateStore } from "@/stores/post-state-store";
 import { radius, spacing, useTheme } from "@/theme";
-import { IComment } from "@/types/comment";
-import { IPost } from "@/types/post";
+import { adjustCommentCount } from "@/lib/comment-target";
+import { CommentTarget, IComment } from "@/types/comment";
 
 type CommentItemProps = {
     comment: IComment;
-    post: IPost;
+    target: CommentTarget;
     onReply: (comment: IComment) => void;
     /** Replies are one level deep and drawn smaller, as on the web */
     isReply?: boolean;
 };
 
-export const CommentItem = memo(function CommentItem({ comment, post, onReply, isReply = false }: CommentItemProps) {
+export const CommentItem = memo(function CommentItem({ comment, target, onReply, isReply = false }: CommentItemProps) {
     const { t, i18n } = useTranslation(["comment", "common", "app"]);
     const { colors } = useTheme();
     const currentUser = useAuthStore((state) => state.currentUser);
-    const patchPost = usePostStateStore((state) => state.patch);
 
     const [isLiked, setIsLiked] = useState(() => !!currentUser && comment.likes.includes(currentUser._id));
     const [likeCount, setLikeCount] = useState(comment.likeCount ?? comment.likes.length);
     const [showReplies, setShowReplies] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    // The comment's author, the post's author and admins can delete (the server's rule)
-    const canDelete = !!currentUser && (comment.commentBy._id === currentUser._id || post.postBy._id === currentUser._id || !!currentUser.isAdmin);
+    // The comment's author, the post's or reel's author and admins can delete (the server's rule)
+    const canDelete = !!currentUser && (comment.commentBy._id === currentUser._id || target.ownerId === currentUser._id || !!currentUser.isAdmin);
     const openProfile = () => router.push({ pathname: "/profile/[id]", params: { id: comment.commentBy._id } });
 
     const toggleLike = async () => {
@@ -69,9 +67,7 @@ export const CommentItem = memo(function CommentItem({ comment, post, onReply, i
             await deleteComment(comment._id);
             toast.success(t("COMMENT_MESSAGE.DELETE_COMMENT_SUCCESS"));
             // A top-level comment takes its replies with it
-            const removed = 1 + (isReply ? 0 : (comment.replyCount ?? 0));
-            const current = usePostStateStore.getState().overrides[post._id]?.commentCount ?? post.commentCount ?? 0;
-            patchPost(post._id, { commentCount: Math.max(0, current - removed) });
+            adjustCommentCount(target, -(1 + (isReply ? 0 : (comment.replyCount ?? 0))));
             invalidate("/comment");
         } catch (error) {
             toast.error(getErrorMessage(error));
@@ -129,7 +125,7 @@ export const CommentItem = memo(function CommentItem({ comment, post, onReply, i
 
                     {!isReply && (comment.replyCount ?? 0) > 0 ? (
                         showReplies ? (
-                            <Replies comment={comment} post={post} onReply={onReply} onHide={() => setShowReplies(false)} />
+                            <Replies comment={comment} target={target} onReply={onReply} onHide={() => setShowReplies(false)} />
                         ) : (
                             <ViewRepliesButton label={t("COMMENT.VIEW_REPLY_COUNT", { count: comment.replyCount })} onPress={() => setShowReplies(true)} />
                         )
@@ -146,7 +142,7 @@ export const CommentItem = memo(function CommentItem({ comment, post, onReply, i
     );
 });
 
-function Replies({ comment, post, onReply, onHide }: { comment: IComment; post: IPost; onReply: (comment: IComment) => void; onHide: () => void }) {
+function Replies({ comment, target, onReply, onHide }: { comment: IComment; target: CommentTarget; onReply: (comment: IComment) => void; onHide: () => void }) {
     const { t } = useTranslation("app");
     const { colors } = useTheme();
     const { items, isLoading, isLoadingMore, isReachedEnd, loadMore } = usePagination<IComment>(repliesUrl(comment._id));
@@ -154,7 +150,7 @@ function Replies({ comment, post, onReply, onHide }: { comment: IComment; post: 
     return (
         <View style={{ marginTop: spacing[1] }}>
             {items.map((reply) => (
-                <CommentItem key={reply._id} comment={reply} post={post} onReply={onReply} isReply />
+                <CommentItem key={reply._id} comment={reply} target={target} onReply={onReply} isReply />
             ))}
             {isLoading || isLoadingMore ? (
                 <ActivityIndicator style={{ alignSelf: "flex-start", marginVertical: spacing[2] }} color={colors.default500} />

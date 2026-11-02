@@ -90,6 +90,9 @@ function ThemedNavigation() {
                         <Stack.Screen name="conversations/[id]/index" />
                         <Stack.Screen name="conversations/[id]/info" />
                         <Stack.Screen name="conversations/[id]/search" />
+                        <Stack.Screen name="reels/[id]" />
+                        <Stack.Screen name="reels/audio/[id]" />
+                        <Stack.Screen name="reels/create" options={{ presentation: "modal", gestureEnabled: false }} />
                         <Stack.Screen name="compose" options={{ presentation: "modal", gestureEnabled: false }} />
                         <Stack.Screen name="kitchen-sink" />
                     </Stack.Protected>

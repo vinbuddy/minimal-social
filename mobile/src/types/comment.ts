@@ -21,3 +21,13 @@ export interface IComment {
     replyCount?: number;
     likeCount?: number;
 }
+
+/** What a comment thread belongs to: a post or a reel (the server's polymorphic `targetType`) */
+export type CommentTarget = {
+    type: "Post" | "Reel";
+    id: string;
+    /** The post's or reel's author, who can delete any comment on it and is notified of new ones */
+    ownerId: string;
+    /** The count from the server, before changes made on this device */
+    commentCount: number;
+};
