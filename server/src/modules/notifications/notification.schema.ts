@@ -12,3 +12,10 @@ export const createNotificationSchema = z.object({
 });
 
 export type CreateNotificationInput = z.infer<typeof createNotificationSchema>;
+
+export const pushTokenSchema = z.object({
+    token: z.string().min(1),
+    platform: z.enum(["ios", "android"]),
+});
+
+export const removePushTokenSchema = z.object({ token: z.string().min(1) });
