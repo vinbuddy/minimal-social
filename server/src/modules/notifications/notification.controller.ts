@@ -3,7 +3,8 @@ import { NextFunction, Request, Response } from "express";
 import logger from "../../shared/configs/logger";
 import UserModel, { User, USER_MODEL_HIDDEN_FIELDS } from "../users/user.model";
 import mongoose from "mongoose";
-import { CreateNotificationInput, createNotificationSchema } from "./notification.schema";
+import { CreateNotificationInput, createNotificationSchema, pushTokenSchema, removePushTokenSchema } from "./notification.schema";
+import { registerPushToken, removePushToken, sendPushNotifications } from "./push.service";
 import NotificationModel, { NotificationReceiver, Notification } from "./notification.model";
 import { Server } from "socket.io";
 // import removed
@@ -127,6 +128,16 @@ export async function createNotificationHandler(_req: Request, res: Response, ne
             }
         });
 
+        // Devices that registered for push (mobile app); not awaited, a slow push must not hold the response
+        const pushReceivers = receivers.filter((receiver: string) => receiver !== senderId.toString());
+        if (pushReceivers.length > 0) {
+            sendPushNotifications(pushReceivers, {
+                title: senderInfo?.username ?? "Minimal Social",
+                body: message,
+                data: { url: url ?? null, notificationId: String(notification?._id) },
+            });
+        }
+
         return res.status(200).json({
             message: "Create notification successfully",
             data: notification,
@@ -136,9 +147,15 @@ export async function createNotificationHandler(_req: Request, res: Response, ne
     }
 }
 
-export async function getUserNotificationsHandler(req: Request, res: Response, next: NextFunction) {
+export async function getUserNotificationsHandler(_req: Request, res: Response, next: NextFunction) {
     try {
+        const req = _req as RequestWithUser;
         const userId = req.params.userId;
+
+        // Notifications are private: anyone signed in could read anyone else's by changing the id
+        if (userId !== req.user._id.toString()) {
+            return res.status(403).json({ message: "You can only read your own notifications" });
+        }
         const page = Number(req.query.page as string) || 1;
         const limit = Number(req.query.limit as string) || 10;
         const action = req.query.action;
@@ -237,6 +254,32 @@ export async function readAllNotificationsHandler(_req: Request, res: Response, 
         }
 
         return res.status(200).json({ message: "Read all notifications successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function registerPushTokenHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+        const { token, platform } = pushTokenSchema.parse(req.body);
+
+        await registerPushToken(req.user._id.toString(), token, platform);
+
+        return res.status(200).json({ message: "Push token registered" });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function removePushTokenHandler(_req: Request, res: Response, next: NextFunction) {
+    try {
+        const req = _req as RequestWithUser;
+        const { token } = removePushTokenSchema.parse(req.body);
+
+        await removePushToken(req.user._id.toString(), token);
+
+        return res.status(200).json({ message: "Push token removed" });
     } catch (error) {
         next(error);
     }
