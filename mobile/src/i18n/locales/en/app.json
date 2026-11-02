@@ -39,5 +39,17 @@
     "SIGNED_IN_WITH_GOOGLE": "Signed in with Google",
     "ACCOUNT_VERIFIED": "Verified account",
     "CHANGE_PASSWORD": "Change password",
-    "CURRENT_PASSWORD": "Current password"
+    "CURRENT_PASSWORD": "Current password",
+    "UNREAD_NOTIFICATIONS": "Unread notifications",
+    "NO_NOTIFICATIONS": "No notifications yet",
+    "DELETE_NOTIFICATION": "Delete notification",
+    "NOTIFICATION_AND_OTHERS_one": "and {{count}} other",
+    "NOTIFICATION_AND_OTHERS_other": "and {{count}} others",
+    "NOTIFICATION_FILTER_ALL": "All",
+    "NOTIFICATION_FILTER_LIKE": "Likes",
+    "NOTIFICATION_FILTER_FOLLOW": "Follows",
+    "NOTIFICATION_FILTER_COMMENT": "Comments",
+    "NOTIFICATION_FILTER_MENTION": "Mentions",
+    "NOTIFICATION_FILTER_REPOST": "Reposts",
+    "DELETE_NOTIFICATION_HINT": "Long press to delete"
 }

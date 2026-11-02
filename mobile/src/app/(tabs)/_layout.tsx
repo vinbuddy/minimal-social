@@ -19,6 +19,7 @@ export default function TabsLayout() {
     const { t } = useTranslation();
     const { colors } = useTheme();
     const currentUser = useAuthStore((state) => state.currentUser);
+    const hasUnread = !!currentUser?.isNotification;
 
     return (
         <DrawerContainer>
@@ -60,7 +61,26 @@ export default function TabsLayout() {
                     name="notifications"
                     options={{
                         title: t("app:NOTIFICATIONS"),
-                        tabBarIcon: ({ focused }) => <HeartIcon size={24} filled={focused} color={focused ? colors.foreground : colors.default400} />,
+                        tabBarIcon: ({ focused }) => (
+                            <View>
+                                <HeartIcon size={24} filled={focused} color={focused ? colors.foreground : colors.default400} />
+                                {/* The API keeps one unread flag, not a count: a dot, like the web's rail */}
+                                {hasUnread ? (
+                                    <View
+                                        accessibilityLabel={t("app:UNREAD_NOTIFICATIONS")}
+                                        style={{
+                                            position: "absolute",
+                                            top: -1,
+                                            right: -3,
+                                            width: 8,
+                                            height: 8,
+                                            borderRadius: radius.full,
+                                            backgroundColor: colors.danger,
+                                        }}
+                                    />
+                                ) : null}
+                            </View>
+                        ),
                     }}
                 />
                 <Tabs.Screen
