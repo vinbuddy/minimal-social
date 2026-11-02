@@ -1,5 +1,6 @@
 import mongoose, { PopulateOptions } from "mongoose";
 import { BadRequestError, ForbiddenError, NotFoundError } from "../../shared/errors/app-error";
+import cloudinary from "../../shared/configs/cloudinary";
 import { uploadToCloudinary } from "../../shared/helpers/cloudinary";
 import { escapeRegex } from "../../shared/helpers/regex";
 import { USER_MODEL_HIDDEN_FIELDS } from "../users/user.model";
@@ -292,7 +293,13 @@ export async function retractMessage(userId: Id, messageId: Id) {
         throw new BadRequestError("You have already deleted this message");
     }
 
-    await MessageModel.findByIdAndUpdate(message._id, { isRetracted: true });
+    // Unsending removes the content for everyone: it used to stay in the API response behind the flag
+    await MessageModel.findByIdAndUpdate(message._id, { isRetracted: true, content: null, mediaFiles: [], stickerUrl: null, gifUrl: null });
+    await Promise.all(
+        message.mediaFiles.map((file) =>
+            cloudinary.uploader.destroy(file.publicId, { resource_type: file.type === "video" ? "video" : "image" }).catch(() => null)
+        )
+    );
 
     return findPopulatedMessage(message._id);
 }

@@ -6,6 +6,22 @@ import mongoose from "mongoose";
 import MessageModel from "./message.model";
 import { RequestWithUser } from "../../shared/types/request";
 import { getConversationForMember } from "./message.service";
+import { Server } from "socket.io";
+
+/** Puts every connected socket of the participants in the conversation's room, so new rooms get live messages */
+function joinConversationRoom(req: Request, participantIds: mongoose.Types.ObjectId[], conversationId: string) {
+    const io = req.app.get("io") as Server | undefined;
+    participantIds.forEach((id) => io?.in(id.toString()).socketsJoin(conversationId));
+}
+
+/** Theme and emoji changes reach the other participant live */
+async function emitConversationUpdate(req: Request, conversationId: string) {
+    const conversation = await ConversationModel.findById(conversationId)
+        .populate({ path: "participants", select: USER_MODEL_HIDDEN_FIELDS })
+        .populate("theme");
+    (req.app.get("io") as Server | undefined)?.to(conversationId).emit("updateConversation", conversation);
+    return conversation;
+}
 
 export async function createPrivateConversationHandler(_req: Request, res: Response, next: NextFunction) {
     try {
@@ -13,7 +29,12 @@ export async function createPrivateConversationHandler(_req: Request, res: Respo
         const participants = req.body.participants as string[];
         const userId = req.user._id?.toString();
 
-        const participantIds = participants.map((participant) => new mongoose.Types.ObjectId(participant));
+        // A private conversation is you and one other person: anyone could otherwise open one between two others
+        const otherIds = [...new Set((participants ?? []).map(String))].filter((id) => id !== userId);
+        if (otherIds.length !== 1 || !mongoose.isValidObjectId(otherIds[0])) {
+            return res.status(400).json({ message: "A private conversation needs exactly one other participant" });
+        }
+        const participantIds = [new mongoose.Types.ObjectId(userId), new mongoose.Types.ObjectId(otherIds[0])];
 
         // Check if the conversation already exists
         const conversation = await ConversationModel.findOne({
@@ -21,7 +42,7 @@ export async function createPrivateConversationHandler(_req: Request, res: Respo
             participants: {
                 $all: participantIds,
             },
-        }).populate({ path: "participants.user", select: USER_MODEL_HIDDEN_FIELDS });
+        }).populate({ path: "participants", select: USER_MODEL_HIDDEN_FIELDS });
 
         // Check if userId is in hiddenBy of the conversation -> pull userId out of hiddenBy
         const isHidden = conversation?.hiddenBy.includes(new mongoose.Types.ObjectId(userId));
@@ -32,6 +53,7 @@ export async function createPrivateConversationHandler(_req: Request, res: Respo
         }
 
         if (conversation) {
+            joinConversationRoom(req, participantIds, conversation._id.toString());
             return res.status(200).json({
                 message: "Conversation already exists",
                 data: conversation,
@@ -47,6 +69,8 @@ export async function createPrivateConversationHandler(_req: Request, res: Respo
             path: "participants",
             select: USER_MODEL_HIDDEN_FIELDS,
         });
+
+        joinConversationRoom(req, participantIds, String(createdConversation._id));
 
         return res.status(201).json({
             message: "Create conversation successfully",
@@ -257,15 +281,9 @@ export async function changeConversationEmojiHandler(_req: Request, res: Respons
         await getConversationForMember(conversationId, (_req as RequestWithUser).user._id);
         const emoji = req.body.emoji;
 
-        const conversation = await ConversationModel.findByIdAndUpdate(conversationId, {
-            emoji,
-        });
-
-        if (!conversation) {
-            return res.status(404).json({
-                message: "Conversation not found",
-            });
-        }
+        await ConversationModel.findByIdAndUpdate(conversationId, { emoji });
+        // The updated document (it used to return the one before the change)
+        const conversation = await emitConversationUpdate(req, conversationId);
 
         return res.status(200).json({
             message: "Change emoji successfully",
@@ -283,15 +301,8 @@ export async function changeThemeConversationHandler(_req: Request, res: Respons
         await getConversationForMember(conversationId, (_req as RequestWithUser).user._id);
         const themeId = req.body.themeId as string;
 
-        const conversation = await ConversationModel.findByIdAndUpdate(conversationId, {
-            theme: new mongoose.Types.ObjectId(themeId),
-        });
-
-        if (!conversation) {
-            return res.status(404).json({
-                message: "Conversation not found",
-            });
-        }
+        await ConversationModel.findByIdAndUpdate(conversationId, { theme: new mongoose.Types.ObjectId(themeId) });
+        const conversation = await emitConversationUpdate(req, conversationId);
 
         return res.status(200).json({
             message: "Change theme successfully",
