@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import useSWR from "swr";
 
 import { PostList } from "@/components/post/post-list";
+import { ReelGrid } from "@/components/reel/reel-grid";
 import { ActionSheet, ActionSheetOption, Avatar, Button, Divider, Skeleton, Text, toast, UserName } from "@/components/ui";
 import { ENV } from "@/config/env";
 import { confirm } from "@/lib/confirm";
@@ -16,6 +17,7 @@ import { invalidate } from "@/lib/invalidate";
 import { goBack } from "@/lib/navigation";
 import { getErrorMessage } from "@/services/auth";
 import { openConversationWith } from "@/services/chat";
+import { userReelsUrl } from "@/services/reels";
 import { blockUser, unblockUser, userUrl } from "@/services/users";
 import useAuthStore from "@/stores/auth-store";
 import { useFollowStore } from "@/stores/follow-store";
@@ -23,10 +25,10 @@ import { borderWidth, spacing, useTheme } from "@/theme";
 import { IUser } from "@/types/user";
 import { FollowButton } from "./follow-button";
 
-type ProfileTab = "post" | "repost" | "liked";
+type ProfileTab = "post" | "repost" | "reels" | "liked";
 
 /** The web's profile tabs; Liked is only the viewer's own (the API always returns the viewer's likes) */
-const TAB_LABELS: Record<ProfileTab, string> = { post: "post:POST_FEED", repost: "post:POST_REPOSTED", liked: "post:POST_LIKED" };
+const TAB_LABELS: Record<ProfileTab, string> = { post: "post:POST_FEED", repost: "post:POST_REPOSTED", reels: "reel:REELS", liked: "post:POST_LIKED" };
 
 function tabUrl(tab: ProfileTab, userId: string) {
     return tab === "liked" ? "/post/liked" : `/post/user-post?userId=${userId}&type=${tab}`;
@@ -34,7 +36,7 @@ function tabUrl(tab: ProfileTab, userId: string) {
 
 /** A profile, Threads-style: name and avatar side by side, bio, counts, actions, then the user's posts */
 export function ProfileView({ userId, isOwnTab = false }: { userId: string; isOwnTab?: boolean }) {
-    const { t } = useTranslation(["user", "post", "app", "common"]);
+    const { t } = useTranslation(["user", "post", "reel", "app", "common"]);
     const { colors } = useTheme();
     const currentUser = useAuthStore((state) => state.currentUser);
     const setCurrentUser = useAuthStore((state) => state.setCurrentUser);
@@ -105,7 +107,7 @@ export function ProfileView({ userId, isOwnTab = false }: { userId: string; isOw
         ...(!isOwner && user ? [{ label: t(isBlockedByMe ? "USER.UNBLOCK_USER" : "USER.BLOCK_USER"), icon: Ban, destructive: !isBlockedByMe, onPress: toggleBlock }] : []),
     ];
 
-    const tabs: ProfileTab[] = isOwner ? ["post", "repost", "liked"] : ["post", "repost"];
+    const tabs: ProfileTab[] = isOwner ? ["post", "repost", "reels", "liked"] : ["post", "repost", "reels"];
 
     const topBar = (
         <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: spacing[2], minHeight: 48 }}>
@@ -271,7 +273,27 @@ export function ProfileView({ userId, isOwnTab = false }: { userId: string; isOw
     return (
         <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: colors.background }}>
             {topBar}
-            {isBlockedByMe ? header : <PostList key={tab} url={tabUrl(tab, userId)} header={header} />}
+            {isBlockedByMe ? (
+                header
+            ) : tab === "reels" ? (
+                <ReelGrid
+                    key={tab}
+                    url={userReelsUrl(userId)}
+                    header={header}
+                    empty={
+                        <View style={{ alignItems: "center", gap: spacing[3], padding: spacing[12] }}>
+                            <Text color="default500">{t("reel:REEL_EMPTY")}</Text>
+                            {isOwner ? (
+                                <Button variant="bordered" color="default" size="sm" onPress={() => router.push("/reels/create")}>
+                                    {t("reel:REEL_CREATE")}
+                                </Button>
+                            ) : null}
+                        </View>
+                    }
+                />
+            ) : (
+                <PostList key={tab} url={tabUrl(tab, userId)} header={header} />
+            )}
             <ActionSheet isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} options={menuOptions} />
         </SafeAreaView>
     );

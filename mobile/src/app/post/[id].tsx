@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,7 +14,7 @@ import { usePagination } from "@/hooks/use-pagination";
 import { fetcher } from "@/lib/http";
 import { commentsUrl } from "@/services/comments";
 import { spacing, useTheme } from "@/theme";
-import { IComment } from "@/types/comment";
+import { CommentTarget, IComment } from "@/types/comment";
 import { IPost } from "@/types/post";
 
 /** The post, then its comments (newest first, replies on demand), with the comment field pinned at the bottom */
@@ -26,15 +26,20 @@ export default function PostDetailScreen() {
 
     const { data, error, isLoading, mutate } = useSWR<{ data: IPost }>(`/post/${id}`, fetcher);
     const post = data?.data;
-    const comments = usePagination<IComment>(post ? commentsUrl(post._id) : null);
+    const target = useMemo<CommentTarget | null>(
+        () => (post ? { type: "Post", id: post._id, ownerId: post.postBy._id, commentCount: post.commentCount ?? 0 } : null),
+        [post]
+    );
+    const comments = usePagination<IComment>(target ? commentsUrl(target) : null);
 
     const renderComment = useCallback(
-        ({ item }: { item: IComment }) => post ? (
+        ({ item }: { item: IComment }) =>
+            target ? (
                 <View style={{ paddingHorizontal: spacing[4] }}>
-                    <CommentItem comment={item} post={post} onReply={setReplyTo} />
+                    <CommentItem comment={item} target={target} onReply={setReplyTo} />
                 </View>
             ) : null,
-        [post]
+        [target]
     );
 
     return (
@@ -93,7 +98,7 @@ export default function PostDetailScreen() {
                             comments.isLoadingMore && comments.items.length > 0 ? <ActivityIndicator style={{ padding: spacing[4] }} color={colors.default500} /> : undefined
                         }
                     />
-                    <CommentForm post={post} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} autoFocus={focus === "comment"} />
+                    <CommentForm target={target!} replyTo={replyTo} onCancelReply={() => setReplyTo(null)} autoFocus={focus === "comment"} />
                 </KeyboardAvoidingView>
             )}
         </SafeAreaView>

@@ -7,30 +7,28 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MentionSuggestions } from "@/components/mention-suggestions";
 import { Avatar, Button, Divider, Text, toast } from "@/components/ui";
 import { useMentionInput } from "@/hooks/use-mention-input";
+import { adjustCommentCount, commentWebUrl } from "@/lib/comment-target";
 import { invalidate } from "@/lib/invalidate";
 import { getErrorMessage } from "@/services/auth";
 import { commentsUrl, createComment, repliesUrl } from "@/services/comments";
 import { notify } from "@/services/notifications";
 import useAuthStore from "@/stores/auth-store";
-import { usePostStateStore } from "@/stores/post-state-store";
 import { fontFamily, radius, spacing, typography, useTheme } from "@/theme";
-import { IComment } from "@/types/comment";
-import { IPost } from "@/types/post";
+import { CommentTarget, IComment } from "@/types/comment";
 
 type CommentFormProps = {
-    post: IPost;
+    target: CommentTarget;
     replyTo: IComment | null;
     onCancelReply: () => void;
     autoFocus?: boolean;
 };
 
-/** Pinned to the bottom of the post screen, with a "Replying to" banner and @mention suggestions */
-export function CommentForm({ post, replyTo, onCancelReply, autoFocus = false }: CommentFormProps) {
+/** Pinned under a post's or reel's comments, with a "Replying to" banner and @mention suggestions */
+export function CommentForm({ target, replyTo, onCancelReply, autoFocus = false }: CommentFormProps) {
     const { t } = useTranslation(["comment", "app"]);
     const { colors } = useTheme();
     const insets = useSafeAreaInsets();
     const currentUser = useAuthStore((state) => state.currentUser);
-    const patchPost = usePostStateStore((state) => state.patch);
     const inputRef = useRef<ComponentRef<typeof TextInput>>(null);
     const [isSending, setIsSending] = useState(false);
     const mention = useMentionInput();
@@ -46,20 +44,18 @@ export function CommentForm({ post, replyTo, onCancelReply, autoFocus = false }:
         if (!canSend) return;
         setIsSending(true);
         try {
-            const comment = await createComment({ postId: post._id, content: mention.toHtml(), replyTo });
+            const comment = await createComment({ target, content: mention.toHtml(), replyTo });
             mention.reset();
             // Sent: put the keyboard away so the new comment is in view
             inputRef.current?.blur();
             Keyboard.dismiss();
             onCancelReply();
 
-            const current = usePostStateStore.getState().overrides[post._id]?.commentCount ?? post.commentCount ?? 0;
-            patchPost(post._id, { commentCount: current + 1 });
+            adjustCommentCount(target, 1);
             // The new comment, and the reply count on its thread
-            invalidate(commentsUrl(post._id));
+            invalidate(commentsUrl(target));
             if (comment.rootComment) invalidate(repliesUrl(comment.rootComment));
 
-            const url = `/post/${post._id}?commentId=${comment._id}`;
             if (replyTo) {
                 notify(currentUser, {
                     target: comment._id,
@@ -67,16 +63,16 @@ export function CommentForm({ post, replyTo, onCancelReply, autoFocus = false }:
                     action: "comment",
                     message: t("COMMENT_MESSAGE.REPLIED_TO_YOUR_COMMENT"),
                     receivers: [replyTo.commentBy._id],
-                    url: `${url}&rootComment=${comment.rootComment}`,
+                    url: commentWebUrl(target, comment._id, comment.rootComment),
                 });
             } else {
                 notify(currentUser, {
                     target: comment._id,
                     targetType: "Comment",
                     action: "comment",
-                    message: t("COMMENT_MESSAGE.COMMENTED_ON_YOUR_POST"),
-                    receivers: [post.postBy._id],
-                    url,
+                    message: t(target.type === "Post" ? "COMMENT_MESSAGE.COMMENTED_ON_YOUR_POST" : "COMMENT_MESSAGE.COMMENTED_ON_YOUR_REEL"),
+                    receivers: [target.ownerId],
+                    url: commentWebUrl(target, comment._id),
                 });
             }
         } catch (error) {
